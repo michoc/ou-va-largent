@@ -1,0 +1,241 @@
+/* ==========================================================================
+   Où va l'argent public ? — design system inspiré du poster (Le 1 hebdo)
+   Fond crème, typographies éditoriales, palette : bleu État / rose Sécu /
+   ocre Collectivités / gris dette.
+   ========================================================================== */
+
+:root {
+  --bg: #FAF6EF;
+  --ink: #1E2430;
+  --ink-soft: #4A5265;
+  --paper: #FFFFFF;
+  --etat: #3D6FB4;
+  --secu: #D95970;
+  --ct: #D9A441;
+  --dette: #4B4F58;
+  --rule: #E4DCCB;
+  --accent: #C13B55;
+  --serif: Georgia, "Iowan Old Style", "Times New Roman", serif;
+  --sans: "Helvetica Neue", Helvetica, Arial, system-ui, sans-serif;
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  padding: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--sans);
+  font-size: 16px;
+  line-height: 1.5;
+}
+
+/* ---------- entête éditorial ---------- */
+.masthead {
+  border-bottom: 3px solid var(--ink);
+  background:
+    linear-gradient(90deg, var(--etat) 0 25%, var(--secu) 25% 50%,
+                    var(--ct) 50% 75%, var(--dette) 75% 100%) top/100% 6px no-repeat,
+    var(--bg);
+  padding: 34px 20px 22px;
+}
+.masthead-inner { max-width: 1180px; margin: 0 auto; }
+.kicker {
+  font-size: 12px;
+  letter-spacing: .18em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin: 0 0 6px;
+  font-weight: 700;
+}
+h1 {
+  font-family: var(--serif);
+  font-size: clamp(30px, 5vw, 56px);
+  margin: 0 0 10px;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  text-transform: uppercase;
+}
+h1 .hl {
+  background: linear-gradient(transparent 58%, #F5E663 58%, #F5E663 94%, transparent 94%);
+  padding: 0 4px;
+}
+.standfirst {
+  max-width: 860px;
+  margin: 0;
+  color: var(--ink-soft);
+  font-size: 15px;
+  font-style: italic;
+  font-family: var(--serif);
+}
+
+/* bande de totaux — écho de la bande jaune « RECETTES » du poster */
+.statband {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-top: 16px;
+  background: #FAF3A0;
+  border: 1.5px solid #1E2430;
+  border-radius: 999px;
+  padding: 7px 18px;
+  font-size: 14px;
+}
+.statband .stat b { text-transform: uppercase; font-size: 11px; letter-spacing: .06em; margin-right: 4px; }
+.statband .stat-dette b { color: var(--dette); }
+.statband .stat-dep b { color: #D94F26; }
+.statband .stat-eq { font-weight: 800; }
+.statband .stat-year {
+  background: #1E2430; color: #FAF3A0; border-radius: 999px;
+  padding: 2px 10px; font-weight: 800; font-size: 12px;
+}
+
+/* toolbar + mode retraites */
+.toolbar { max-width: 1180px; margin: 8px auto 0; padding: 0 20px; }
+#btn-retraites {
+  font: 700 13px/1.3 var(--sans);
+  background: var(--paper);
+  color: var(--ink);
+  border: 1.5px solid #D64A85;
+  border-radius: 999px;
+  padding: 9px 16px;
+  cursor: pointer;
+  transition: background .15s, color .15s;
+}
+#btn-retraites:hover { background: #FCEDF4; }
+#btn-retraites.active { background: #D64A85; color: #fff; }
+.panel-retraites {
+  display: none;
+  max-width: 1180px;
+  margin: 12px auto 0;
+  padding: 16px 20px;
+  background: #FCEDF4;
+  border: 1.5px solid #D64A85;
+  border-radius: 10px;
+  font-size: 14px;
+  color: var(--ink);
+}
+.panel-retraites.open { display: block; }
+.panel-retraites h3 { font-family: var(--serif); margin: 0 0 8px; font-size: 18px; }
+.panel-retraites .ret-big { font-size: 15px; }
+.panel-retraites table { border-collapse: collapse; margin: 8px 0; }
+.panel-retraites td { border-bottom: 1px dashed #E5B8CD; padding: 4px 18px 4px 0; }
+.panel-retraites td:last-child { font-weight: 700; text-align: right; }
+.panel-retraites .ret-src { font-size: 12px; color: var(--ink-soft); margin-bottom: 0; }
+
+/* ---------- breadcrumb ---------- */
+.breadcrumb {
+  max-width: 1180px;
+  margin: 14px auto 0;
+  padding: 0 20px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex-wrap: wrap;
+  min-height: 36px;
+}
+.crumb {
+  font: 600 13px/1 var(--sans);
+  color: var(--ink);
+  background: var(--paper);
+  border: 1px solid var(--rule);
+  border-radius: 999px;
+  padding: 8px 14px;
+  cursor: pointer;
+  transition: background .15s, border-color .15s;
+}
+.crumb:hover { border-color: var(--ink); }
+.crumb[aria-current="page"] {
+  background: var(--ink);
+  color: var(--bg);
+  border-color: var(--ink);
+  cursor: default;
+}
+.breadcrumb .sep { color: var(--ink-soft); font-size: 12px; padding: 0 2px; }
+
+/* ---------- graphique ---------- */
+main { max-width: 1220px; margin: 0 auto; padding: 6px 12px 8px; }
+#chart {
+  width: 100%;
+  height: 640px;               /* ajusté dynamiquement par app.js */
+  background: var(--paper);
+  border: 1px solid var(--rule);
+  border-radius: 10px;
+  box-shadow: 0 2px 14px rgba(30, 36, 48, .06);
+  transition: opacity .18s ease;
+}
+#chart.switching { opacity: 0; }
+
+.hint {
+  text-align: center;
+  color: var(--ink-soft);
+  font-size: 13px;
+  margin: 10px 0 0;
+}
+.hint kbd {
+  font: 600 11px/1 var(--sans);
+  border: 1px solid var(--rule);
+  border-bottom-width: 2px;
+  border-radius: 4px;
+  padding: 2px 5px;
+  background: var(--paper);
+}
+
+/* ---------- tooltip ECharts (classe injectée) ---------- */
+.sankey-tip {
+  max-width: 340px;
+  white-space: normal !important;
+  font-family: var(--sans);
+}
+.sankey-tip .tip-title {
+  font-family: var(--serif);
+  font-weight: 700;
+  font-size: 14px;
+  margin-bottom: 2px;
+}
+.sankey-tip .tip-value {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--accent);
+  margin-bottom: 4px;
+}
+.sankey-tip .tip-note {
+  font-size: 12px;
+  color: var(--ink-soft);
+  border-top: 1px dashed var(--rule);
+  padding-top: 4px;
+  margin-top: 2px;
+}
+
+/* ---------- méthodologie / footer ---------- */
+.metho {
+  max-width: 1180px;
+  margin: 26px auto 40px;
+  padding: 0 20px;
+  color: var(--ink-soft);
+  font-size: 13px;
+}
+.metho details {
+  background: var(--paper);
+  border: 1px solid var(--rule);
+  border-radius: 8px;
+  padding: 12px 16px;
+}
+.metho summary {
+  cursor: pointer;
+  font-weight: 700;
+  color: var(--ink);
+  font-family: var(--serif);
+  font-size: 15px;
+}
+.metho ul { margin: 10px 0 4px; padding-left: 20px; }
+.metho li { margin-bottom: 6px; }
+.metho .src { font-size: 12px; }
+.credits { margin-top: 14px; font-size: 12px; }
+
+@media (max-width: 720px) {
+  #chart { height: 560px; }
+  .standfirst { font-size: 14px; }
+}

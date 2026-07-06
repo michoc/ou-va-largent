@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Où va l'argent public ? — Recettes et dépenses publiques 2025</title>
+  <meta name="description" content="Infographie interactive : d'où vient l'argent public français et comment il est dépensé (exercice 2025). Données open data — État, Sécurité sociale, collectivités.">
+  <link rel="preconnect" href="https://cdnjs.cloudflare.com">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="masthead">
+    <div class="masthead-inner">
+      <p class="kicker">Grand poster interactif · exercice <span id="exercice">2025</span></p>
+      <h1><span class="hl">Où va l'argent public&nbsp;?</span></h1>
+      <p class="standfirst">
+        Pour comprendre en (presque) un clin d'œil d'où vient l'argent public et comment il est
+        dépensé. Chaque flux est en <strong>milliards d'euros</strong>&nbsp;; les données sont
+        sourcées dans l'open data officielle (État&nbsp;: LOLF&nbsp;· Sécu&nbsp;: LFSS) et le
+        diagramme est <strong>comptablement équilibré</strong>&nbsp;: recettes + dette = dépenses.
+      </p>
+      <div class="statband" id="statband" aria-label="Totaux de l'exercice"></div>
+    </div>
+  </header>
+
+  <nav class="breadcrumb" id="breadcrumb" aria-label="Fil d'ariane">
+    <button class="crumb crumb-root" data-view="__macro__">Vue d'ensemble</button>
+  </nav>
+  <div class="toolbar">
+    <button id="btn-retraites" aria-pressed="false" title="Mettre en lumière tout ce qui finance les retraites">
+      🔎 Mode retraites — 269 Md€ de cotisations, 405 Md€ de pensions
+    </button>
+  </div>
+  <aside id="panel-retraites" class="panel-retraites" aria-live="polite"></aside>
+
+  <main>
+    <div id="chart" role="img" aria-label="Diagramme de Sankey des finances publiques françaises"></div>
+    <p class="hint" id="hint">Cliquez sur une famille de dépenses de l'État ou une branche de la Sécu pour
+      l'éclater en missions, programmes ou catégories. <kbd>Échap</kbd> pour revenir.</p>
+  </main>
+
+  <footer class="metho">
+    <details>
+      <summary>Méthodologie, périmètre &amp; sources</summary>
+      <div id="metho-body"><!-- rempli par app.js depuis meta --></div>
+    </details>
+    <p class="credits">
+      Design inspiré du poster «&nbsp;Où va l'argent public&nbsp;?&nbsp;» (<em>Le&nbsp;1 hebdo</em> n°569,
+      C.&nbsp;Alet &amp; C.&nbsp;Martha, avec F.&nbsp;Ecalle/Fipeco). Données&nbsp;: data.economie.gouv.fr,
+      data.gouv.fr, PLFSS (open data Assemblée nationale) — Licence Ouverte 2.0.
+      Code&nbsp;: MIT. Généré le <span id="generated-at">…</span>.
+    </p>
+  </footer>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/echarts/5.5.0/echarts.min.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
