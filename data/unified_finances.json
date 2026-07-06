@@ -2,7 +2,7 @@
  "meta": {
   "exercice": 2025,
   "unit": "Md€",
-  "generated_at": "2026-07-05T22:15:02+00:00",
+  "generated_at": "2026-07-05T23:14:49+00:00",
   "sources": {
    "etat_depenses": "plf25-depenses-2025-selon-destination (PLF (crédits demandés))",
    "etat_recettes": "plf25-recettes-du-budget-general + Voies & moyens (partages TVA/PSR, cf. data/reference)",

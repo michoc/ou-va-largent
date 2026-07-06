@@ -1,27 +1,30 @@
 /* ==========================================================================
  * Où va l'argent public ? — Sankey ECharts façon « poster »
  * --------------------------------------------------------------------------
- * - Vue macro VERTICALE (recettes → administrations → dépenses).
- * - Navigation en profondeur illimitée : famille → missions → programmes →
- *   dispositifs (CNRS, AAH, dissuasion…), chaque niveau ayant son entrée
- *   dans DATA.drill ; pile de vues + breadcrumb cliquable.
- * - Mode « Retraites » : Sankey dédié à 3 étages (financements → régimes →
- *   405 Md€ de pensions), structure iFRAP recalée 2025.
+ * - Vue d'ensemble VERTICALE (recettes → administrations → dépenses).
+ * - Clic sur un nœud : ZOOM en place sur ses flux (détail missions →
+ *   programmes → dispositifs), avec animation « on ne quitte jamais le
+ *   diagramme » ; pile de vues + breadcrumb cliquable, Échap/clic-fond pour
+ *   dézoomer.
+ * - Étage « pensions » PERMANENT sous le diagramme principal : d'où viennent
+ *   les 405 Md€ de pensions (tous régimes, nomenclature COR juin 2025), avec
+ *   les flux de chaque ministère (CAS Pensions) et de chaque financeur.
  * ========================================================================== */
 
 (function () {
   "use strict";
 
   const chartEl = document.getElementById("chart");
+  const pensEl = document.getElementById("chart-pensions");
   const crumbEl = document.getElementById("breadcrumb");
   const statEl = document.getElementById("statband");
-  const retBtn = document.getElementById("btn-retraites");
   const retPanel = document.getElementById("panel-retraites");
   const chart = echarts.init(chartEl, null, { renderer: "canvas" });
+  const chartPensions = pensEl ? echarts.init(pensEl, null, { renderer: "canvas" }) : null;
 
   let DATA = null;
-  let viewStack = [];          // [] = macro ; sinon [{key,label}, …]
-  let retraitesMode = false;
+  let viewStack = [];          // [] = vue d'ensemble ; sinon [{key,label}, …]
+  let zoomOrigin = null;       // point de clic (px) pour l'origine du zoom
 
   const DETTE_NAMES = ["Émission de dette (Déficit)", "Déficit résiduel (dette sociale)"];
 
@@ -71,6 +74,7 @@
       const v = nodeValue(links, n.name);
       const isDette = DETTE_NAMES.includes(n.name) || n.color === "#FFFFFF";
       const short = shortLabel(n.name);
+      const drillable = !!(DATA.drill && DATA.drill[n.name]) && !opts.noDrill;
       return {
         name: n.name,
         depth: n.col != null ? n.col : n.depth,
@@ -101,7 +105,7 @@
             : "right",
         },
         _tooltip: n.tooltip || "",
-        _drillable: !!(DATA.drill && DATA.drill[n.name]) && !opts.noDrill,
+        _drillable: drillable,
       };
     });
 
@@ -117,7 +121,7 @@
           }
           const meta = nodeMeta[p.name] || {};
           let note = meta.tooltip || "";
-          if (p.data._drillable) note += (note ? " " : "") + "➜ Cliquer pour éclater ce nœud.";
+          if (p.data._drillable) note += (note ? " " : "") + "➜ Cliquer pour zoomer sur ce nœud.";
           return tooltipHtml(p.name, nodeValue(links, p.name), note);
         },
       },
@@ -155,23 +159,6 @@
     chart.setOption(buildOption(DATA.nodes, DATA.links,
       { vertical: true, lastCol: lastCol(DATA.nodes) }), true);
     renderBreadcrumb();
-    retPanel.classList.remove("open");
-  }
-
-  function renderRetraites() {
-    viewStack = [];
-    const v = DATA.retraites_view;
-    // Vertical façon poster : les financeurs (CAS Pensions ministériels, cotisations,
-    // ITAF, transferts…) forment le 1er étage en haut, ruissellent vers les régimes
-    // (2e étage) puis convergent vers « Retraites 405 Md€ », 3e étage tout en bas —
-    // dans la continuité du poster macro (recettes → administrations → dépenses).
-    chartEl.style.height = Math.max(940, Math.min(1180, window.innerWidth * 0.78)) + "px";
-    chart.resize();
-    chart.setOption(buildOption(v.nodes, v.links,
-      { vertical: true, lastCol: lastCol(v.nodes), noDrill: true,
-        labelMin: 1.5, labelWidth: 96, nodeGap: 30, left: 150, right: 205 }), true);
-    renderBreadcrumb();
-    retPanel.classList.add("open");
   }
 
   function renderDrill() {
@@ -181,18 +168,45 @@
     chart.resize();
     chart.setOption(buildOption(d.nodes, d.links, { vertical: false }), true);
     renderBreadcrumb();
-    retPanel.classList.remove("open");
+  }
+
+  // Étage « pensions » permanent (tous régimes, ~405 Md€) — vue verticale façon
+  // poster : financeurs (ministères CAS Pensions + sources) → régimes → 405.
+  function renderPensions() {
+    if (!chartPensions || !DATA.retraites_view) { if (pensEl) pensEl.style.display = "none"; return; }
+    const v = DATA.retraites_view;
+    pensEl.style.height = Math.max(940, Math.min(1180, window.innerWidth * 0.78)) + "px";
+    chartPensions.resize();
+    chartPensions.setOption(buildOption(v.nodes, v.links,
+      { vertical: true, lastCol: lastCol(v.nodes), noDrill: true,
+        labelMin: 1.5, labelWidth: 96, nodeGap: 30, left: 150, right: 205 }), true);
   }
 
   function currentRender() {
     if (viewStack.length) renderDrill();
-    else if (retraitesMode) renderRetraites();
     else renderMacro();
   }
 
-  function switchView(fn) {
-    chartEl.classList.add("switching");
-    setTimeout(() => { fn(); chartEl.classList.remove("switching"); }, 160);
+  /* ---------------- transition « zoom » ---------------- */
+  // dir "in"  : on plonge dans le nœud cliqué (l'ancienne vue grossit & disparaît,
+  //             la nouvelle apparaît depuis un état réduit) ;
+  // dir "out" : on prend du recul (effet inverse).
+  function zoom(fn, dir) {
+    if (zoomOrigin) {
+      chartEl.style.transformOrigin = zoomOrigin.x + "px " + zoomOrigin.y + "px";
+    } else {
+      chartEl.style.transformOrigin = "50% 40%";
+    }
+    chartEl.classList.remove("zoom-enter-in", "zoom-enter-out");
+    chartEl.classList.add(dir === "in" ? "zoom-exit-in" : "zoom-exit-out");
+    setTimeout(() => {
+      fn();
+      chartEl.classList.remove("zoom-exit-in", "zoom-exit-out");
+      chartEl.classList.add(dir === "in" ? "zoom-enter-in" : "zoom-enter-out");
+      void chartEl.offsetWidth;                 // reflow → l'anim part de l'état réduit/agrandi
+      chartEl.classList.remove("zoom-enter-in", "zoom-enter-out");
+      zoomOrigin = null;
+    }, 190);
   }
 
   /* ---------------- breadcrumb (pile de vues) ---------------- */
@@ -207,25 +221,17 @@
       else b.addEventListener("click", onclick);
       return b;
     };
-    const rootLabel = retraitesMode && !viewStack.length ? "Vue d'ensemble" : "Vue d'ensemble";
-    crumbEl.appendChild(mk(rootLabel, !viewStack.length && !retraitesMode, () => {
-      retraitesMode = false; retBtn.classList.remove("active");
-      switchView(renderMacro);
+    crumbEl.appendChild(mk("Vue d'ensemble", !viewStack.length, () => {
+      zoomOrigin = null; viewStack = []; zoom(renderMacro, "out");
     }));
-    if (retraitesMode && !viewStack.length) {
-      const sep = document.createElement("span"); sep.className = "sep"; sep.textContent = "›";
-      crumbEl.appendChild(sep);
-      crumbEl.appendChild(mk("Retraites : qui paie les 405 Md€ ?", true, null));
-    }
     viewStack.forEach((v, i) => {
       const sep = document.createElement("span"); sep.className = "sep"; sep.textContent = "›";
       crumbEl.appendChild(sep);
       crumbEl.appendChild(mk(v.label, i === viewStack.length - 1, () => {
         viewStack = viewStack.slice(0, i + 1);
-        switchView(renderDrill);
+        zoomOrigin = null; zoom(renderDrill, "out");
       }));
     });
-    retBtn.style.display = viewStack.length ? "none" : "";
   }
 
   /* ---------------- bande de chiffres ---------------- */
@@ -240,11 +246,11 @@
       '<span class="stat-year">' + meta.exercice + "</span>";
   }
 
-  /* ---------------- panneau retraites ---------------- */
+  /* ---------------- panneau pensions (explication) ---------------- */
 
   function renderRetraitesPanel(meta) {
     const r = meta.retraites;
-    if (!r) { retBtn.style.display = "none"; return; }
+    if (!r || !retPanel) { if (retPanel) retPanel.style.display = "none"; return; }
     const f = r.ifrap || {};
     const rows = Object.entries(r.contributions_par_mission || {})
       .sort((a, b) => b[1] - a[1])
@@ -254,7 +260,7 @@
       "<h3>Qui paie les 405 Md€ de retraites ?</h3>" +
       '<p class="ret-big"><b>' + fmt0(r.cotisations_directes) + " Md€</b> de cotisations (au taux du privé) pour <b>" +
       fmt0(r.pensions_versees) + " Md€</b> de pensions : <b>" + fmt0(r.ecart) + " Md€</b> financés autrement.</p>" +
-      "<p>Le poster ci-dessous décompose ces ressources selon la nomenclature du <b>COR (rapport juin 2025)</b> : " +
+      "<p>Le diagramme ci-dessus décompose ces ressources selon la nomenclature du <b>COR (rapport juin 2025)</b> : " +
       "cotisations ≈ 65 %, contributions de l'État employeur ≈ 12 % (<b>" + fmt0(f.surcotisations_fp_total || 52.9) +
       " Md€</b> : État " + fmt0(f.fpe || 39.5) + ", opérateurs " + fmt0(f.operateurs || 4.6) + ", CNRACL " +
       fmt0(f.cnracl || 8.8) + "), impôts &amp; taxes affectés ≈ 15 % (" + fmt0(f.itaf || 56.6) + " Md€), " +
@@ -266,14 +272,6 @@
       "<table>" + rows + "</table>" +
       '<p class="ret-src">Sources : COR (rapport juin 2025), iFRAP (fév. 2025), PLFSS 2026 — détail dans data/reference/retraites_2025.json.</p>';
   }
-
-  retBtn.addEventListener("click", () => {
-    retraitesMode = !retraitesMode;
-    retBtn.classList.toggle("active", retraitesMode);
-    retBtn.setAttribute("aria-pressed", retraitesMode ? "true" : "false");
-    viewStack = [];
-    switchView(currentRender);
-  });
 
   /* ---------------- méthodologie ---------------- */
 
@@ -299,21 +297,31 @@
 
   chart.on("click", (p) => {
     if (p.dataType !== "node") return;
-    if (DATA.drill && DATA.drill[p.name] && !(retraitesMode && !viewStack.length)) {
-      if (!viewStack.length) retraitesMode = false;
+    if (DATA.drill && DATA.drill[p.name]) {
+      zoomOrigin = (p.event && p.event.event)
+        ? { x: p.event.event.zrX != null ? p.event.event.zrX : p.event.offsetX,
+            y: p.event.event.zrY != null ? p.event.event.zrY : p.event.offsetY }
+        : null;
       viewStack.push({ key: p.name, label: shortLabel(p.name) });
-      switchView(renderDrill);
+      zoom(renderDrill, "in");
     }
   });
   document.addEventListener("keydown", (e) => {
-    if (e.key !== "Escape") return;
-    if (viewStack.length) { viewStack.pop(); switchView(currentRender); }
-    else if (retraitesMode) { retraitesMode = false; retBtn.classList.remove("active"); switchView(renderMacro); }
+    if (e.key !== "Escape" || !viewStack.length) return;
+    viewStack.pop(); zoomOrigin = null; zoom(currentRender, "out");
   });
   chart.getZr().on("click", (e) => {
-    if (!e.target && viewStack.length) { viewStack.pop(); switchView(currentRender); }
+    if (!e.target && viewStack.length) { viewStack.pop(); zoomOrigin = null; zoom(currentRender, "out"); }
   });
-  window.addEventListener("resize", () => { chart.resize(); if (!viewStack.length) currentRender(); });
+  let resizeT = null;
+  window.addEventListener("resize", () => {
+    clearTimeout(resizeT);
+    resizeT = setTimeout(() => {
+      chart.resize();
+      if (chartPensions) renderPensions();
+      if (!viewStack.length) currentRender();
+    }, 120);
+  });
 
   /* ---------------- boot ---------------- */
 
@@ -323,6 +331,7 @@
     renderStatband(json.meta || {});
     renderRetraitesPanel(json.meta || {});
     renderMacro();
+    renderPensions();
   }
 
   if (window.__DATA__) {

@@ -26,18 +26,23 @@
   <nav class="breadcrumb" id="breadcrumb" aria-label="Fil d'ariane">
     <button class="crumb crumb-root" data-view="__macro__">Vue d'ensemble</button>
   </nav>
-  <div class="toolbar">
-    <button id="btn-retraites" aria-pressed="false" title="Mettre en lumière tout ce qui finance les retraites">
-      🔎 Mode retraites — 269 Md€ de cotisations, 405 Md€ de pensions
-    </button>
-  </div>
-  <aside id="panel-retraites" class="panel-retraites" aria-live="polite"></aside>
 
   <main>
     <div id="chart" role="img" aria-label="Diagramme de Sankey des finances publiques françaises"></div>
     <p class="hint" id="hint">Cliquez sur une famille de dépenses de l'État ou une branche de la Sécu pour
-      l'éclater en missions, programmes ou catégories. <kbd>Échap</kbd> pour revenir.</p>
+      <strong>zoomer</strong> dessus et en voir le détail (missions, programmes, dispositifs).
+      <kbd>Échap</kbd> ou clic sur le fond pour dézoomer.</p>
   </main>
+
+  <section class="pensions-section" aria-label="Financement des retraites">
+    <h2 class="pensions-title">Zoom&nbsp;· d'où viennent les <strong>405&nbsp;Md€</strong> de pensions versées chaque année&nbsp;?</h2>
+    <div id="chart-pensions" role="img" aria-label="Décomposition du financement des retraites, tous régimes"></div>
+    <p class="hint pensions-note">Chaque ministère (via le CAS&nbsp;Pensions) et chaque source de financement alimente les
+      régimes, qui versent les 405&nbsp;Md€ de pensions&nbsp;; survolez un flux pour le détail. Périmètre
+      «&nbsp;tous régimes&nbsp;» (COR, rapport juin&nbsp;2025) — il recoupe des recettes du diagramme principal
+      (cotisations, impôts affectés…), qui y sont donc rappelées.</p>
+    <aside id="panel-retraites" class="panel-retraites open" aria-live="polite"></aside>
+  </section>
 
   <footer class="metho">
     <details>
