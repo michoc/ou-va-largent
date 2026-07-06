@@ -15,17 +15,16 @@
   "use strict";
 
   const chartEl = document.getElementById("chart");
-  const pensEl = document.getElementById("chart-pensions");
   const crumbEl = document.getElementById("breadcrumb");
   const statEl = document.getElementById("statband");
   const retPanel = document.getElementById("panel-retraites");
   const chart = echarts.init(chartEl, null, { renderer: "canvas" });
-  const chartPensions = pensEl ? echarts.init(pensEl, null, { renderer: "canvas" }) : null;
 
   let DATA = null;
   let viewStack = [];          // [] = vue d'ensemble ; sinon [{key,label}, …]
   let zoomOrigin = null;       // point de clic (px) pour l'origine du zoom
 
+  const PENS = "Retraites — 405 Md€";
   const DETTE_NAMES = ["Émission de dette (Déficit)", "Déficit résiduel (dette sociale)"];
 
   /* ---------------- utilitaires ---------------- */
@@ -154,32 +153,33 @@
 
   function renderMacro() {
     viewStack = [];
-    chartEl.style.height = Math.max(680, Math.min(860, window.innerWidth * 0.62)) + "px";
+    chartEl.style.height = Math.max(820, Math.min(1080, window.innerWidth * 0.74)) + "px";
     chart.resize();
     chart.setOption(buildOption(DATA.nodes, DATA.links,
       { vertical: true, lastCol: lastCol(DATA.nodes) }), true);
+    retPanel.classList.remove("open");
     renderBreadcrumb();
   }
 
   function renderDrill() {
     const key = viewStack[viewStack.length - 1].key;
     const d = DATA.drill[key];
-    chartEl.style.height = Math.max(560, Math.min(1500, d.nodes.length * 30)) + "px";
-    chart.resize();
-    chart.setOption(buildOption(d.nodes, d.links, { vertical: false }), true);
+    if (key === PENS) {
+      // Zoom sur les retraites : décomposition verticale façon poster (COR juin 2025),
+      // financeurs (ministères CAS Pensions + sources) → régimes → 405.
+      chartEl.style.height = Math.max(940, Math.min(1180, window.innerWidth * 0.78)) + "px";
+      chart.resize();
+      chart.setOption(buildOption(d.nodes, d.links,
+        { vertical: true, lastCol: lastCol(d.nodes), noDrill: true,
+          labelMin: 1.5, labelWidth: 96, nodeGap: 30, left: 150, right: 205 }), true);
+      retPanel.classList.add("open");
+    } else {
+      chartEl.style.height = Math.max(560, Math.min(1500, d.nodes.length * 30)) + "px";
+      chart.resize();
+      chart.setOption(buildOption(d.nodes, d.links, { vertical: false }), true);
+      retPanel.classList.remove("open");
+    }
     renderBreadcrumb();
-  }
-
-  // Étage « pensions » permanent (tous régimes, ~405 Md€) — vue verticale façon
-  // poster : financeurs (ministères CAS Pensions + sources) → régimes → 405.
-  function renderPensions() {
-    if (!chartPensions || !DATA.retraites_view) { if (pensEl) pensEl.style.display = "none"; return; }
-    const v = DATA.retraites_view;
-    pensEl.style.height = Math.max(940, Math.min(1180, window.innerWidth * 0.78)) + "px";
-    chartPensions.resize();
-    chartPensions.setOption(buildOption(v.nodes, v.links,
-      { vertical: true, lastCol: lastCol(v.nodes), noDrill: true,
-        labelMin: 1.5, labelWidth: 96, nodeGap: 30, left: 150, right: 205 }), true);
   }
 
   function currentRender() {
@@ -295,15 +295,22 @@
 
   /* ---------------- événements ---------------- */
 
+  // Zoom sur un nœud OU sur un flux (toute la zone du flux est cliquable).
+  function drillInto(name, p) {
+    if (!DATA.drill || !DATA.drill[name]) return false;
+    zoomOrigin = (p && p.event && p.event.offsetX != null)
+      ? { x: p.event.offsetX, y: p.event.offsetY } : null;
+    viewStack.push({ key: name, label: name === PENS ? "Retraites" : shortLabel(name) });
+    zoom(renderDrill, "in");
+    return true;
+  }
   chart.on("click", (p) => {
-    if (p.dataType !== "node") return;
-    if (DATA.drill && DATA.drill[p.name]) {
-      zoomOrigin = (p.event && p.event.event)
-        ? { x: p.event.event.zrX != null ? p.event.event.zrX : p.event.offsetX,
-            y: p.event.event.zrY != null ? p.event.event.zrY : p.event.offsetY }
-        : null;
-      viewStack.push({ key: p.name, label: shortLabel(p.name) });
-      zoom(renderDrill, "in");
+    if (p.dataType === "node") {
+      drillInto(p.name, p);
+    } else if (p.dataType === "edge" && p.data) {
+      // un flux mène d'une source à une cible : on zoome sur la cible éclatable,
+      // sinon sur la source — pour que toute la bande soit utile.
+      if (!drillInto(p.data.target, p)) drillInto(p.data.source, p);
     }
   });
   document.addEventListener("keydown", (e) => {
@@ -316,11 +323,7 @@
   let resizeT = null;
   window.addEventListener("resize", () => {
     clearTimeout(resizeT);
-    resizeT = setTimeout(() => {
-      chart.resize();
-      if (chartPensions) renderPensions();
-      if (!viewStack.length) currentRender();
-    }, 120);
+    resizeT = setTimeout(() => { chart.resize(); if (!viewStack.length) currentRender(); }, 120);
   });
 
   /* ---------------- boot ---------------- */
@@ -331,13 +334,12 @@
     renderStatband(json.meta || {});
     renderRetraitesPanel(json.meta || {});
     renderMacro();
-    renderPensions();
   }
 
   if (window.__DATA__) {
     boot(window.__DATA__);
   } else {
-    fetch("data/unified_finances.json")
+    fetch("data/unified_finances.json", { cache: "no-cache" })
       .then((r) => { if (!r.ok) throw new Error("HTTP " + r.status); return r.json(); })
       .then(boot)
       .catch((err) => {
