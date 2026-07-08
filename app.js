@@ -41,11 +41,11 @@
   const PENS = "Pensions versées — 405 Md€";
   const DETTE_NAMES = ["Émission de dette (Déficit)", "Déficit résiduel (dette sociale)"];
   // nœuds de la voie retraites (bord gauche) — pastilles rentrées sur mobile
-  const LANE_NODES = {
-    "Cotisations retraites (tous régimes)": 1,
+  const LANE_NODES = {   // valeur = sens du décalage mobile (vers l'intérieur)
     "Système de retraites (tous régimes)": 1,
     "Régimes de base & complémentaires": 1,
     "Pensions versées — 405 Md€": 1,
+    "É · Autres missions": -1,          // agrégat mobile collé au bord droit
   };
   const REDUCED_MOTION = window.matchMedia &&
     window.matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -133,10 +133,10 @@
    */
   const MACRO_COL0 = [
     "Cotisations retraites (tous régimes)", "Unédic (assurance chômage)",
-    "CSG · CRDS", "Impôts et taxes affectés (Sécu)", "Cotisations sociales",
-    "Autres recettes Sécu", "Émission de dette (Déficit)",
+    "CSG · CRDS", "Impôts et taxes affectés (Sécu)", "Taxes affectées & transferts",
+    "Cotisations sociales", "Autres recettes Sécu", "Émission de dette (Déficit)",
     "TVA", "Impôt sur le revenu", "Impôt sur les sociétés", "Autres impôts d'État",
-    "Recettes non fiscales",
+    "Recettes non fiscales", "Autres impôts & recettes",
   ];
   function macroSorted(nodes) {
     const rank = (n, i) => {
@@ -207,7 +207,9 @@
         }
         // voie retraites collée au bord gauche : sur écran étroit, on rentre
         // les pastilles vers l'intérieur pour qu'elles ne soient pas rognées.
-        if (opts.laneNudge && LANE_NODES[n.name]) offset = [offset[0] + opts.laneNudge, offset[1]];
+        if (opts.laneNudge && LANE_NODES[n.name]) {
+          offset = [offset[0] + opts.laneNudge * LANE_NODES[n.name], offset[1]];
+        }
       }
       return {
         name: n.name,
@@ -289,22 +291,75 @@
 
   /* ---------------- vues ---------------- */
 
+  /* Vue d'ensemble MOBILE : le poster complet est illisible à 390 px — on
+   * regroupe les petits nœuds en agrégats (recettes diverses, petites familles
+   * de missions, petites branches) pour ne garder que l'histoire principale.
+   * Les agrégats ne sont pas plongeables ; leur composition est au tap. */
+  const MOBILE_GROUPS = {
+    "Impôt sur les sociétés": "Autres impôts & recettes",
+    "Autres impôts d'État": "Autres impôts & recettes",
+    "Recettes non fiscales": "Autres impôts & recettes",
+    "Impôts et taxes affectés (Sécu)": "Taxes affectées & transferts",
+    "Autres recettes Sécu": "Taxes affectées & transferts",
+    "Unédic (assurance chômage)": "Taxes affectées & transferts",
+    "É · Écologie, territoires & agriculture": "É · Autres missions",
+    "É · Économie & investissements d'avenir": "É · Autres missions",
+    "É · Administration & autres missions": "É · Autres missions",
+    "É · Culture, médias, sport": "É · Autres missions",
+    "Famille": "Autres branches Sécu",
+    "Autonomie": "Autres branches Sécu",
+    "Accidents du travail": "Autres branches Sécu",
+  };
+  const MOBILE_GROUP_NODES = [
+    { name: "Autres impôts & recettes", col: 0, color: "#7B68B5",
+      tooltip: "Regroupé sur mobile : impôt sur les sociétés, autres impôts d'État (TICPE, successions…), recettes non fiscales." },
+    { name: "Taxes affectées & transferts", col: 0, color: "#7E6BB8",
+      tooltip: "Regroupé sur mobile : impôts et taxes affectés à la Sécu, autres recettes des régimes, transfert Unédic. Une part descend vers les retraites (taxes affectées à la vieillesse)." },
+    { name: "É · Autres missions", col: 2, color: "#E5A07A",
+      tooltip: "Regroupé sur mobile : Écologie & territoires, Économie & investissements, Administration, Culture & sport. Détail sur grand écran." },
+    { name: "Autres branches Sécu", col: 2, color: "#F2A9C4",
+      tooltip: "Regroupé sur mobile : Famille, Autonomie, Accidents du travail. Détail sur grand écran." },
+  ];
+  function mobileAggregate(nodes, links) {
+    const gnames = new Set(MOBILE_GROUP_NODES.map((n) => n.name));
+    const outNodes = nodes.filter((n) => !MOBILE_GROUPS[n.name])
+      .concat(MOBILE_GROUP_NODES);
+    const merged = {};
+    for (const l of links) {
+      const s = MOBILE_GROUPS[l.source] || l.source;
+      const t = MOBILE_GROUPS[l.target] || l.target;
+      if (s === t) continue;
+      const k = s + "→" + t + (l.cas ? "|c" : "") + (l.est ? "|e" : "");
+      if (!merged[k]) {
+        merged[k] = { source: s, target: t, value: 0 };
+        if (l.cas) merged[k].cas = true;
+        if (l.est) merged[k].est = true;
+        if (l.tooltip && !gnames.has(s) && !gnames.has(t)) merged[k].tooltip = l.tooltip;
+      }
+      merged[k].value = Math.round((merged[k].value + l.value) * 100) / 100;
+    }
+    return { nodes: outNodes, links: Object.values(merged) };
+  }
+
   function renderMacro() {
     viewStack = [];
-    // Mobile : poster nettement plus HAUT (l'écran étroit se rattrape en
-    // vertical) et seuls les GRANDS nœuds portent une pastille (le reste au
-    // tap) — à 390 px, dix pastilles par rangée se chevauchent inévitablement.
+    // Mobile : poster plus HAUT + vue AGRÉGÉE (cf. mobileAggregate).
     const narrow = window.innerWidth < 700;
     chartEl.style.height = (narrow
       ? Math.max(1000, Math.round(window.innerHeight * 1.25))
       : Math.max(820, Math.min(1080, window.innerWidth * 0.74))) + "px";
     chart.resize();
-    const nodes = macroSorted(DATA.nodes);
-    chart.setOption(buildOption(nodes, DATA.links,
-      { lastCol: lastCol(nodes), iterations: 0, top: narrow ? 104 : 88,
-        wrapChars: narrow ? 11 : 14, labelMin: narrow ? 110 : undefined,
+    let nodes = macroSorted(DATA.nodes), links = DATA.links;
+    if (narrow) {
+      const agg = mobileAggregate(nodes, links);
+      nodes = macroSorted(agg.nodes);
+      links = agg.links;
+    }
+    chart.setOption(buildOption(nodes, links,
+      { lastCol: lastCol(nodes), iterations: 0, top: narrow ? 122 : 88,
+        wrapChars: narrow ? 11 : 14, labelMin: narrow ? 58 : undefined,
         left: narrow ? 8 : 16, right: narrow ? 8 : 22,
-        stagger: narrow ? 42 : 28, laneNudge: narrow ? 46 : 0 }), true);
+        stagger: narrow ? 42 : 28, laneNudge: narrow ? 30 : 0 }), true);
     retPanel.classList.remove("open");
     casLegendEl.hidden = true;
     histoEl.hidden = true;
@@ -580,12 +635,13 @@
       "<p>Le <strong>compte d'affectation spéciale « Pensions »</strong> (créé par la LOLF, en " +
       "vigueur depuis 2006) encaisse les cotisations des fonctionnaires de l'État et les " +
       "« contributions employeur » des ministères, et verse leurs pensions. Comme il doit être " +
-      "équilibré en permanence, le taux de contribution employeur a été relevé de façon " +
-      "continue de 2006 à 2013 pour combler le déséquilibre démographique&nbsp;— civils " +
-      "(en % du traitement indiciaire)&nbsp;: <strong>49,9&nbsp;% (2006)</strong> · 55,71 (2008) " +
-      "· 62,14 (2010) · 68,59 (2012) · <strong>74,28&nbsp;% depuis 2013</strong>, stable depuis, " +
-      "y compris en 2026 (militaires&nbsp;: 100&nbsp;% → <strong>126,07&nbsp;%</strong>) — à " +
-      "comparer aux ≈ 16,5&nbsp;% de cotisation retraite employeur du privé. Cette hausse est une " +
+      "équilibré en permanence, le taux de contribution employeur des civils (en % du " +
+      "traitement indiciaire) est relevé à mesure que le déséquilibre se creuse&nbsp;: " +
+      "<strong>49,9&nbsp;% (2006)</strong> · 55,71 (2008) · 62,14 (2010) · 68,59 (2012) · " +
+      "74,28&nbsp;% (2013-2024) · <strong>78,28&nbsp;% (2025, décret n°&nbsp;2025-61)</strong> · " +
+      "<strong>82,28&nbsp;% (2026, décret n°&nbsp;2025-1341)</strong> — militaires&nbsp;: " +
+      "100&nbsp;% → <strong>126,07&nbsp;%</strong> (inchangé depuis 2013) — à comparer aux " +
+      "≈ 16,5&nbsp;% de cotisation retraite employeur du privé. Cette hausse est une " +
       "<strong>subvention d'équilibre du système de retraites prélevée sur le budget de chaque " +
       "ministère</strong>&nbsp;: ce n'est <strong>ni une augmentation du salaire des " +
       "fonctionnaires, ni une ouverture de droits supplémentaires</strong> — la retenue payée " +
@@ -606,7 +662,7 @@
       "&nbsp;· Recettes&nbsp;: " + esc(src.etat_recettes || "") +
       "&nbsp;· Sécu&nbsp;: " + esc(src.secu || "") +
       "&nbsp;· CAS Pensions&nbsp;: recettes par ligne, PLF 2024 (data.economie.gouv.fr) ; taux " +
-      "de contribution&nbsp;: décrets 2012-1507/1508.</p>" +
+      "de contribution&nbsp;: décrets 2012-1507/1508, 2025-61, 2025-1341.</p>" +
       (meta.seed ? '<p class="src">⚠ ' + esc(meta.seed_note || "") + "</p>" : "");
   }
 
