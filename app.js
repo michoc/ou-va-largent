@@ -546,6 +546,54 @@
     });
     svg += "</svg>";
 
+    // — « Où va chaque hausse annuelle ? » : barres divergentes ΔCAS (gris)
+    //   vs Δ moyens hors retraites (beige au-dessus, ROUGE sous l'axe quand la
+    //   hausse du CAS dépasse celle du budget → de facto moins de moyens) —
+    let svg2 = "";
+    if (hasCas && years.length >= 3) {
+      const pairs = [];
+      for (let i = 1; i < years.length; i++) {
+        const ya = years[i - 1], yb = years[i];
+        if (cas[ya] == null || cas[yb] == null) continue;
+        const dTot = serie.cp[yb] - serie.cp[ya];
+        const dCasY = cas[yb] - cas[ya];
+        pairs.push({ y: yb, dCas: dCasY, dReste: dTot - dCasY });
+      }
+      if (pairs.length >= 2) {
+        const bw2 = 30, gap2 = 12, pad2 = 4;
+        const mAbs = Math.max.apply(null, pairs.map((p) =>
+          Math.max(Math.max(p.dCas, 0) + Math.max(p.dReste, 0),
+                   Math.abs(Math.min(p.dReste, 0)), Math.abs(p.dCas))));
+        const sc = 52 / Math.max(mAbs, 0.1);          // px par Md€
+        const axisY = 72;                              // ligne du zéro
+        const W2 = pairs.length * (bw2 + gap2) - gap2 + pad2 * 2;
+        svg2 = '<svg width="' + W2 + '" height="116" viewBox="0 0 ' + W2 + ' 116" role="img"' +
+               ' aria-label="Décomposition de la hausse annuelle : retraites contre moyens">' +
+               '<text x="' + (W2 / 2) + '" y="10" text-anchor="middle" class="axis-year">' +
+               "hausse annuelle : CAS (gris) vs moyens</text>";
+        pairs.forEach((p, i) => {
+          const x = pad2 + i * (bw2 + gap2);
+          const hCas = Math.abs(p.dCas) * sc;
+          svg2 += '<rect class="bar-cas" x="' + x + '" y="' +
+                  (p.dCas >= 0 ? axisY - hCas : axisY) + '" width="' + bw2 +
+                  '" height="' + Math.max(hCas, 1) + '" rx="2"></rect>';
+          const hR = Math.abs(p.dReste) * sc;
+          if (p.dReste >= 0) {  // moyens en hausse : beige, empilé au-dessus du gris
+            svg2 += '<rect class="bar-total" x="' + x + '" y="' +
+                    (axisY - Math.max(p.dCas, 0) * sc - hR) + '" width="' + bw2 +
+                    '" height="' + Math.max(hR, 1) + '" rx="2"></rect>';
+          } else {              // moyens en RECUL : rouge, sous l'axe
+            svg2 += '<rect class="bar-neg" x="' + x + '" y="' + axisY + '" width="' + bw2 +
+                    '" height="' + Math.max(hR, 2) + '" rx="2"></rect>';
+          }
+          svg2 += '<text class="axis-year" x="' + (x + bw2 / 2) + '" y="110" ' +
+                  'text-anchor="middle">' + p.y + "</text>";
+        });
+        svg2 += '<line x1="0" y1="' + axisY + '" x2="' + W2 + '" y2="' + axisY +
+                '" stroke="#1E2430" stroke-width="1"></line></svg>';
+      }
+    }
+
     // — l'addition qui résume la période (formulations selon le signe) —
     const dCp = serie.cp[y1] - serie.cp[y0];
     const pct = Math.round((dCp / serie.cp[y0]) * 100);
@@ -556,8 +604,8 @@
       const dCas = cas[y1] - cas[y0];
       const part = dCp > 0 && dCas > 0 ? Math.round((dCas / dCp) * 100) : null;
       if (dCas >= 0.05) {
-        punch += " — dont <b>≈ " + fmt0(dCas) + " Md€</b> de contributions retraites en plus " +
-                 "(CAS Pensions)" + (part != null && part > 0 && part <= 100
+        punch += " — dont <b>≈ " + fmt0(dCas) + " Md€</b> absorbés par la hausse des " +
+                 "contributions retraites (CAS Pensions)" + (part != null && part > 0 && part <= 100
                  ? ", soit <b>" + part + " %</b> de la hausse" : "") + ".";
       } else if (dCas <= -0.05) {
         punch += " — la part retraites (CAS Pensions) a, elle, baissé de <b>≈ " +
@@ -565,19 +613,33 @@
       } else {
         punch += " — la part retraites (CAS Pensions) est restée stable.";
       }
+      // ⚠ le moment-clé : la dernière hausse du CAS dépasse celle du budget
+      const yPrev = years[years.length - 2];
+      if (yPrev && cas[yPrev] != null) {
+        const dL = serie.cp[y1] - serie.cp[yPrev], dCL = cas[y1] - cas[yPrev];
+        if (dCL > 0.02 && dCL > dL) {
+          punch += ' <span class="histo-alert">⚠ En ' + y1 + ", la hausse des contributions " +
+                   "retraites (+" + fmt0(dCL) + " Md€, taux relevé à 78,28 %) dépasse celle " +
+                   "du budget (" + (dL >= 0 ? "+" : "−") + fmt0(Math.abs(dL)) +
+                   ") : les moyens hors retraites reculent.</span>";
+        }
+      }
     } else {
       punch += ".";
     }
     let noteOp = "";
     if (serie.op25) {
-      noteOp = " Hors part payée par les opérateurs financés (≈ " + fmt0(serie.op25) +
-               " Md€ en 2025, estimation — hachures du diagramme).";
+      const surcout = serie.op25 * 4 / 78.28;
+      noteOp = " Opérateurs financés : ≈ " + fmt0(serie.op25) + " Md€ versés au CAS en 2025 " +
+               "(estimation, hachures) — le relèvement du taux leur coûte ≈ " + fmt0(surcout) +
+               " Md€ de plus, non compensés dans l'enseignement supérieur (Sénat, PLF 2025).";
     }
     histoEl.innerHTML =
       '<div class="histo-text"><h3>Évolution du budget ' + y0 + " → " + y1 + "</h3>" +
       '<p class="histo-punch">' + punch + "</p>" +
       '<p class="histo-note">Crédits de paiement votés (LFI ; 2024 : PLF), budget général. ' +
-      esc(H.note_cas || "") + esc(noteOp) + "</p></div>" + svg;
+      esc(H.note_cas || "") + esc(noteOp) + "</p></div>" +
+      '<div class="histo-charts">' + svg + svg2 + "</div>";
     histoEl.hidden = false;
   }
 

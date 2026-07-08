@@ -2,7 +2,7 @@
  "meta": {
   "exercice": 2025,
   "unit": "Md€",
-  "generated_at": "2026-07-08T21:50:19+00:00",
+  "generated_at": "2026-07-08T23:07:02+00:00",
   "sources": {
    "etat_depenses": "plf25-depenses-2025-selon-destination (PLF (crédits demandés))",
    "etat_recettes": "plf25-recettes-du-budget-general + Voies & moyens (partages TVA/PSR, cf. data/reference)",
@@ -444,38 +444,38 @@
   {
    "source": "É · Enseignement & recherche",
    "target": "Pensions versées — 405 Md€",
-   "value": 23.76,
-   "tooltip": "Subvention d'équilibre prélevée sur les budgets de « Enseignement & recherche » pour le système de retraites (part au-delà du taux du privé, déjà comprise dans ses crédits) : Éducation nationale 20,4 · opérateurs (est,) 3,2 · Enseignement sup, & recherche (ESR) 0,2. La contribution totale au CAS Pensions, plus large, est grisée dans les plongées."
+   "value": 24.28,
+   "tooltip": "Subvention d'équilibre prélevée sur les budgets de « Enseignement & recherche » pour le système de retraites (part au-delà du taux du privé, déjà comprise dans ses crédits) : Éducation nationale 20,4 · opérateurs (est,) 3,7 · Enseignement sup, & recherche (ESR) 0,2. La contribution totale au CAS Pensions, plus large, est grisée dans les plongées."
   },
   {
    "source": "É · Défense, sécurité, justice",
    "target": "Pensions versées — 405 Md€",
-   "value": 14.25,
+   "value": 14.19,
    "tooltip": "Subvention d'équilibre prélevée sur les budgets de « Défense, sécurité, justice » pour le système de retraites (part au-delà du taux du privé, déjà comprise dans ses crédits) : Défense 6,7 · Police, gendarmerie & sécurité civile 5,6 · Justice 1,8 · opérateurs (est,) 0,1. La contribution totale au CAS Pensions, plus large, est grisée dans les plongées."
   },
   {
    "source": "É · Solidarités, travail & santé",
    "target": "Pensions versées — 405 Md€",
-   "value": 8.62,
-   "tooltip": "Subvention d'équilibre prélevée sur les budgets de « Solidarités, travail & santé » pour le système de retraites (part au-delà du taux du privé, déjà comprise dans ses crédits) : subventions aux régimes spéciaux (SNCF, RATP…) 7,8 · opérateurs (est,) 0,6 · Travail & emploi 0,2. La contribution totale au CAS Pensions, plus large, est grisée dans les plongées."
+   "value": 8.42,
+   "tooltip": "Subvention d'équilibre prélevée sur les budgets de « Solidarités, travail & santé » pour le système de retraites (part au-delà du taux du privé, déjà comprise dans ses crédits) : subventions aux régimes spéciaux (SNCF, RATP…) 7,8 · opérateurs (est,) 0,4 · Travail & emploi 0,2. La contribution totale au CAS Pensions, plus large, est grisée dans les plongées."
   },
   {
    "source": "É · Administration & autres missions",
    "target": "Pensions versées — 405 Md€",
-   "value": 3.24,
-   "tooltip": "Subvention d'équilibre prélevée sur les budgets de « Administration & autres missions » pour le système de retraites (part au-delà du taux du privé, déjà comprise dans ses crédits) : Finances publiques (Bercy) 2,1 · Administration territoriale (Intérieur) 0,7 · Diplomatie (Quai d'Orsay) 0,2 · Conseil et contrôle de l'État 0,1 · opérateurs (est,) 0,1. La contribution totale au CAS Pensions, plus large, est grisée dans les plongées."
+   "value": 3.22,
+   "tooltip": "Subvention d'équilibre prélevée sur les budgets de « Administration & autres missions » pour le système de retraites (part au-delà du taux du privé, déjà comprise dans ses crédits) : Finances publiques (Bercy) 2,1 · Administration territoriale (Intérieur) 0,7 · Diplomatie (Quai d'Orsay) 0,2 · Conseil et contrôle de l'État 0,1 · Services du Premier ministre 0,1. La contribution totale au CAS Pensions, plus large, est grisée dans les plongées."
   },
   {
    "source": "É · Écologie, territoires & agriculture",
    "target": "Pensions versées — 405 Md€",
-   "value": 1.35,
-   "tooltip": "Subvention d'équilibre prélevée sur les budgets de « Écologie, territoires & agriculture » pour le système de retraites (part au-delà du taux du privé, déjà comprise dans ses crédits) : Écologie & transports 0,8 · opérateurs (est,) 0,3 · Agriculture 0,2. La contribution totale au CAS Pensions, plus large, est grisée dans les plongées."
+   "value": 1.22,
+   "tooltip": "Subvention d'équilibre prélevée sur les budgets de « Écologie, territoires & agriculture » pour le système de retraites (part au-delà du taux du privé, déjà comprise dans ses crédits) : Écologie & transports 0,8 · opérateurs (est,) 0,2 · Agriculture 0,2. La contribution totale au CAS Pensions, plus large, est grisée dans les plongées."
   },
   {
    "source": "É · Culture, médias, sport",
    "target": "Pensions versées — 405 Md€",
-   "value": 0.48,
-   "tooltip": "Subvention d'équilibre prélevée sur les budgets de « Culture, médias, sport » pour le système de retraites (part au-delà du taux du privé, déjà comprise dans ses crédits) : opérateurs (est,) 0,3 · Culture 0,2. La contribution totale au CAS Pensions, plus large, est grisée dans les plongées."
+   "value": 0.37,
+   "tooltip": "Subvention d'équilibre prélevée sur les budgets de « Culture, médias, sport » pour le système de retraites (part au-delà du taux du privé, déjà comprise dans ses crédits) : Culture 0,2 · opérateurs (est,) 0,2. La contribution totale au CAS Pensions, plus large, est grisée dans les plongées."
   },
   {
    "source": "É · Économie & investissements d'avenir",
@@ -847,7 +847,7 @@
      "name": "Finances publiques (Bercy)",
      "color": "#E5A07A",
      "depth": 0,
-     "tooltip": "Mission LOLF : « Gestion des finances publiques ». 🔎 Retraites : ≈ 2.58 Md€ de ses crédits (gris uni) partent au CAS Pensions — subvention d'équilibre prélevée sur le budget du ministère pour le système de retraites ; dont ≈ 2.08 Md€ au-delà du taux du privé, la part re-fléchée vers les pensions dans la vue d'ensemble. Taux employeur civils : 74,28 % (2013-2024) → 78,28 % en 2025 → 82,28 % en 2026 (décrets 2025-61 et 2025-1341) ; privé ≈ 16,5 %."
+     "tooltip": "Mission LOLF : « Gestion des finances publiques ». 🔎 Retraites : ≈ 2.58 Md€ de ses crédits (gris uni) partent au CAS Pensions — subvention d'équilibre prélevée sur le budget du ministère pour le système de retraites ; dont ≈ 2.08 Md€ au-delà du taux du privé, la part re-fléchée vers les pensions dans la vue d'ensemble. Taux employeur civils : 74,28 % (2013-2024) → 78,28 % en 2025 → 82,28 % en 2026 (décrets 2025-61 et 2025-1341) ; privé ≈ 16,5 %. 📈 2024→2025 : budget +0,07 Md€ ; contribution CAS +0,08 Md€ — la hausse du CAS DÉPASSE celle du budget : les moyens hors retraites reculent."
     },
     {
      "name": "156 · Gestion fiscale et financière de l'État et du secteur public local",
@@ -1000,7 +1000,7 @@
      "name": "Aide au développement",
      "color": "#E5A07A",
      "depth": 0,
-     "tooltip": "Mission LOLF : « Aide publique au développement ». "
+     "tooltip": "Mission LOLF : « Aide publique au développement ».  📈 2024→2025 : budget -0,78 Md€ ; contribution CAS -0,02 Md€."
     },
     {
      "name": "209 · Solidarité à l'égard des pays en développement",
@@ -1343,7 +1343,7 @@
      "name": "Administration territoriale (Intérieur)",
      "color": "#E5A07A",
      "depth": 0,
-     "tooltip": "Mission LOLF : « Administration générale et territoriale de l'État ». 🔎 Retraites : ≈ 0.85 Md€ de ses crédits (gris uni) partent au CAS Pensions — subvention d'équilibre prélevée sur le budget du ministère pour le système de retraites ; dont ≈ 0.68 Md€ au-delà du taux du privé, la part re-fléchée vers les pensions dans la vue d'ensemble. Taux employeur civils : 74,28 % (2013-2024) → 78,28 % en 2025 → 82,28 % en 2026 (décrets 2025-61 et 2025-1341) ; privé ≈ 16,5 %."
+     "tooltip": "Mission LOLF : « Administration générale et territoriale de l'État ». 🔎 Retraites : ≈ 0.85 Md€ de ses crédits (gris uni) partent au CAS Pensions — subvention d'équilibre prélevée sur le budget du ministère pour le système de retraites ; dont ≈ 0.68 Md€ au-delà du taux du privé, la part re-fléchée vers les pensions dans la vue d'ensemble. Taux employeur civils : 74,28 % (2013-2024) → 78,28 % en 2025 → 82,28 % en 2026 (décrets 2025-61 et 2025-1341) ; privé ≈ 16,5 %. 📈 2024→2025 : budget +0,30 Md€ ; contribution CAS +0,04 Md€ (13 % de la hausse)."
     },
     {
      "name": "354 · Administration territoriale de l'État",
@@ -1529,7 +1529,7 @@
      "name": "Dotations aux collectivités",
      "color": "#E5A07A",
      "depth": 0,
-     "tooltip": "Mission LOLF : « Relations avec les collectivités territoriales ». "
+     "tooltip": "Mission LOLF : « Relations avec les collectivités territoriales ».  📈 2024→2025 : budget -0,22 Md€ ; contribution CAS +0,00 Md€."
     },
     {
      "name": "119 · Concours financiers aux collectivités territoriales et à leurs groupements",
@@ -1679,7 +1679,7 @@
      "name": "185 · Diplomatie culturelle et d'influence",
      "color": "#E5A07A",
      "depth": 0,
-     "tooltip": "Diplomatie culturelle et d'influence : instituts français, AEFE (lycées français). 🔎 ≈ 0.08 Md€ supplémentaires (hachures, estimation) versés au CAS par les opérateurs financés par ce programme."
+     "tooltip": "Diplomatie culturelle et d'influence : instituts français, AEFE (lycées français). 🔎 ≈ 0.05 Md€ supplémentaires (hachures, estimation) versés au CAS par les opérateurs financés par ce programme."
     },
     {
      "name": "Agence pour l'enseignement français à l'étranger",
@@ -1716,15 +1716,15 @@
     {
      "source": "185 · Diplomatie culturelle et d'influence",
      "target": "Agence pour l'enseignement français à l'étranger",
-     "value": 0.36
+     "value": 0.39
     },
     {
      "source": "185 · Diplomatie culturelle et d'influence",
      "target": "Agence pour l'enseignement français à l'étranger",
-     "value": 0.08,
+     "value": 0.05,
      "cas": true,
      "est": true,
-     "tooltip": "≈ 0.08 Md€ (hachures = ESTIMATION) versés au CAS Pensions — dont les opérateurs financés par « Agence pour l'enseignement français à l'étranger » (universités, établissements publics…), via leurs subventions : ligne de recettes réelle du CAS (6,3 Md€/an) répartie au prorata des subventions pour charges de service public."
+     "tooltip": "≈ 0.05 Md€ (hachures = ESTIMATION) versés au CAS Pensions — dont les opérateurs financés par « Agence pour l'enseignement français à l'étranger » (universités, établissements publics…), via leurs subventions : ligne de recettes réelle du CAS (6,3 Md€/an) répartie au prorata des subventions pour charges de service public."
     },
     {
      "source": "185 · Diplomatie culturelle et d'influence",
@@ -1803,7 +1803,7 @@
      "name": "Diplomatie (Quai d'Orsay)",
      "color": "#E5A07A",
      "depth": 0,
-     "tooltip": "Mission LOLF : « Action extérieure de l'État ». 🔎 Retraites : ≈ 0.21 Md€ de ses crédits (gris uni) partent au CAS Pensions — subvention d'équilibre prélevée sur le budget du ministère pour le système de retraites ; dont ≈ 0.17 Md€ au-delà du taux du privé, la part re-fléchée vers les pensions dans la vue d'ensemble. Taux employeur civils : 74,28 % (2013-2024) → 78,28 % en 2025 → 82,28 % en 2026 (décrets 2025-61 et 2025-1341) ; privé ≈ 16,5 %. 🔎 S'y ajoutent ≈ 0.08 Md€ (hachures, estimation) versés au CAS par les OPÉRATEURS qu'elle finance (universités, établissements publics…), pris sur leurs subventions."
+     "tooltip": "Mission LOLF : « Action extérieure de l'État ». 🔎 Retraites : ≈ 0.21 Md€ de ses crédits (gris uni) partent au CAS Pensions — subvention d'équilibre prélevée sur le budget du ministère pour le système de retraites ; dont ≈ 0.17 Md€ au-delà du taux du privé, la part re-fléchée vers les pensions dans la vue d'ensemble. Taux employeur civils : 74,28 % (2013-2024) → 78,28 % en 2025 → 82,28 % en 2026 (décrets 2025-61 et 2025-1341) ; privé ≈ 16,5 %. 🔎 S'y ajoutent ≈ 0.05 Md€ (hachures, estimation) versés au CAS par les OPÉRATEURS qu'elle finance (universités, établissements publics…), pris sur leurs subventions."
     },
     {
      "name": "105 · Action de la France en Europe et dans le monde",
@@ -1815,7 +1815,7 @@
      "name": "185 · Diplomatie culturelle et d'influence",
      "color": "#E5A07A",
      "depth": 1,
-     "tooltip": "Diplomatie culturelle et d'influence : instituts français, AEFE (lycées français). 🔎 ≈ 0.08 Md€ supplémentaires (hachures, estimation) versés au CAS par les opérateurs financés par ce programme."
+     "tooltip": "Diplomatie culturelle et d'influence : instituts français, AEFE (lycées français). 🔎 ≈ 0.05 Md€ supplémentaires (hachures, estimation) versés au CAS par les opérateurs financés par ce programme."
     },
     {
      "name": "151 · Français à l'étranger et affaires consulaires",
@@ -1840,15 +1840,15 @@
     {
      "source": "Diplomatie (Quai d'Orsay)",
      "target": "185 · Diplomatie culturelle et d'influence",
-     "value": 0.6
+     "value": 0.63
     },
     {
      "source": "Diplomatie (Quai d'Orsay)",
      "target": "185 · Diplomatie culturelle et d'influence",
-     "value": 0.08,
+     "value": 0.05,
      "cas": true,
      "est": true,
-     "tooltip": "≈ 0.08 Md€ (hachures = ESTIMATION) versés au CAS Pensions — dont les opérateurs financés par « 185 · Diplomatie culturelle et d'influence » (universités, établissements publics…), via leurs subventions : ligne de recettes réelle du CAS (6,3 Md€/an) répartie au prorata des subventions pour charges de service public."
+     "tooltip": "≈ 0.05 Md€ (hachures = ESTIMATION) versés au CAS Pensions — dont les opérateurs financés par « 185 · Diplomatie culturelle et d'influence » (universités, établissements publics…), via leurs subventions : ligne de recettes réelle du CAS (6,3 Md€/an) répartie au prorata des subventions pour charges de service public."
     },
     {
      "source": "Diplomatie (Quai d'Orsay)",
@@ -2700,7 +2700,7 @@
      "name": "Transformation et fonction publiques",
      "color": "#E5A07A",
      "depth": 0,
-     "tooltip": ""
+     "tooltip": " 📈 2024→2025 : budget -0,30 Md€ ; contribution CAS +0,01 Md€."
     },
     {
      "name": "348 · Performance et résilience des bâtiments de l'État et de ses opérateurs",
@@ -2757,7 +2757,7 @@
      "name": "Crédits non répartis",
      "color": "#E5A07A",
      "depth": 0,
-     "tooltip": ""
+     "tooltip": " 📈 2024→2025 : budget -0,31 Md€ ; contribution CAS +0,00 Md€."
     },
     {
      "name": "552 · Dépenses accidentelles et imprévisibles",
@@ -2797,7 +2797,7 @@
      "name": "Finances publiques (Bercy)",
      "color": "#E5A07A",
      "depth": 1,
-     "tooltip": "Mission LOLF : « Gestion des finances publiques ». 🔎 Retraites : ≈ 2.58 Md€ de ses crédits (gris uni) partent au CAS Pensions — subvention d'équilibre prélevée sur le budget du ministère pour le système de retraites ; dont ≈ 2.08 Md€ au-delà du taux du privé, la part re-fléchée vers les pensions dans la vue d'ensemble. Taux employeur civils : 74,28 % (2013-2024) → 78,28 % en 2025 → 82,28 % en 2026 (décrets 2025-61 et 2025-1341) ; privé ≈ 16,5 %.",
+     "tooltip": "Mission LOLF : « Gestion des finances publiques ». 🔎 Retraites : ≈ 2.58 Md€ de ses crédits (gris uni) partent au CAS Pensions — subvention d'équilibre prélevée sur le budget du ministère pour le système de retraites ; dont ≈ 2.08 Md€ au-delà du taux du privé, la part re-fléchée vers les pensions dans la vue d'ensemble. Taux employeur civils : 74,28 % (2013-2024) → 78,28 % en 2025 → 82,28 % en 2026 (décrets 2025-61 et 2025-1341) ; privé ≈ 16,5 %. 📈 2024→2025 : budget +0,07 Md€ ; contribution CAS +0,08 Md€ — la hausse du CAS DÉPASSE celle du budget : les moyens hors retraites reculent.",
      "tags": [
       "retraites"
      ]
@@ -2806,13 +2806,13 @@
      "name": "Aide au développement",
      "color": "#E5A07A",
      "depth": 1,
-     "tooltip": "Mission LOLF : « Aide publique au développement ». "
+     "tooltip": "Mission LOLF : « Aide publique au développement ».  📈 2024→2025 : budget -0,78 Md€ ; contribution CAS -0,02 Md€."
     },
     {
      "name": "Administration territoriale (Intérieur)",
      "color": "#E5A07A",
      "depth": 1,
-     "tooltip": "Mission LOLF : « Administration générale et territoriale de l'État ». 🔎 Retraites : ≈ 0.85 Md€ de ses crédits (gris uni) partent au CAS Pensions — subvention d'équilibre prélevée sur le budget du ministère pour le système de retraites ; dont ≈ 0.68 Md€ au-delà du taux du privé, la part re-fléchée vers les pensions dans la vue d'ensemble. Taux employeur civils : 74,28 % (2013-2024) → 78,28 % en 2025 → 82,28 % en 2026 (décrets 2025-61 et 2025-1341) ; privé ≈ 16,5 %.",
+     "tooltip": "Mission LOLF : « Administration générale et territoriale de l'État ». 🔎 Retraites : ≈ 0.85 Md€ de ses crédits (gris uni) partent au CAS Pensions — subvention d'équilibre prélevée sur le budget du ministère pour le système de retraites ; dont ≈ 0.68 Md€ au-delà du taux du privé, la part re-fléchée vers les pensions dans la vue d'ensemble. Taux employeur civils : 74,28 % (2013-2024) → 78,28 % en 2025 → 82,28 % en 2026 (décrets 2025-61 et 2025-1341) ; privé ≈ 16,5 %. 📈 2024→2025 : budget +0,30 Md€ ; contribution CAS +0,04 Md€ (13 % de la hausse).",
      "tags": [
       "retraites"
      ]
@@ -2821,13 +2821,13 @@
      "name": "Dotations aux collectivités",
      "color": "#E5A07A",
      "depth": 1,
-     "tooltip": "Mission LOLF : « Relations avec les collectivités territoriales ». "
+     "tooltip": "Mission LOLF : « Relations avec les collectivités territoriales ».  📈 2024→2025 : budget -0,22 Md€ ; contribution CAS +0,00 Md€."
     },
     {
      "name": "Diplomatie (Quai d'Orsay)",
      "color": "#E5A07A",
      "depth": 1,
-     "tooltip": "Mission LOLF : « Action extérieure de l'État ». 🔎 Retraites : ≈ 0.21 Md€ de ses crédits (gris uni) partent au CAS Pensions — subvention d'équilibre prélevée sur le budget du ministère pour le système de retraites ; dont ≈ 0.17 Md€ au-delà du taux du privé, la part re-fléchée vers les pensions dans la vue d'ensemble. Taux employeur civils : 74,28 % (2013-2024) → 78,28 % en 2025 → 82,28 % en 2026 (décrets 2025-61 et 2025-1341) ; privé ≈ 16,5 %. 🔎 S'y ajoutent ≈ 0.08 Md€ (hachures, estimation) versés au CAS par les OPÉRATEURS qu'elle finance (universités, établissements publics…), pris sur leurs subventions.",
+     "tooltip": "Mission LOLF : « Action extérieure de l'État ». 🔎 Retraites : ≈ 0.21 Md€ de ses crédits (gris uni) partent au CAS Pensions — subvention d'équilibre prélevée sur le budget du ministère pour le système de retraites ; dont ≈ 0.17 Md€ au-delà du taux du privé, la part re-fléchée vers les pensions dans la vue d'ensemble. Taux employeur civils : 74,28 % (2013-2024) → 78,28 % en 2025 → 82,28 % en 2026 (décrets 2025-61 et 2025-1341) ; privé ≈ 16,5 %. 🔎 S'y ajoutent ≈ 0.05 Md€ (hachures, estimation) versés au CAS par les OPÉRATEURS qu'elle finance (universités, établissements publics…), pris sur leurs subventions.",
      "tags": [
       "retraites"
      ]
@@ -2858,12 +2858,14 @@
     {
      "name": "Transformation et fonction publiques",
      "color": "#E5A07A",
-     "depth": 1
+     "depth": 1,
+     "tooltip": " 📈 2024→2025 : budget -0,30 Md€ ; contribution CAS +0,01 Md€."
     },
     {
      "name": "Crédits non répartis",
      "color": "#E5A07A",
-     "depth": 1
+     "depth": 1,
+     "tooltip": " 📈 2024→2025 : budget -0,31 Md€ ; contribution CAS +0,00 Md€."
     }
    ],
    "links": [
@@ -2904,7 +2906,7 @@
     {
      "source": "É · Administration & autres missions",
      "target": "Diplomatie (Quai d'Orsay)",
-     "value": 3.24
+     "value": 3.27
     },
     {
      "source": "É · Administration & autres missions",
@@ -2916,10 +2918,10 @@
     {
      "source": "É · Administration & autres missions",
      "target": "Diplomatie (Quai d'Orsay)",
-     "value": 0.08,
+     "value": 0.05,
      "cas": true,
      "est": true,
-     "tooltip": "≈ 0.08 Md€ (hachures = ESTIMATION) versés au CAS Pensions — dont les opérateurs financés par « Diplomatie (Quai d'Orsay) » (universités, établissements publics…), via leurs subventions : ligne de recettes réelle du CAS (6,3 Md€/an) répartie au prorata des subventions pour charges de service public."
+     "tooltip": "≈ 0.05 Md€ (hachures = ESTIMATION) versés au CAS Pensions — dont les opérateurs financés par « Diplomatie (Quai d'Orsay) » (universités, établissements publics…), via leurs subventions : ligne de recettes réelle du CAS (6,3 Md€/an) répartie au prorata des subventions pour charges de service public."
     },
     {
      "source": "É · Administration & autres missions",
@@ -3297,7 +3299,7 @@
      "name": "Logement & territoires",
      "color": "#E88A54",
      "depth": 0,
-     "tooltip": "Mission LOLF : « Cohésion des territoires ». "
+     "tooltip": "Mission LOLF : « Cohésion des territoires ».  📈 2024→2025 : budget +4,41 Md€ ; contribution CAS +0,00 Md€."
     },
     {
      "name": "109 · Aide à l'accès au logement",
@@ -3469,7 +3471,7 @@
      "name": "203 · Infrastructures et services de transports",
      "color": "#E88A54",
      "depth": 0,
-     "tooltip": "Infrastructures et services de transports : routes, rail (AFIT France), fluvial. 🔎 ≈ 0.05 Md€ supplémentaires (hachures, estimation) versés au CAS par les opérateurs financés par ce programme."
+     "tooltip": "Infrastructures et services de transports : routes, rail (AFIT France), fluvial."
     },
     {
      "name": "Ferroviaire",
@@ -3537,15 +3539,7 @@
     {
      "source": "203 · Infrastructures et services de transports",
      "target": "Voies navigables",
-     "value": 0.21
-    },
-    {
-     "source": "203 · Infrastructures et services de transports",
-     "target": "Voies navigables",
-     "value": 0.05,
-     "cas": true,
-     "est": true,
-     "tooltip": "≈ 0.05 Md€ (hachures = ESTIMATION) versés au CAS Pensions — dont les opérateurs financés par « Voies navigables » (universités, établissements publics…), via leurs subventions : ligne de recettes réelle du CAS (6,3 Md€/an) répartie au prorata des subventions pour charges de service public."
+     "value": 0.26
     },
     {
      "source": "203 · Infrastructures et services de transports",
@@ -3824,7 +3818,7 @@
      "name": "181 · Prévention des risques",
      "color": "#E88A54",
      "depth": 0,
-     "tooltip": "Prévention des risques : sites Seveso, inondations, ADEME. 🔎 ≈ 0.18 Md€ supplémentaires (hachures, estimation) versés au CAS par les opérateurs financés par ce programme."
+     "tooltip": "Prévention des risques : sites Seveso, inondations, ADEME. 🔎 ≈ 0.11 Md€ supplémentaires (hachures, estimation) versés au CAS par les opérateurs financés par ce programme."
     },
     {
      "name": "Agence de l'environnement et de la maîtrise de l'énergie (ADEME)",
@@ -3861,15 +3855,15 @@
     {
      "source": "181 · Prévention des risques",
      "target": "Agence de l'environnement et de la maîtrise de l'énergie (ADEME)",
-     "value": 0.75
+     "value": 0.81
     },
     {
      "source": "181 · Prévention des risques",
      "target": "Agence de l'environnement et de la maîtrise de l'énergie (ADEME)",
-     "value": 0.16,
+     "value": 0.1,
      "cas": true,
      "est": true,
-     "tooltip": "≈ 0.16 Md€ (hachures = ESTIMATION) versés au CAS Pensions — dont les opérateurs financés par « Agence de l'environnement et de la maîtrise de l'énergie (ADEME) » (universités, établissements publics…), via leurs subventions : ligne de recettes réelle du CAS (6,3 Md€/an) répartie au prorata des subventions pour charges de service public."
+     "tooltip": "≈ 0.1 Md€ (hachures = ESTIMATION) versés au CAS Pensions — dont les opérateurs financés par « Agence de l'environnement et de la maîtrise de l'énergie (ADEME) » (universités, établissements publics…), via leurs subventions : ligne de recettes réelle du CAS (6,3 Md€/an) répartie au prorata des subventions pour charges de service public."
     },
     {
      "source": "181 · Prévention des risques",
@@ -3948,7 +3942,7 @@
      "name": "159 · Expertise, information géographique et météorologie",
      "color": "#E88A54",
      "depth": 0,
-     "tooltip": "🔎 ≈ 0.09 Md€ supplémentaires (hachures, estimation) versés au CAS par les opérateurs financés par ce programme."
+     "tooltip": "🔎 ≈ 0.06 Md€ supplémentaires (hachures, estimation) versés au CAS par les opérateurs financés par ce programme."
     },
     {
      "name": "Météorologie",
@@ -4171,7 +4165,7 @@
      "name": "Écologie & transports",
      "color": "#E88A54",
      "depth": 0,
-     "tooltip": "Mission LOLF : « Écologie, développement et mobilité durables ». 🔎 Retraites : ≈ 0.95 Md€ de ses crédits (gris uni) partent au CAS Pensions — subvention d'équilibre prélevée sur le budget du ministère pour le système de retraites ; dont ≈ 0.77 Md€ au-delà du taux du privé, la part re-fléchée vers les pensions dans la vue d'ensemble. Taux employeur civils : 74,28 % (2013-2024) → 78,28 % en 2025 → 82,28 % en 2026 (décrets 2025-61 et 2025-1341) ; privé ≈ 16,5 %. 🔎 S'y ajoutent ≈ 0.36 Md€ (hachures, estimation) versés au CAS par les OPÉRATEURS qu'elle finance (universités, établissements publics…), pris sur leurs subventions."
+     "tooltip": "Mission LOLF : « Écologie, développement et mobilité durables ». 🔎 Retraites : ≈ 0.95 Md€ de ses crédits (gris uni) partent au CAS Pensions — subvention d'équilibre prélevée sur le budget du ministère pour le système de retraites ; dont ≈ 0.77 Md€ au-delà du taux du privé, la part re-fléchée vers les pensions dans la vue d'ensemble. Taux employeur civils : 74,28 % (2013-2024) → 78,28 % en 2025 → 82,28 % en 2026 (décrets 2025-61 et 2025-1341) ; privé ≈ 16,5 %. 🔎 S'y ajoutent ≈ 0.22 Md€ (hachures, estimation) versés au CAS par les OPÉRATEURS qu'elle finance (universités, établissements publics…), pris sur leurs subventions. 📈 2024→2025 : budget -1,13 Md€ ; contribution CAS +0,09 Md€."
     },
     {
      "name": "345 · Service public de l'énergie",
@@ -4183,7 +4177,7 @@
      "name": "203 · Infrastructures et services de transports",
      "color": "#E88A54",
      "depth": 1,
-     "tooltip": "Infrastructures et services de transports : routes, rail (AFIT France), fluvial. 🔎 ≈ 0.05 Md€ supplémentaires (hachures, estimation) versés au CAS par les opérateurs financés par ce programme."
+     "tooltip": "Infrastructures et services de transports : routes, rail (AFIT France), fluvial."
     },
     {
      "name": "217 · Conduite et pilotage des politiques de l'écologie, du développement et de la mobilité durables",
@@ -4201,7 +4195,7 @@
      "name": "181 · Prévention des risques",
      "color": "#E88A54",
      "depth": 1,
-     "tooltip": "Prévention des risques : sites Seveso, inondations, ADEME. 🔎 ≈ 0.18 Md€ supplémentaires (hachures, estimation) versés au CAS par les opérateurs financés par ce programme."
+     "tooltip": "Prévention des risques : sites Seveso, inondations, ADEME. 🔎 ≈ 0.11 Md€ supplémentaires (hachures, estimation) versés au CAS par les opérateurs financés par ce programme."
     },
     {
      "name": "380 · Fonds d'accélération de la transition écologique dans les territoires",
@@ -4213,7 +4207,7 @@
      "name": "159 · Expertise, information géographique et météorologie",
      "color": "#E88A54",
      "depth": 1,
-     "tooltip": "🔎 ≈ 0.09 Md€ supplémentaires (hachures, estimation) versés au CAS par les opérateurs financés par ce programme."
+     "tooltip": "🔎 ≈ 0.06 Md€ supplémentaires (hachures, estimation) versés au CAS par les opérateurs financés par ce programme."
     },
     {
      "name": "113 · Paysages, eau et biodiversité",
@@ -4243,15 +4237,7 @@
     {
      "source": "Écologie & transports",
      "target": "203 · Infrastructures et services de transports",
-     "value": 4.43
-    },
-    {
-     "source": "Écologie & transports",
-     "target": "203 · Infrastructures et services de transports",
-     "value": 0.05,
-     "cas": true,
-     "est": true,
-     "tooltip": "≈ 0.05 Md€ (hachures = ESTIMATION) versés au CAS Pensions — dont les opérateurs financés par « 203 · Infrastructures et services de transports » (universités, établissements publics…), via leurs subventions : ligne de recettes réelle du CAS (6,3 Md€/an) répartie au prorata des subventions pour charges de service public."
+     "value": 4.48
     },
     {
      "source": "Écologie & transports",
@@ -4273,15 +4259,15 @@
     {
      "source": "Écologie & transports",
      "target": "181 · Prévention des risques",
-     "value": 1.13
+     "value": 1.2
     },
     {
      "source": "Écologie & transports",
      "target": "181 · Prévention des risques",
-     "value": 0.18,
+     "value": 0.11,
      "cas": true,
      "est": true,
-     "tooltip": "≈ 0.18 Md€ (hachures = ESTIMATION) versés au CAS Pensions — dont les opérateurs financés par « 181 · Prévention des risques » (universités, établissements publics…), via leurs subventions : ligne de recettes réelle du CAS (6,3 Md€/an) répartie au prorata des subventions pour charges de service public."
+     "tooltip": "≈ 0.11 Md€ (hachures = ESTIMATION) versés au CAS Pensions — dont les opérateurs financés par « 181 · Prévention des risques » (universités, établissements publics…), via leurs subventions : ligne de recettes réelle du CAS (6,3 Md€/an) répartie au prorata des subventions pour charges de service public."
     },
     {
      "source": "Écologie & transports",
@@ -4291,15 +4277,15 @@
     {
      "source": "Écologie & transports",
      "target": "159 · Expertise, information géographique et météorologie",
-     "value": 0.43
+     "value": 0.46
     },
     {
      "source": "Écologie & transports",
      "target": "159 · Expertise, information géographique et météorologie",
-     "value": 0.09,
+     "value": 0.06,
      "cas": true,
      "est": true,
-     "tooltip": "≈ 0.09 Md€ (hachures = ESTIMATION) versés au CAS Pensions — dont les opérateurs financés par « 159 · Expertise, information géographique et météorologie » (universités, établissements publics…), via leurs subventions : ligne de recettes réelle du CAS (6,3 Md€/an) répartie au prorata des subventions pour charges de service public."
+     "tooltip": "≈ 0.06 Md€ (hachures = ESTIMATION) versés au CAS Pensions — dont les opérateurs financés par « 159 · Expertise, information géographique et météorologie » (universités, établissements publics…), via leurs subventions : ligne de recettes réelle du CAS (6,3 Md€/an) répartie au prorata des subventions pour charges de service public."
     },
     {
      "source": "Écologie & transports",
@@ -4332,7 +4318,7 @@
      "name": "149 · Compétitivité et durabilité de l'agriculture, de l'agroalimentaire et de la forêt",
      "color": "#E88A54",
      "depth": 0,
-     "tooltip": "Compétitivité et durabilité de l'agriculture : aides nationales, PAC cofinancée. 🔎 ≈ 0.09 Md€ supplémentaires (hachures, estimation) versés au CAS par les opérateurs financés par ce programme."
+     "tooltip": "Compétitivité et durabilité de l'agriculture : aides nationales, PAC cofinancée. 🔎 ≈ 0.06 Md€ supplémentaires (hachures, estimation) versés au CAS par les opérateurs financés par ce programme."
     },
     {
      "name": "Gestion équilibrée et durable des territoires",
@@ -4384,15 +4370,7 @@
     {
      "source": "149 · Compétitivité et durabilité de l'agriculture, de l'agroalimentaire et de la forêt",
      "target": "Moyens de mise en oeuvre des politiques publiques et gestion des interventions",
-     "value": 0.44
-    },
-    {
-     "source": "149 · Compétitivité et durabilité de l'agriculture, de l'agroalimentaire et de la forêt",
-     "target": "Moyens de mise en oeuvre des politiques publiques et gestion des interventions",
-     "value": 0.05,
-     "cas": true,
-     "est": true,
-     "tooltip": "≈ 0.05 Md€ (hachures = ESTIMATION) versés au CAS Pensions — dont les opérateurs financés par « Moyens de mise en oeuvre des politiques publiques et gestion des interventions » (universités, établissements publics…), via leurs subventions : ligne de recettes réelle du CAS (6,3 Md€/an) répartie au prorata des subventions pour charges de service public."
+     "value": 0.49
     },
     {
      "source": "149 · Compétitivité et durabilité de l'agriculture, de l'agroalimentaire et de la forêt",
@@ -4601,13 +4579,13 @@
      "name": "Agriculture",
      "color": "#E88A54",
      "depth": 0,
-     "tooltip": "Mission LOLF : « Agriculture, alimentation, forêt et affaires rurales ». 🔎 Retraites : ≈ 0.24 Md€ de ses crédits (gris uni) partent au CAS Pensions — subvention d'équilibre prélevée sur le budget du ministère pour le système de retraites ; dont ≈ 0.19 Md€ au-delà du taux du privé, la part re-fléchée vers les pensions dans la vue d'ensemble. Taux employeur civils : 74,28 % (2013-2024) → 78,28 % en 2025 → 82,28 % en 2026 (décrets 2025-61 et 2025-1341) ; privé ≈ 16,5 %. 🔎 S'y ajoutent ≈ 0.1 Md€ (hachures, estimation) versés au CAS par les OPÉRATEURS qu'elle finance (universités, établissements publics…), pris sur leurs subventions."
+     "tooltip": "Mission LOLF : « Agriculture, alimentation, forêt et affaires rurales ». 🔎 Retraites : ≈ 0.24 Md€ de ses crédits (gris uni) partent au CAS Pensions — subvention d'équilibre prélevée sur le budget du ministère pour le système de retraites ; dont ≈ 0.19 Md€ au-delà du taux du privé, la part re-fléchée vers les pensions dans la vue d'ensemble. Taux employeur civils : 74,28 % (2013-2024) → 78,28 % en 2025 → 82,28 % en 2026 (décrets 2025-61 et 2025-1341) ; privé ≈ 16,5 %. 🔎 S'y ajoutent ≈ 0.07 Md€ (hachures, estimation) versés au CAS par les OPÉRATEURS qu'elle finance (universités, établissements publics…), pris sur leurs subventions. 📈 2024→2025 : budget -0,31 Md€ ; contribution CAS -0,02 Md€."
     },
     {
      "name": "149 · Compétitivité et durabilité de l'agriculture, de l'agroalimentaire et de la forêt",
      "color": "#E88A54",
      "depth": 1,
-     "tooltip": "Compétitivité et durabilité de l'agriculture : aides nationales, PAC cofinancée. 🔎 ≈ 0.09 Md€ supplémentaires (hachures, estimation) versés au CAS par les opérateurs financés par ce programme."
+     "tooltip": "Compétitivité et durabilité de l'agriculture : aides nationales, PAC cofinancée. 🔎 ≈ 0.06 Md€ supplémentaires (hachures, estimation) versés au CAS par les opérateurs financés par ce programme."
     },
     {
      "name": "206 · Sécurité et qualité sanitaires de l'alimentation",
@@ -4632,15 +4610,15 @@
     {
      "source": "Agriculture",
      "target": "149 · Compétitivité et durabilité de l'agriculture, de l'agroalimentaire et de la forêt",
-     "value": 2.37
+     "value": 2.4
     },
     {
      "source": "Agriculture",
      "target": "149 · Compétitivité et durabilité de l'agriculture, de l'agroalimentaire et de la forêt",
-     "value": 0.09,
+     "value": 0.06,
      "cas": true,
      "est": true,
-     "tooltip": "≈ 0.09 Md€ (hachures = ESTIMATION) versés au CAS Pensions — dont les opérateurs financés par « 149 · Compétitivité et durabilité de l'agriculture, de l'agroalimentaire et de la forêt » (universités, établissements publics…), via leurs subventions : ligne de recettes réelle du CAS (6,3 Md€/an) répartie au prorata des subventions pour charges de service public."
+     "tooltip": "≈ 0.06 Md€ (hachures = ESTIMATION) versés au CAS Pensions — dont les opérateurs financés par « 149 · Compétitivité et durabilité de l'agriculture, de l'agroalimentaire et de la forêt » (universités, établissements publics…), via leurs subventions : ligne de recettes réelle du CAS (6,3 Md€/an) répartie au prorata des subventions pour charges de service public."
     },
     {
      "source": "Agriculture",
@@ -4837,7 +4815,7 @@
      "name": "Outre-mer",
      "color": "#E88A54",
      "depth": 0,
-     "tooltip": "🔎 Retraites : ≈ 0.06 Md€ de ses crédits (gris uni) partent au CAS Pensions — subvention d'équilibre prélevée sur le budget du ministère pour le système de retraites. Taux employeur civils : 74,28 % (2013-2024) → 78,28 % en 2025 → 82,28 % en 2026 (décrets 2025-61 et 2025-1341) ; privé ≈ 16,5 %."
+     "tooltip": "🔎 Retraites : ≈ 0.06 Md€ de ses crédits (gris uni) partent au CAS Pensions — subvention d'équilibre prélevée sur le budget du ministère pour le système de retraites. Taux employeur civils : 74,28 % (2013-2024) → 78,28 % en 2025 → 82,28 % en 2026 (décrets 2025-61 et 2025-1341) ; privé ≈ 16,5 %. 📈 2024→2025 : budget -0,10 Md€ ; contribution CAS +0,00 Md€."
     },
     {
      "name": "138 · Emploi outre-mer",
@@ -4884,13 +4862,13 @@
      "name": "Logement & territoires",
      "color": "#E88A54",
      "depth": 1,
-     "tooltip": "Mission LOLF : « Cohésion des territoires ». "
+     "tooltip": "Mission LOLF : « Cohésion des territoires ».  📈 2024→2025 : budget +4,41 Md€ ; contribution CAS +0,00 Md€."
     },
     {
      "name": "Écologie & transports",
      "color": "#E88A54",
      "depth": 1,
-     "tooltip": "Mission LOLF : « Écologie, développement et mobilité durables ». 🔎 Retraites : ≈ 0.95 Md€ de ses crédits (gris uni) partent au CAS Pensions — subvention d'équilibre prélevée sur le budget du ministère pour le système de retraites ; dont ≈ 0.77 Md€ au-delà du taux du privé, la part re-fléchée vers les pensions dans la vue d'ensemble. Taux employeur civils : 74,28 % (2013-2024) → 78,28 % en 2025 → 82,28 % en 2026 (décrets 2025-61 et 2025-1341) ; privé ≈ 16,5 %. 🔎 S'y ajoutent ≈ 0.36 Md€ (hachures, estimation) versés au CAS par les OPÉRATEURS qu'elle finance (universités, établissements publics…), pris sur leurs subventions.",
+     "tooltip": "Mission LOLF : « Écologie, développement et mobilité durables ». 🔎 Retraites : ≈ 0.95 Md€ de ses crédits (gris uni) partent au CAS Pensions — subvention d'équilibre prélevée sur le budget du ministère pour le système de retraites ; dont ≈ 0.77 Md€ au-delà du taux du privé, la part re-fléchée vers les pensions dans la vue d'ensemble. Taux employeur civils : 74,28 % (2013-2024) → 78,28 % en 2025 → 82,28 % en 2026 (décrets 2025-61 et 2025-1341) ; privé ≈ 16,5 %. 🔎 S'y ajoutent ≈ 0.22 Md€ (hachures, estimation) versés au CAS par les OPÉRATEURS qu'elle finance (universités, établissements publics…), pris sur leurs subventions. 📈 2024→2025 : budget -1,13 Md€ ; contribution CAS +0,09 Md€.",
      "tags": [
       "retraites"
      ]
@@ -4899,7 +4877,7 @@
      "name": "Agriculture",
      "color": "#E88A54",
      "depth": 1,
-     "tooltip": "Mission LOLF : « Agriculture, alimentation, forêt et affaires rurales ». 🔎 Retraites : ≈ 0.24 Md€ de ses crédits (gris uni) partent au CAS Pensions — subvention d'équilibre prélevée sur le budget du ministère pour le système de retraites ; dont ≈ 0.19 Md€ au-delà du taux du privé, la part re-fléchée vers les pensions dans la vue d'ensemble. Taux employeur civils : 74,28 % (2013-2024) → 78,28 % en 2025 → 82,28 % en 2026 (décrets 2025-61 et 2025-1341) ; privé ≈ 16,5 %. 🔎 S'y ajoutent ≈ 0.1 Md€ (hachures, estimation) versés au CAS par les OPÉRATEURS qu'elle finance (universités, établissements publics…), pris sur leurs subventions.",
+     "tooltip": "Mission LOLF : « Agriculture, alimentation, forêt et affaires rurales ». 🔎 Retraites : ≈ 0.24 Md€ de ses crédits (gris uni) partent au CAS Pensions — subvention d'équilibre prélevée sur le budget du ministère pour le système de retraites ; dont ≈ 0.19 Md€ au-delà du taux du privé, la part re-fléchée vers les pensions dans la vue d'ensemble. Taux employeur civils : 74,28 % (2013-2024) → 78,28 % en 2025 → 82,28 % en 2026 (décrets 2025-61 et 2025-1341) ; privé ≈ 16,5 %. 🔎 S'y ajoutent ≈ 0.07 Md€ (hachures, estimation) versés au CAS par les OPÉRATEURS qu'elle finance (universités, établissements publics…), pris sur leurs subventions. 📈 2024→2025 : budget -0,31 Md€ ; contribution CAS -0,02 Md€.",
      "tags": [
       "retraites"
      ]
@@ -4908,7 +4886,7 @@
      "name": "Outre-mer",
      "color": "#E88A54",
      "depth": 1,
-     "tooltip": "🔎 Retraites : ≈ 0.06 Md€ de ses crédits (gris uni) partent au CAS Pensions — subvention d'équilibre prélevée sur le budget du ministère pour le système de retraites. Taux employeur civils : 74,28 % (2013-2024) → 78,28 % en 2025 → 82,28 % en 2026 (décrets 2025-61 et 2025-1341) ; privé ≈ 16,5 %.",
+     "tooltip": "🔎 Retraites : ≈ 0.06 Md€ de ses crédits (gris uni) partent au CAS Pensions — subvention d'équilibre prélevée sur le budget du ministère pour le système de retraites. Taux employeur civils : 74,28 % (2013-2024) → 78,28 % en 2025 → 82,28 % en 2026 (décrets 2025-61 et 2025-1341) ; privé ≈ 16,5 %. 📈 2024→2025 : budget -0,10 Md€ ; contribution CAS +0,00 Md€.",
      "tags": [
       "retraites"
      ]
@@ -4923,7 +4901,7 @@
     {
      "source": "É · Écologie, territoires & agriculture",
      "target": "Écologie & transports",
-     "value": 19.19
+     "value": 19.33
     },
     {
      "source": "É · Écologie, territoires & agriculture",
@@ -4935,15 +4913,15 @@
     {
      "source": "É · Écologie, territoires & agriculture",
      "target": "Écologie & transports",
-     "value": 0.36,
+     "value": 0.22,
      "cas": true,
      "est": true,
-     "tooltip": "≈ 0.36 Md€ (hachures = ESTIMATION) versés au CAS Pensions — dont les opérateurs financés par « Écologie & transports » (universités, établissements publics…), via leurs subventions : ligne de recettes réelle du CAS (6,3 Md€/an) répartie au prorata des subventions pour charges de service public."
+     "tooltip": "≈ 0.22 Md€ (hachures = ESTIMATION) versés au CAS Pensions — dont les opérateurs financés par « Écologie & transports » (universités, établissements publics…), via leurs subventions : ligne de recettes réelle du CAS (6,3 Md€/an) répartie au prorata des subventions pour charges de service public."
     },
     {
      "source": "É · Écologie, territoires & agriculture",
      "target": "Agriculture",
-     "value": 4.1
+     "value": 4.13
     },
     {
      "source": "É · Écologie, territoires & agriculture",
@@ -4955,10 +4933,10 @@
     {
      "source": "É · Écologie, territoires & agriculture",
      "target": "Agriculture",
-     "value": 0.1,
+     "value": 0.07,
      "cas": true,
      "est": true,
-     "tooltip": "≈ 0.1 Md€ (hachures = ESTIMATION) versés au CAS Pensions — dont les opérateurs financés par « Agriculture » (universités, établissements publics…), via leurs subventions : ligne de recettes réelle du CAS (6,3 Md€/an) répartie au prorata des subventions pour charges de service public."
+     "tooltip": "≈ 0.07 Md€ (hachures = ESTIMATION) versés au CAS Pensions — dont les opérateurs financés par « Agriculture » (universités, établissements publics…), via leurs subventions : ligne de recettes réelle du CAS (6,3 Md€/an) répartie au prorata des subventions pour charges de service public."
     },
     {
      "source": "É · Écologie, territoires & agriculture",
@@ -5171,7 +5149,7 @@
      "name": "Solidarités",
      "color": "#E06D3C",
      "depth": 0,
-     "tooltip": "Mission LOLF : « Solidarité, insertion et égalité des chances ». "
+     "tooltip": "Mission LOLF : « Solidarité, insertion et égalité des chances ».  📈 2024→2025 : budget -0,48 Md€ ; contribution CAS -0,11 Md€."
     },
     {
      "name": "157 · Handicap et dépendance",
@@ -5217,7 +5195,7 @@
      "name": "103 · Accompagnement des mutations économiques et développement de l'emploi",
      "color": "#E06D3C",
      "depth": 0,
-     "tooltip": "Accompagnement des mutations économiques : aides à l'apprentissage et à l'alternance. 🔎 ≈ 0.39 Md€ supplémentaires (hachures, estimation) versés au CAS par les opérateurs financés par ce programme."
+     "tooltip": "Accompagnement des mutations économiques : aides à l'apprentissage et à l'alternance. 🔎 ≈ 0.25 Md€ supplémentaires (hachures, estimation) versés au CAS par les opérateurs financés par ce programme."
     },
     {
      "name": "Développement des compétences par l'alternance",
@@ -5259,15 +5237,15 @@
     {
      "source": "103 · Accompagnement des mutations économiques et développement de l'emploi",
      "target": "Financement des structures de la formation professionnelle et de l'emploi",
-     "value": 1.73
+     "value": 1.85
     },
     {
      "source": "103 · Accompagnement des mutations économiques et développement de l'emploi",
      "target": "Financement des structures de la formation professionnelle et de l'emploi",
-     "value": 0.36,
+     "value": 0.24,
      "cas": true,
      "est": true,
-     "tooltip": "≈ 0.36 Md€ (hachures = ESTIMATION) versés au CAS Pensions — dont les opérateurs financés par « Financement des structures de la formation professionnelle et de l'emploi » (universités, établissements publics…), via leurs subventions : ligne de recettes réelle du CAS (6,3 Md€/an) répartie au prorata des subventions pour charges de service public."
+     "tooltip": "≈ 0.24 Md€ (hachures = ESTIMATION) versés au CAS Pensions — dont les opérateurs financés par « Financement des structures de la formation professionnelle et de l'emploi » (universités, établissements publics…), via leurs subventions : ligne de recettes réelle du CAS (6,3 Md€/an) répartie au prorata des subventions pour charges de service public."
     },
     {
      "source": "103 · Accompagnement des mutations économiques et développement de l'emploi",
@@ -5288,7 +5266,7 @@
      "name": "102 · Accès et retour à l'emploi",
      "color": "#E06D3C",
      "depth": 0,
-     "tooltip": "Accès et retour à l'emploi : France Travail, insertion par l'activité économique. 🔎 ≈ 0.27 Md€ supplémentaires (hachures, estimation) versés au CAS par les opérateurs financés par ce programme."
+     "tooltip": "Accès et retour à l'emploi : France Travail, insertion par l'activité économique. 🔎 ≈ 0.17 Md€ supplémentaires (hachures, estimation) versés au CAS par les opérateurs financés par ce programme."
     },
     {
      "name": "Accompagnement des personnes les plus éloignées du marché du travail- Fonds d'inclusion dans l'emploi",
@@ -5320,15 +5298,15 @@
     {
      "source": "102 · Accès et retour à l'emploi",
      "target": "Structures de mise en oeuvre de la politique de l'emploi",
-     "value": 1.84
+     "value": 1.93
     },
     {
      "source": "102 · Accès et retour à l'emploi",
      "target": "Structures de mise en oeuvre de la politique de l'emploi",
-     "value": 0.25,
+     "value": 0.16,
      "cas": true,
      "est": true,
-     "tooltip": "≈ 0.25 Md€ (hachures = ESTIMATION) versés au CAS Pensions — dont les opérateurs financés par « Structures de mise en oeuvre de la politique de l'emploi » (universités, établissements publics…), via leurs subventions : ligne de recettes réelle du CAS (6,3 Md€/an) répartie au prorata des subventions pour charges de service public."
+     "tooltip": "≈ 0.16 Md€ (hachures = ESTIMATION) versés au CAS Pensions — dont les opérateurs financés par « Structures de mise en oeuvre de la politique de l'emploi » (universités, établissements publics…), via leurs subventions : ligne de recettes réelle du CAS (6,3 Md€/an) répartie au prorata des subventions pour charges de service public."
     },
     {
      "source": "102 · Accès et retour à l'emploi",
@@ -5349,7 +5327,7 @@
      "name": "155 · Soutien des ministères sociaux",
      "color": "#E06D3C",
      "depth": 0,
-     "tooltip": "Soutien des ministères du travail : administration, statistiques (Dares). 🔎 Retraites : ≈ 0.29 Md€ de ses crédits (gris uni) partent au CAS Pensions — subvention d'équilibre pour le système de retraites. 🔎 ≈ 0.11 Md€ supplémentaires (hachures, estimation) versés au CAS par les opérateurs financés par ce programme."
+     "tooltip": "Soutien des ministères du travail : administration, statistiques (Dares). 🔎 Retraites : ≈ 0.29 Md€ de ses crédits (gris uni) partent au CAS Pensions — subvention d'équilibre pour le système de retraites. 🔎 ≈ 0.07 Md€ supplémentaires (hachures, estimation) versés au CAS par les opérateurs financés par ce programme."
     },
     {
      "name": "Financement des agences régionales de santé",
@@ -5414,15 +5392,15 @@
     {
      "source": "155 · Soutien des ministères sociaux",
      "target": "Financement des agences régionales de santé",
-     "value": 0.51
+     "value": 0.55
     },
     {
      "source": "155 · Soutien des ministères sociaux",
      "target": "Financement des agences régionales de santé",
-     "value": 0.11,
+     "value": 0.07,
      "cas": true,
      "est": true,
-     "tooltip": "≈ 0.11 Md€ (hachures = ESTIMATION) versés au CAS Pensions — dont les opérateurs financés par « Financement des agences régionales de santé » (universités, établissements publics…), via leurs subventions : ligne de recettes réelle du CAS (6,3 Md€/an) répartie au prorata des subventions pour charges de service public."
+     "tooltip": "≈ 0.07 Md€ (hachures = ESTIMATION) versés au CAS Pensions — dont les opérateurs financés par « Financement des agences régionales de santé » (universités, établissements publics…), via leurs subventions : ligne de recettes réelle du CAS (6,3 Md€/an) répartie au prorata des subventions pour charges de service public."
     },
     {
      "source": "155 · Soutien des ministères sociaux",
@@ -5537,25 +5515,25 @@
      "name": "Travail & emploi",
      "color": "#E06D3C",
      "depth": 0,
-     "tooltip": "Mission LOLF : « Travail, emploi et administration des ministères sociaux ». 🔎 Retraites : ≈ 0.29 Md€ de ses crédits (gris uni) partent au CAS Pensions — subvention d'équilibre prélevée sur le budget du ministère pour le système de retraites ; dont ≈ 0.24 Md€ au-delà du taux du privé, la part re-fléchée vers les pensions dans la vue d'ensemble. Taux employeur civils : 74,28 % (2013-2024) → 78,28 % en 2025 → 82,28 % en 2026 (décrets 2025-61 et 2025-1341) ; privé ≈ 16,5 %. 🔎 S'y ajoutent ≈ 0.77 Md€ (hachures, estimation) versés au CAS par les OPÉRATEURS qu'elle finance (universités, établissements publics…), pris sur leurs subventions."
+     "tooltip": "Mission LOLF : « Travail, emploi et administration des ministères sociaux ». 🔎 Retraites : ≈ 0.29 Md€ de ses crédits (gris uni) partent au CAS Pensions — subvention d'équilibre prélevée sur le budget du ministère pour le système de retraites ; dont ≈ 0.24 Md€ au-delà du taux du privé, la part re-fléchée vers les pensions dans la vue d'ensemble. Taux employeur civils : 74,28 % (2013-2024) → 78,28 % en 2025 → 82,28 % en 2026 (décrets 2025-61 et 2025-1341) ; privé ≈ 16,5 %. 🔎 S'y ajoutent ≈ 0.49 Md€ (hachures, estimation) versés au CAS par les OPÉRATEURS qu'elle finance (universités, établissements publics…), pris sur leurs subventions. 📈 2024→2025 : budget -0,93 Md€ ; contribution CAS +0,13 Md€."
     },
     {
      "name": "103 · Accompagnement des mutations économiques et développement de l'emploi",
      "color": "#E06D3C",
      "depth": 1,
-     "tooltip": "Accompagnement des mutations économiques : aides à l'apprentissage et à l'alternance. 🔎 ≈ 0.39 Md€ supplémentaires (hachures, estimation) versés au CAS par les opérateurs financés par ce programme."
+     "tooltip": "Accompagnement des mutations économiques : aides à l'apprentissage et à l'alternance. 🔎 ≈ 0.25 Md€ supplémentaires (hachures, estimation) versés au CAS par les opérateurs financés par ce programme."
     },
     {
      "name": "102 · Accès et retour à l'emploi",
      "color": "#E06D3C",
      "depth": 1,
-     "tooltip": "Accès et retour à l'emploi : France Travail, insertion par l'activité économique. 🔎 ≈ 0.27 Md€ supplémentaires (hachures, estimation) versés au CAS par les opérateurs financés par ce programme."
+     "tooltip": "Accès et retour à l'emploi : France Travail, insertion par l'activité économique. 🔎 ≈ 0.17 Md€ supplémentaires (hachures, estimation) versés au CAS par les opérateurs financés par ce programme."
     },
     {
      "name": "155 · Soutien des ministères sociaux",
      "color": "#E06D3C",
      "depth": 1,
-     "tooltip": "Soutien des ministères du travail : administration, statistiques (Dares). 🔎 Retraites : ≈ 0.29 Md€ de ses crédits (gris uni) partent au CAS Pensions — subvention d'équilibre pour le système de retraites. 🔎 ≈ 0.11 Md€ supplémentaires (hachures, estimation) versés au CAS par les opérateurs financés par ce programme."
+     "tooltip": "Soutien des ministères du travail : administration, statistiques (Dares). 🔎 Retraites : ≈ 0.29 Md€ de ses crédits (gris uni) partent au CAS Pensions — subvention d'équilibre pour le système de retraites. 🔎 ≈ 0.07 Md€ supplémentaires (hachures, estimation) versés au CAS par les opérateurs financés par ce programme."
     },
     {
      "name": "111 · Amélioration de la qualité de l'emploi et des relations du travail",
@@ -5568,33 +5546,33 @@
     {
      "source": "Travail & emploi",
      "target": "103 · Accompagnement des mutations économiques et développement de l'emploi",
-     "value": 11.93
+     "value": 12.07
     },
     {
      "source": "Travail & emploi",
      "target": "103 · Accompagnement des mutations économiques et développement de l'emploi",
-     "value": 0.39,
+     "value": 0.25,
      "cas": true,
      "est": true,
-     "tooltip": "≈ 0.39 Md€ (hachures = ESTIMATION) versés au CAS Pensions — dont les opérateurs financés par « 103 · Accompagnement des mutations économiques et développement de l'emploi » (universités, établissements publics…), via leurs subventions : ligne de recettes réelle du CAS (6,3 Md€/an) répartie au prorata des subventions pour charges de service public."
+     "tooltip": "≈ 0.25 Md€ (hachures = ESTIMATION) versés au CAS Pensions — dont les opérateurs financés par « 103 · Accompagnement des mutations économiques et développement de l'emploi » (universités, établissements publics…), via leurs subventions : ligne de recettes réelle du CAS (6,3 Md€/an) répartie au prorata des subventions pour charges de service public."
     },
     {
      "source": "Travail & emploi",
      "target": "102 · Accès et retour à l'emploi",
-     "value": 6.94
+     "value": 7.04
     },
     {
      "source": "Travail & emploi",
      "target": "102 · Accès et retour à l'emploi",
-     "value": 0.27,
+     "value": 0.17,
      "cas": true,
      "est": true,
-     "tooltip": "≈ 0.27 Md€ (hachures = ESTIMATION) versés au CAS Pensions — dont les opérateurs financés par « 102 · Accès et retour à l'emploi » (universités, établissements publics…), via leurs subventions : ligne de recettes réelle du CAS (6,3 Md€/an) répartie au prorata des subventions pour charges de service public."
+     "tooltip": "≈ 0.17 Md€ (hachures = ESTIMATION) versés au CAS Pensions — dont les opérateurs financés par « 102 · Accès et retour à l'emploi » (universités, établissements publics…), via leurs subventions : ligne de recettes réelle du CAS (6,3 Md€/an) répartie au prorata des subventions pour charges de service public."
     },
     {
      "source": "Travail & emploi",
      "target": "155 · Soutien des ministères sociaux",
-     "value": 1.62
+     "value": 1.66
     },
     {
      "source": "Travail & emploi",
@@ -5606,10 +5584,10 @@
     {
      "source": "Travail & emploi",
      "target": "155 · Soutien des ministères sociaux",
-     "value": 0.11,
+     "value": 0.07,
      "cas": true,
      "est": true,
-     "tooltip": "≈ 0.11 Md€ (hachures = ESTIMATION) versés au CAS Pensions — dont les opérateurs financés par « 155 · Soutien des ministères sociaux » (universités, établissements publics…), via leurs subventions : ligne de recettes réelle du CAS (6,3 Md€/an) répartie au prorata des subventions pour charges de service public."
+     "tooltip": "≈ 0.07 Md€ (hachures = ESTIMATION) versés au CAS Pensions — dont les opérateurs financés par « 155 · Soutien des ministères sociaux » (universités, établissements publics…), via leurs subventions : ligne de recettes réelle du CAS (6,3 Md€/an) répartie au prorata des subventions pour charges de service public."
     },
     {
      "source": "Travail & emploi",
@@ -5741,7 +5719,7 @@
      "name": "Régimes spéciaux de retraite (subventions)",
      "color": "#E06D3C",
      "depth": 0,
-     "tooltip": "Mission LOLF : « Régimes sociaux et de retraite ». "
+     "tooltip": "Mission LOLF : « Régimes sociaux et de retraite ».  📈 2024→2025 : budget -0,23 Md€ ; contribution CAS +0,00 Md€."
     },
     {
      "name": "198 · Régimes sociaux et de retraite des transports terrestres",
@@ -6034,7 +6012,7 @@
      "name": "Santé",
      "color": "#E06D3C",
      "depth": 0,
-     "tooltip": ""
+     "tooltip": " 📈 2024→2025 : budget -0,71 Md€ ; contribution CAS +0,00 Md€."
     },
     {
      "name": "183 · Protection maladie",
@@ -6085,13 +6063,13 @@
      "name": "Solidarités",
      "color": "#E06D3C",
      "depth": 1,
-     "tooltip": "Mission LOLF : « Solidarité, insertion et égalité des chances ». "
+     "tooltip": "Mission LOLF : « Solidarité, insertion et égalité des chances ».  📈 2024→2025 : budget -0,48 Md€ ; contribution CAS -0,11 Md€."
     },
     {
      "name": "Travail & emploi",
      "color": "#E06D3C",
      "depth": 1,
-     "tooltip": "Mission LOLF : « Travail, emploi et administration des ministères sociaux ». 🔎 Retraites : ≈ 0.29 Md€ de ses crédits (gris uni) partent au CAS Pensions — subvention d'équilibre prélevée sur le budget du ministère pour le système de retraites ; dont ≈ 0.24 Md€ au-delà du taux du privé, la part re-fléchée vers les pensions dans la vue d'ensemble. Taux employeur civils : 74,28 % (2013-2024) → 78,28 % en 2025 → 82,28 % en 2026 (décrets 2025-61 et 2025-1341) ; privé ≈ 16,5 %. 🔎 S'y ajoutent ≈ 0.77 Md€ (hachures, estimation) versés au CAS par les OPÉRATEURS qu'elle finance (universités, établissements publics…), pris sur leurs subventions.",
+     "tooltip": "Mission LOLF : « Travail, emploi et administration des ministères sociaux ». 🔎 Retraites : ≈ 0.29 Md€ de ses crédits (gris uni) partent au CAS Pensions — subvention d'équilibre prélevée sur le budget du ministère pour le système de retraites ; dont ≈ 0.24 Md€ au-delà du taux du privé, la part re-fléchée vers les pensions dans la vue d'ensemble. Taux employeur civils : 74,28 % (2013-2024) → 78,28 % en 2025 → 82,28 % en 2026 (décrets 2025-61 et 2025-1341) ; privé ≈ 16,5 %. 🔎 S'y ajoutent ≈ 0.49 Md€ (hachures, estimation) versés au CAS par les OPÉRATEURS qu'elle finance (universités, établissements publics…), pris sur leurs subventions. 📈 2024→2025 : budget -0,93 Md€ ; contribution CAS +0,13 Md€.",
      "tags": [
       "retraites"
      ]
@@ -6100,7 +6078,7 @@
      "name": "Régimes spéciaux de retraite (subventions)",
      "color": "#E06D3C",
      "depth": 1,
-     "tooltip": "Mission LOLF : « Régimes sociaux et de retraite ». "
+     "tooltip": "Mission LOLF : « Régimes sociaux et de retraite ».  📈 2024→2025 : budget -0,23 Md€ ; contribution CAS +0,00 Md€."
     },
     {
      "name": "Anciens combattants",
@@ -6111,7 +6089,8 @@
     {
      "name": "Santé",
      "color": "#E06D3C",
-     "depth": 1
+     "depth": 1,
+     "tooltip": " 📈 2024→2025 : budget -0,71 Md€ ; contribution CAS +0,00 Md€."
     }
    ],
    "links": [
@@ -6123,7 +6102,7 @@
     {
      "source": "É · Solidarités, travail & santé",
      "target": "Travail & emploi",
-     "value": 20.57
+     "value": 20.85
     },
     {
      "source": "É · Solidarités, travail & santé",
@@ -6135,10 +6114,10 @@
     {
      "source": "É · Solidarités, travail & santé",
      "target": "Travail & emploi",
-     "value": 0.77,
+     "value": 0.49,
      "cas": true,
      "est": true,
-     "tooltip": "≈ 0.77 Md€ (hachures = ESTIMATION) versés au CAS Pensions — dont les opérateurs financés par « Travail & emploi » (universités, établissements publics…), via leurs subventions : ligne de recettes réelle du CAS (6,3 Md€/an) répartie au prorata des subventions pour charges de service public."
+     "tooltip": "≈ 0.49 Md€ (hachures = ESTIMATION) versés au CAS Pensions — dont les opérateurs financés par « Travail & emploi » (universités, établissements publics…), via leurs subventions : ligne de recettes réelle du CAS (6,3 Md€/an) répartie au prorata des subventions pour charges de service public."
     },
     {
      "source": "É · Solidarités, travail & santé",
@@ -6317,7 +6296,7 @@
      "name": "175 · Patrimoines",
      "color": "#DB6A42",
      "depth": 0,
-     "tooltip": "Patrimoines : monuments historiques, musées, archéologie. 🔎 ≈ 0.1 Md€ supplémentaires (hachures, estimation) versés au CAS par les opérateurs financés par ce programme."
+     "tooltip": "Patrimoines : monuments historiques, musées, archéologie. 🔎 ≈ 0.06 Md€ supplémentaires (hachures, estimation) versés au CAS par les opérateurs financés par ce programme."
     },
     {
      "name": "Monuments Historiques et patrimoine monumental",
@@ -6359,15 +6338,7 @@
     {
      "source": "175 · Patrimoines",
      "target": "Patrimoine des musées de France",
-     "value": 0.38
-    },
-    {
-     "source": "175 · Patrimoines",
-     "target": "Patrimoine des musées de France",
-     "value": 0.06,
-     "cas": true,
-     "est": true,
-     "tooltip": "≈ 0.06 Md€ (hachures = ESTIMATION) versés au CAS Pensions — dont les opérateurs financés par « Patrimoine des musées de France » (universités, établissements publics…), via leurs subventions : ligne de recettes réelle du CAS (6,3 Md€/an) répartie au prorata des subventions pour charges de service public."
+     "value": 0.44
     },
     {
      "source": "175 · Patrimoines",
@@ -6398,7 +6369,7 @@
      "name": "131 · Création",
      "color": "#DB6A42",
      "depth": 0,
-     "tooltip": "Création artistique : spectacle vivant, arts plastiques. 🔎 ≈ 0.06 Md€ supplémentaires (hachures, estimation) versés au CAS par les opérateurs financés par ce programme."
+     "tooltip": "Création artistique : spectacle vivant, arts plastiques."
     },
     {
      "name": "Soutien à la création, à la production et à la diffusion du spectacle vivant",
@@ -6420,15 +6391,7 @@
     {
      "source": "131 · Création",
      "target": "Soutien à la création, à la production et à la diffusion du spectacle vivant",
-     "value": 0.77
-    },
-    {
-     "source": "131 · Création",
-     "target": "Soutien à la création, à la production et à la diffusion du spectacle vivant",
-     "value": 0.05,
-     "cas": true,
-     "est": true,
-     "tooltip": "≈ 0.05 Md€ (hachures = ESTIMATION) versés au CAS Pensions — dont les opérateurs financés par « Soutien à la création, à la production et à la diffusion du spectacle vivant » (universités, établissements publics…), via leurs subventions : ligne de recettes réelle du CAS (6,3 Md€/an) répartie au prorata des subventions pour charges de service public."
+     "value": 0.82
     },
     {
      "source": "131 · Création",
@@ -6493,7 +6456,7 @@
      "name": "361 · Transmission des savoirs et démocratisation de la culture",
      "color": "#DB6A42",
      "depth": 0,
-     "tooltip": "🔎 ≈ 0.05 Md€ supplémentaires (hachures, estimation) versés au CAS par les opérateurs financés par ce programme."
+     "tooltip": ""
     },
     {
      "name": "Soutien à la démocratisation et à l'éducation artistique et culturelle",
@@ -6546,19 +6509,19 @@
      "name": "Culture",
      "color": "#DB6A42",
      "depth": 0,
-     "tooltip": "🔎 Retraites : ≈ 0.21 Md€ de ses crédits (gris uni) partent au CAS Pensions — subvention d'équilibre prélevée sur le budget du ministère pour le système de retraites ; dont ≈ 0.17 Md€ au-delà du taux du privé, la part re-fléchée vers les pensions dans la vue d'ensemble. Taux employeur civils : 74,28 % (2013-2024) → 78,28 % en 2025 → 82,28 % en 2026 (décrets 2025-61 et 2025-1341) ; privé ≈ 16,5 %. 🔎 S'y ajoutent ≈ 0.2 Md€ (hachures, estimation) versés au CAS par les OPÉRATEURS qu'elle finance (universités, établissements publics…), pris sur leurs subventions."
+     "tooltip": "🔎 Retraites : ≈ 0.21 Md€ de ses crédits (gris uni) partent au CAS Pensions — subvention d'équilibre prélevée sur le budget du ministère pour le système de retraites ; dont ≈ 0.17 Md€ au-delà du taux du privé, la part re-fléchée vers les pensions dans la vue d'ensemble. Taux employeur civils : 74,28 % (2013-2024) → 78,28 % en 2025 → 82,28 % en 2026 (décrets 2025-61 et 2025-1341) ; privé ≈ 16,5 %. 🔎 S'y ajoutent ≈ 0.13 Md€ (hachures, estimation) versés au CAS par les OPÉRATEURS qu'elle finance (universités, établissements publics…), pris sur leurs subventions."
     },
     {
      "name": "175 · Patrimoines",
      "color": "#DB6A42",
      "depth": 1,
-     "tooltip": "Patrimoines : monuments historiques, musées, archéologie. 🔎 ≈ 0.1 Md€ supplémentaires (hachures, estimation) versés au CAS par les opérateurs financés par ce programme."
+     "tooltip": "Patrimoines : monuments historiques, musées, archéologie. 🔎 ≈ 0.06 Md€ supplémentaires (hachures, estimation) versés au CAS par les opérateurs financés par ce programme."
     },
     {
      "name": "131 · Création",
      "color": "#DB6A42",
      "depth": 1,
-     "tooltip": "Création artistique : spectacle vivant, arts plastiques. 🔎 ≈ 0.06 Md€ supplémentaires (hachures, estimation) versés au CAS par les opérateurs financés par ce programme."
+     "tooltip": "Création artistique : spectacle vivant, arts plastiques."
     },
     {
      "name": "224 · Soutien aux politiques du ministère de la culture",
@@ -6570,35 +6533,27 @@
      "name": "361 · Transmission des savoirs et démocratisation de la culture",
      "color": "#DB6A42",
      "depth": 1,
-     "tooltip": "🔎 ≈ 0.05 Md€ supplémentaires (hachures, estimation) versés au CAS par les opérateurs financés par ce programme."
+     "tooltip": ""
     }
    ],
    "links": [
     {
      "source": "Culture",
      "target": "175 · Patrimoines",
-     "value": 1.1
+     "value": 1.14
     },
     {
      "source": "Culture",
      "target": "175 · Patrimoines",
-     "value": 0.1,
-     "cas": true,
-     "est": true,
-     "tooltip": "≈ 0.1 Md€ (hachures = ESTIMATION) versés au CAS Pensions — dont les opérateurs financés par « 175 · Patrimoines » (universités, établissements publics…), via leurs subventions : ligne de recettes réelle du CAS (6,3 Md€/an) répartie au prorata des subventions pour charges de service public."
-    },
-    {
-     "source": "Culture",
-     "target": "131 · Création",
-     "value": 0.98
-    },
-    {
-     "source": "Culture",
-     "target": "131 · Création",
      "value": 0.06,
      "cas": true,
      "est": true,
-     "tooltip": "≈ 0.06 Md€ (hachures = ESTIMATION) versés au CAS Pensions — dont les opérateurs financés par « 131 · Création » (universités, établissements publics…), via leurs subventions : ligne de recettes réelle du CAS (6,3 Md€/an) répartie au prorata des subventions pour charges de service public."
+     "tooltip": "≈ 0.06 Md€ (hachures = ESTIMATION) versés au CAS Pensions — dont les opérateurs financés par « 175 · Patrimoines » (universités, établissements publics…), via leurs subventions : ligne de recettes réelle du CAS (6,3 Md€/an) répartie au prorata des subventions pour charges de service public."
+    },
+    {
+     "source": "Culture",
+     "target": "131 · Création",
+     "value": 1.04
     },
     {
      "source": "Culture",
@@ -6615,15 +6570,7 @@
     {
      "source": "Culture",
      "target": "361 · Transmission des savoirs et démocratisation de la culture",
-     "value": 0.76
-    },
-    {
-     "source": "Culture",
-     "target": "361 · Transmission des savoirs et démocratisation de la culture",
-     "value": 0.05,
-     "cas": true,
-     "est": true,
-     "tooltip": "≈ 0.05 Md€ (hachures = ESTIMATION) versés au CAS Pensions — dont les opérateurs financés par « 361 · Transmission des savoirs et démocratisation de la culture » (universités, établissements publics…), via leurs subventions : ligne de recettes réelle du CAS (6,3 Md€/an) répartie au prorata des subventions pour charges de service public."
+     "value": 0.81
     }
    ]
   },
@@ -6634,7 +6581,7 @@
      "name": "163 · Jeunesse et vie associative",
      "color": "#DB6A42",
      "depth": 0,
-     "tooltip": "Jeunesse et vie associative : Service national universel, service civique, FONJEP. 🔎 ≈ 0.11 Md€ supplémentaires (hachures, estimation) versés au CAS par les opérateurs financés par ce programme."
+     "tooltip": "Jeunesse et vie associative : Service national universel, service civique, FONJEP. 🔎 ≈ 0.07 Md€ supplémentaires (hachures, estimation) versés au CAS par les opérateurs financés par ce programme."
     },
     {
      "name": "Développement du service civique",
@@ -6661,15 +6608,15 @@
     {
      "source": "163 · Jeunesse et vie associative",
      "target": "Développement du service civique",
-     "value": 0.49
+     "value": 0.53
     },
     {
      "source": "163 · Jeunesse et vie associative",
      "target": "Développement du service civique",
-     "value": 0.11,
+     "value": 0.07,
      "cas": true,
      "est": true,
-     "tooltip": "≈ 0.11 Md€ (hachures = ESTIMATION) versés au CAS Pensions — dont les opérateurs financés par « Développement du service civique » (universités, établissements publics…), via leurs subventions : ligne de recettes réelle du CAS (6,3 Md€/an) répartie au prorata des subventions pour charges de service public."
+     "tooltip": "≈ 0.07 Md€ (hachures = ESTIMATION) versés au CAS Pensions — dont les opérateurs financés par « Développement du service civique » (universités, établissements publics…), via leurs subventions : ligne de recettes réelle du CAS (6,3 Md€/an) répartie au prorata des subventions pour charges de service public."
     },
     {
      "source": "163 · Jeunesse et vie associative",
@@ -6748,13 +6695,13 @@
      "name": "Sport & jeunesse",
      "color": "#DB6A42",
      "depth": 0,
-     "tooltip": "Mission LOLF : « Sport, jeunesse et vie associative ».  🔎 S'y ajoutent ≈ 0.12 Md€ (hachures, estimation) versés au CAS par les OPÉRATEURS qu'elle finance (universités, établissements publics…), pris sur leurs subventions."
+     "tooltip": "Mission LOLF : « Sport, jeunesse et vie associative ».  🔎 S'y ajoutent ≈ 0.08 Md€ (hachures, estimation) versés au CAS par les OPÉRATEURS qu'elle finance (universités, établissements publics…), pris sur leurs subventions. 📈 2024→2025 : budget -0,21 Md€ ; contribution CAS +0,00 Md€."
     },
     {
      "name": "163 · Jeunesse et vie associative",
      "color": "#DB6A42",
      "depth": 1,
-     "tooltip": "Jeunesse et vie associative : Service national universel, service civique, FONJEP. 🔎 ≈ 0.11 Md€ supplémentaires (hachures, estimation) versés au CAS par les opérateurs financés par ce programme."
+     "tooltip": "Jeunesse et vie associative : Service national universel, service civique, FONJEP. 🔎 ≈ 0.07 Md€ supplémentaires (hachures, estimation) versés au CAS par les opérateurs financés par ce programme."
     },
     {
      "name": "219 · Sport",
@@ -6773,15 +6720,15 @@
     {
      "source": "Sport & jeunesse",
      "target": "163 · Jeunesse et vie associative",
-     "value": 0.83
+     "value": 0.87
     },
     {
      "source": "Sport & jeunesse",
      "target": "163 · Jeunesse et vie associative",
-     "value": 0.11,
+     "value": 0.07,
      "cas": true,
      "est": true,
-     "tooltip": "≈ 0.11 Md€ (hachures = ESTIMATION) versés au CAS Pensions — dont les opérateurs financés par « 163 · Jeunesse et vie associative » (universités, établissements publics…), via leurs subventions : ligne de recettes réelle du CAS (6,3 Md€/an) répartie au prorata des subventions pour charges de service public."
+     "tooltip": "≈ 0.07 Md€ (hachures = ESTIMATION) versés au CAS Pensions — dont les opérateurs financés par « 163 · Jeunesse et vie associative » (universités, établissements publics…), via leurs subventions : ligne de recettes réelle du CAS (6,3 Md€/an) répartie au prorata des subventions pour charges de service public."
     },
     {
      "source": "Sport & jeunesse",
@@ -6865,7 +6812,7 @@
      "name": "334 · Livre et industries culturelles",
      "color": "#DB6A42",
      "depth": 0,
-     "tooltip": "Livre et industries culturelles : BnF, bibliothèques, musique. 🔎 ≈ 0.05 Md€ supplémentaires (hachures, estimation) versés au CAS par les opérateurs financés par ce programme."
+     "tooltip": "Livre et industries culturelles : BnF, bibliothèques, musique."
     },
     {
      "name": "Livre et lecture",
@@ -6882,15 +6829,7 @@
     {
      "source": "334 · Livre et industries culturelles",
      "target": "Livre et lecture",
-     "value": 0.28
-    },
-    {
-     "source": "334 · Livre et industries culturelles",
-     "target": "Livre et lecture",
-     "value": 0.05,
-     "cas": true,
-     "est": true,
-     "tooltip": "≈ 0.05 Md€ (hachures = ESTIMATION) versés au CAS Pensions — dont les opérateurs financés par « Livre et lecture » (universités, établissements publics…), via leurs subventions : ligne de recettes réelle du CAS (6,3 Md€/an) répartie au prorata des subventions pour charges de service public."
+     "value": 0.33
     },
     {
      "source": "334 · Livre et industries culturelles",
@@ -6906,7 +6845,7 @@
      "name": "Médias & livre",
      "color": "#DB6A42",
      "depth": 0,
-     "tooltip": "Mission LOLF : « Médias, livre et industries culturelles ».  🔎 S'y ajoutent ≈ 0.05 Md€ (hachures, estimation) versés au CAS par les OPÉRATEURS qu'elle finance (universités, établissements publics…), pris sur leurs subventions."
+     "tooltip": "Mission LOLF : « Médias, livre et industries culturelles ». "
     },
     {
      "name": "180 · Presse et médias",
@@ -6918,7 +6857,7 @@
      "name": "334 · Livre et industries culturelles",
      "color": "#DB6A42",
      "depth": 1,
-     "tooltip": "Livre et industries culturelles : BnF, bibliothèques, musique. 🔎 ≈ 0.05 Md€ supplémentaires (hachures, estimation) versés au CAS par les opérateurs financés par ce programme."
+     "tooltip": "Livre et industries culturelles : BnF, bibliothèques, musique."
     }
    ],
    "links": [
@@ -6930,15 +6869,7 @@
     {
      "source": "Médias & livre",
      "target": "334 · Livre et industries culturelles",
-     "value": 0.31
-    },
-    {
-     "source": "Médias & livre",
-     "target": "334 · Livre et industries culturelles",
-     "value": 0.05,
-     "cas": true,
-     "est": true,
-     "tooltip": "≈ 0.05 Md€ (hachures = ESTIMATION) versés au CAS Pensions — dont les opérateurs financés par « 334 · Livre et industries culturelles » (universités, établissements publics…), via leurs subventions : ligne de recettes réelle du CAS (6,3 Md€/an) répartie au prorata des subventions pour charges de service public."
+     "value": 0.36
     }
    ]
   },
@@ -6959,7 +6890,7 @@
      "name": "Culture",
      "color": "#DB6A42",
      "depth": 1,
-     "tooltip": "🔎 Retraites : ≈ 0.21 Md€ de ses crédits (gris uni) partent au CAS Pensions — subvention d'équilibre prélevée sur le budget du ministère pour le système de retraites ; dont ≈ 0.17 Md€ au-delà du taux du privé, la part re-fléchée vers les pensions dans la vue d'ensemble. Taux employeur civils : 74,28 % (2013-2024) → 78,28 % en 2025 → 82,28 % en 2026 (décrets 2025-61 et 2025-1341) ; privé ≈ 16,5 %. 🔎 S'y ajoutent ≈ 0.2 Md€ (hachures, estimation) versés au CAS par les OPÉRATEURS qu'elle finance (universités, établissements publics…), pris sur leurs subventions.",
+     "tooltip": "🔎 Retraites : ≈ 0.21 Md€ de ses crédits (gris uni) partent au CAS Pensions — subvention d'équilibre prélevée sur le budget du ministère pour le système de retraites ; dont ≈ 0.17 Md€ au-delà du taux du privé, la part re-fléchée vers les pensions dans la vue d'ensemble. Taux employeur civils : 74,28 % (2013-2024) → 78,28 % en 2025 → 82,28 % en 2026 (décrets 2025-61 et 2025-1341) ; privé ≈ 16,5 %. 🔎 S'y ajoutent ≈ 0.13 Md€ (hachures, estimation) versés au CAS par les OPÉRATEURS qu'elle finance (universités, établissements publics…), pris sur leurs subventions.",
      "tags": [
       "retraites"
      ]
@@ -6968,7 +6899,7 @@
      "name": "Sport & jeunesse",
      "color": "#DB6A42",
      "depth": 1,
-     "tooltip": "Mission LOLF : « Sport, jeunesse et vie associative ».  🔎 S'y ajoutent ≈ 0.12 Md€ (hachures, estimation) versés au CAS par les OPÉRATEURS qu'elle finance (universités, établissements publics…), pris sur leurs subventions.",
+     "tooltip": "Mission LOLF : « Sport, jeunesse et vie associative ».  🔎 S'y ajoutent ≈ 0.08 Md€ (hachures, estimation) versés au CAS par les OPÉRATEURS qu'elle finance (universités, établissements publics…), pris sur leurs subventions. 📈 2024→2025 : budget -0,21 Md€ ; contribution CAS +0,00 Md€.",
      "tags": [
       "retraites"
      ]
@@ -6977,10 +6908,7 @@
      "name": "Médias & livre",
      "color": "#DB6A42",
      "depth": 1,
-     "tooltip": "Mission LOLF : « Médias, livre et industries culturelles ».  🔎 S'y ajoutent ≈ 0.05 Md€ (hachures, estimation) versés au CAS par les OPÉRATEURS qu'elle finance (universités, établissements publics…), pris sur leurs subventions.",
-     "tags": [
-      "retraites"
-     ]
+     "tooltip": "Mission LOLF : « Médias, livre et industries culturelles ». "
     }
    ],
    "links": [
@@ -6992,7 +6920,7 @@
     {
      "source": "É · Culture, médias, sport",
      "target": "Culture",
-     "value": 3.51
+     "value": 3.58
     },
     {
      "source": "É · Culture, médias, sport",
@@ -7004,36 +6932,28 @@
     {
      "source": "É · Culture, médias, sport",
      "target": "Culture",
-     "value": 0.2,
+     "value": 0.13,
      "cas": true,
      "est": true,
-     "tooltip": "≈ 0.2 Md€ (hachures = ESTIMATION) versés au CAS Pensions — dont les opérateurs financés par « Culture » (universités, établissements publics…), via leurs subventions : ligne de recettes réelle du CAS (6,3 Md€/an) répartie au prorata des subventions pour charges de service public."
+     "tooltip": "≈ 0.13 Md€ (hachures = ESTIMATION) versés au CAS Pensions — dont les opérateurs financés par « Culture » (universités, établissements publics…), via leurs subventions : ligne de recettes réelle du CAS (6,3 Md€/an) répartie au prorata des subventions pour charges de service public."
     },
     {
      "source": "É · Culture, médias, sport",
      "target": "Sport & jeunesse",
-     "value": 1.46
+     "value": 1.5
     },
     {
      "source": "É · Culture, médias, sport",
      "target": "Sport & jeunesse",
-     "value": 0.12,
+     "value": 0.08,
      "cas": true,
      "est": true,
-     "tooltip": "≈ 0.12 Md€ (hachures = ESTIMATION) versés au CAS Pensions — dont les opérateurs financés par « Sport & jeunesse » (universités, établissements publics…), via leurs subventions : ligne de recettes réelle du CAS (6,3 Md€/an) répartie au prorata des subventions pour charges de service public."
+     "tooltip": "≈ 0.08 Md€ (hachures = ESTIMATION) versés au CAS Pensions — dont les opérateurs financés par « Sport & jeunesse » (universités, établissements publics…), via leurs subventions : ligne de recettes réelle du CAS (6,3 Md€/an) répartie au prorata des subventions pour charges de service public."
     },
     {
      "source": "É · Culture, médias, sport",
      "target": "Médias & livre",
-     "value": 0.67
-    },
-    {
-     "source": "É · Culture, médias, sport",
-     "target": "Médias & livre",
-     "value": 0.05,
-     "cas": true,
-     "est": true,
-     "tooltip": "≈ 0.05 Md€ (hachures = ESTIMATION) versés au CAS Pensions — dont les opérateurs financés par « Médias & livre » (universités, établissements publics…), via leurs subventions : ligne de recettes réelle du CAS (6,3 Md€/an) répartie au prorata des subventions pour charges de service public."
+     "value": 0.72
     }
    ]
   },
@@ -7388,7 +7308,7 @@
      "name": "144 · Environnement et prospective de la politique de défense",
      "color": "#D94F26",
      "depth": 0,
-     "tooltip": "Environnement et prospective de la politique de défense : renseignement (DGSE), études amont. 🔎 ≈ 0.06 Md€ supplémentaires (hachures, estimation) versés au CAS par les opérateurs financés par ce programme."
+     "tooltip": "Environnement et prospective de la politique de défense : renseignement (DGSE), études amont."
     },
     {
      "name": "Prospective de défense",
@@ -7410,15 +7330,7 @@
     {
      "source": "144 · Environnement et prospective de la politique de défense",
      "target": "Prospective de défense",
-     "value": 1.41
-    },
-    {
-     "source": "144 · Environnement et prospective de la politique de défense",
-     "target": "Prospective de défense",
-     "value": 0.06,
-     "cas": true,
-     "est": true,
-     "tooltip": "≈ 0.06 Md€ (hachures = ESTIMATION) versés au CAS Pensions — dont les opérateurs financés par « Prospective de défense » (universités, établissements publics…), via leurs subventions : ligne de recettes réelle du CAS (6,3 Md€/an) répartie au prorata des subventions pour charges de service public."
+     "value": 1.47
     },
     {
      "source": "144 · Environnement et prospective de la politique de défense",
@@ -7439,7 +7351,7 @@
      "name": "Défense",
      "color": "#D94F26",
      "depth": 0,
-     "tooltip": "🔎 Retraites : ≈ 8.32 Md€ de ses crédits (gris uni) partent au CAS Pensions — subvention d'équilibre prélevée sur le budget du ministère pour le système de retraites ; dont ≈ 6.71 Md€ au-delà du taux du privé, la part re-fléchée vers les pensions dans la vue d'ensemble. Taux employeur civils : 74,28 % (2013-2024) → 78,28 % en 2025 → 82,28 % en 2026 (décrets 2025-61 et 2025-1341) ; privé ≈ 16,5 %. 🔎 S'y ajoutent ≈ 0.09 Md€ (hachures, estimation) versés au CAS par les OPÉRATEURS qu'elle finance (universités, établissements publics…), pris sur leurs subventions. NB : les militaires cotisent au CAS à 126,07 % (taux inchangé) ; leurs contributions réelles pèsent 11,3 Md€ en 2025 (ligne de recettes du CAS, PLF 2025), portées pour l'essentiel par la Défense et la gendarmerie."
+     "tooltip": "🔎 Retraites : ≈ 8.32 Md€ de ses crédits (gris uni) partent au CAS Pensions — subvention d'équilibre prélevée sur le budget du ministère pour le système de retraites ; dont ≈ 6.71 Md€ au-delà du taux du privé, la part re-fléchée vers les pensions dans la vue d'ensemble. Taux employeur civils : 74,28 % (2013-2024) → 78,28 % en 2025 → 82,28 % en 2026 (décrets 2025-61 et 2025-1341) ; privé ≈ 16,5 %. 🔎 S'y ajoutent ≈ 0.07 Md€ (hachures, estimation) versés au CAS par les OPÉRATEURS qu'elle finance (universités, établissements publics…), pris sur leurs subventions. 📈 2024→2025 : budget +3,22 Md€ ; contribution CAS -0,03 Md€. 📄 Le Sénat relève que la hausse 2025 (+3,3 Md€ hors pensions, conforme à la LPM) concerne toutes les opérations stratégiques « à la seule exception des contributions au CAS Pensions » : le taux militaire (126,07 %) n'a pas été relevé, contrairement à celui des civils. Les contributions militaires réelles pèsent ≈ 11,3 Md€ en 2025 (ligne de recettes du CAS) ; l'assiette croît avec les effectifs de la LPM (+0,8 Md€ de contributions depuis 2020) mais reste marginale dans la hausse, portée par l'équipement. (Sénat, rapport PLF 2025 « Défense »)."
     },
     {
      "name": "212 · Soutien de la politique de la défense",
@@ -7463,7 +7375,7 @@
      "name": "144 · Environnement et prospective de la politique de défense",
      "color": "#D94F26",
      "depth": 1,
-     "tooltip": "Environnement et prospective de la politique de défense : renseignement (DGSE), études amont. 🔎 ≈ 0.06 Md€ supplémentaires (hachures, estimation) versés au CAS par les opérateurs financés par ce programme."
+     "tooltip": "Environnement et prospective de la politique de défense : renseignement (DGSE), études amont."
     }
    ],
    "links": [
@@ -7492,15 +7404,7 @@
     {
      "source": "Défense",
      "target": "144 · Environnement et prospective de la politique de défense",
-     "value": 2.02
-    },
-    {
-     "source": "Défense",
-     "target": "144 · Environnement et prospective de la politique de défense",
-     "value": 0.06,
-     "cas": true,
-     "est": true,
-     "tooltip": "≈ 0.06 Md€ (hachures = ESTIMATION) versés au CAS Pensions — dont les opérateurs financés par « 144 · Environnement et prospective de la politique de défense » (universités, établissements publics…), via leurs subventions : ligne de recettes réelle du CAS (6,3 Md€/an) répartie au prorata des subventions pour charges de service public."
+     "value": 2.08
     }
    ]
   },
@@ -7875,7 +7779,7 @@
      "name": "Police, gendarmerie & sécurité civile",
      "color": "#D94F26",
      "depth": 0,
-     "tooltip": "Mission LOLF : « Sécurités ». 🔎 Retraites : ≈ 6.99 Md€ de ses crédits (gris uni) partent au CAS Pensions — subvention d'équilibre prélevée sur le budget du ministère pour le système de retraites ; dont ≈ 5.64 Md€ au-delà du taux du privé, la part re-fléchée vers les pensions dans la vue d'ensemble. Taux employeur civils : 74,28 % (2013-2024) → 78,28 % en 2025 → 82,28 % en 2026 (décrets 2025-61 et 2025-1341) ; privé ≈ 16,5 %."
+     "tooltip": "Mission LOLF : « Sécurités ». 🔎 Retraites : ≈ 6.99 Md€ de ses crédits (gris uni) partent au CAS Pensions — subvention d'équilibre prélevée sur le budget du ministère pour le système de retraites ; dont ≈ 5.64 Md€ au-delà du taux du privé, la part re-fléchée vers les pensions dans la vue d'ensemble. Taux employeur civils : 74,28 % (2013-2024) → 78,28 % en 2025 → 82,28 % en 2026 (décrets 2025-61 et 2025-1341) ; privé ≈ 16,5 %. 📈 2024→2025 : budget +1,05 Md€ ; contribution CAS +0,26 Md€ (24 % de la hausse). 📄 Le Sénat note que les crédits hors titre 2 de la police (1 761 M€) restent sous la cible LOPMI (1 826 M€) : la hausse de la mission est en partie absorbée par les dépenses de personnel, dont la contribution au CAS Pensions des policiers (civils, touchés par le relèvement à 78,28 %) — les gendarmes (militaires) ne le sont pas. (Sénat, rapport PLF 2025 « Sécurités »)."
     },
     {
      "name": "176 · Police nationale",
@@ -8355,7 +8259,7 @@
      "name": "Justice",
      "color": "#D94F26",
      "depth": 0,
-     "tooltip": "🔎 Retraites : ≈ 2.16 Md€ de ses crédits (gris uni) partent au CAS Pensions — subvention d'équilibre prélevée sur le budget du ministère pour le système de retraites ; dont ≈ 1.75 Md€ au-delà du taux du privé, la part re-fléchée vers les pensions dans la vue d'ensemble. Taux employeur civils : 74,28 % (2013-2024) → 78,28 % en 2025 → 82,28 % en 2026 (décrets 2025-61 et 2025-1341) ; privé ≈ 16,5 %."
+     "tooltip": "🔎 Retraites : ≈ 2.16 Md€ de ses crédits (gris uni) partent au CAS Pensions — subvention d'équilibre prélevée sur le budget du ministère pour le système de retraites ; dont ≈ 1.75 Md€ au-delà du taux du privé, la part re-fléchée vers les pensions dans la vue d'ensemble. Taux employeur civils : 74,28 % (2013-2024) → 78,28 % en 2025 → 82,28 % en 2026 (décrets 2025-61 et 2025-1341) ; privé ≈ 16,5 %. 📈 2024→2025 : budget +0,30 Md€ ; contribution CAS +0,10 Md€ (33 % de la hausse)."
     },
     {
      "name": "107 · Administration pénitentiaire",
@@ -8568,7 +8472,7 @@
      "name": "Immigration & asile",
      "color": "#D94F26",
      "depth": 0,
-     "tooltip": "Mission LOLF : « Immigration, asile et intégration ».  🔎 S'y ajoutent ≈ 0.06 Md€ (hachures, estimation) versés au CAS par les OPÉRATEURS qu'elle finance (universités, établissements publics…), pris sur leurs subventions."
+     "tooltip": "Mission LOLF : « Immigration, asile et intégration ».  📈 2024→2025 : budget -0,11 Md€ ; contribution CAS +0,00 Md€."
     },
     {
      "name": "303 · Immigration et asile",
@@ -8608,7 +8512,7 @@
      "name": "Défense",
      "color": "#D94F26",
      "depth": 1,
-     "tooltip": "🔎 Retraites : ≈ 8.32 Md€ de ses crédits (gris uni) partent au CAS Pensions — subvention d'équilibre prélevée sur le budget du ministère pour le système de retraites ; dont ≈ 6.71 Md€ au-delà du taux du privé, la part re-fléchée vers les pensions dans la vue d'ensemble. Taux employeur civils : 74,28 % (2013-2024) → 78,28 % en 2025 → 82,28 % en 2026 (décrets 2025-61 et 2025-1341) ; privé ≈ 16,5 %. 🔎 S'y ajoutent ≈ 0.09 Md€ (hachures, estimation) versés au CAS par les OPÉRATEURS qu'elle finance (universités, établissements publics…), pris sur leurs subventions. NB : les militaires cotisent au CAS à 126,07 % (taux inchangé) ; leurs contributions réelles pèsent 11,3 Md€ en 2025 (ligne de recettes du CAS, PLF 2025), portées pour l'essentiel par la Défense et la gendarmerie.",
+     "tooltip": "🔎 Retraites : ≈ 8.32 Md€ de ses crédits (gris uni) partent au CAS Pensions — subvention d'équilibre prélevée sur le budget du ministère pour le système de retraites ; dont ≈ 6.71 Md€ au-delà du taux du privé, la part re-fléchée vers les pensions dans la vue d'ensemble. Taux employeur civils : 74,28 % (2013-2024) → 78,28 % en 2025 → 82,28 % en 2026 (décrets 2025-61 et 2025-1341) ; privé ≈ 16,5 %. 🔎 S'y ajoutent ≈ 0.07 Md€ (hachures, estimation) versés au CAS par les OPÉRATEURS qu'elle finance (universités, établissements publics…), pris sur leurs subventions. 📈 2024→2025 : budget +3,22 Md€ ; contribution CAS -0,03 Md€. 📄 Le Sénat relève que la hausse 2025 (+3,3 Md€ hors pensions, conforme à la LPM) concerne toutes les opérations stratégiques « à la seule exception des contributions au CAS Pensions » : le taux militaire (126,07 %) n'a pas été relevé, contrairement à celui des civils. Les contributions militaires réelles pèsent ≈ 11,3 Md€ en 2025 (ligne de recettes du CAS) ; l'assiette croît avec les effectifs de la LPM (+0,8 Md€ de contributions depuis 2020) mais reste marginale dans la hausse, portée par l'équipement. (Sénat, rapport PLF 2025 « Défense »).",
      "tags": [
       "retraites"
      ]
@@ -8617,7 +8521,7 @@
      "name": "Police, gendarmerie & sécurité civile",
      "color": "#D94F26",
      "depth": 1,
-     "tooltip": "Mission LOLF : « Sécurités ». 🔎 Retraites : ≈ 6.99 Md€ de ses crédits (gris uni) partent au CAS Pensions — subvention d'équilibre prélevée sur le budget du ministère pour le système de retraites ; dont ≈ 5.64 Md€ au-delà du taux du privé, la part re-fléchée vers les pensions dans la vue d'ensemble. Taux employeur civils : 74,28 % (2013-2024) → 78,28 % en 2025 → 82,28 % en 2026 (décrets 2025-61 et 2025-1341) ; privé ≈ 16,5 %.",
+     "tooltip": "Mission LOLF : « Sécurités ». 🔎 Retraites : ≈ 6.99 Md€ de ses crédits (gris uni) partent au CAS Pensions — subvention d'équilibre prélevée sur le budget du ministère pour le système de retraites ; dont ≈ 5.64 Md€ au-delà du taux du privé, la part re-fléchée vers les pensions dans la vue d'ensemble. Taux employeur civils : 74,28 % (2013-2024) → 78,28 % en 2025 → 82,28 % en 2026 (décrets 2025-61 et 2025-1341) ; privé ≈ 16,5 %. 📈 2024→2025 : budget +1,05 Md€ ; contribution CAS +0,26 Md€ (24 % de la hausse). 📄 Le Sénat note que les crédits hors titre 2 de la police (1 761 M€) restent sous la cible LOPMI (1 826 M€) : la hausse de la mission est en partie absorbée par les dépenses de personnel, dont la contribution au CAS Pensions des policiers (civils, touchés par le relèvement à 78,28 %) — les gendarmes (militaires) ne le sont pas. (Sénat, rapport PLF 2025 « Sécurités »).",
      "tags": [
       "retraites"
      ]
@@ -8626,7 +8530,7 @@
      "name": "Justice",
      "color": "#D94F26",
      "depth": 1,
-     "tooltip": "🔎 Retraites : ≈ 2.16 Md€ de ses crédits (gris uni) partent au CAS Pensions — subvention d'équilibre prélevée sur le budget du ministère pour le système de retraites ; dont ≈ 1.75 Md€ au-delà du taux du privé, la part re-fléchée vers les pensions dans la vue d'ensemble. Taux employeur civils : 74,28 % (2013-2024) → 78,28 % en 2025 → 82,28 % en 2026 (décrets 2025-61 et 2025-1341) ; privé ≈ 16,5 %.",
+     "tooltip": "🔎 Retraites : ≈ 2.16 Md€ de ses crédits (gris uni) partent au CAS Pensions — subvention d'équilibre prélevée sur le budget du ministère pour le système de retraites ; dont ≈ 1.75 Md€ au-delà du taux du privé, la part re-fléchée vers les pensions dans la vue d'ensemble. Taux employeur civils : 74,28 % (2013-2024) → 78,28 % en 2025 → 82,28 % en 2026 (décrets 2025-61 et 2025-1341) ; privé ≈ 16,5 %. 📈 2024→2025 : budget +0,30 Md€ ; contribution CAS +0,10 Md€ (33 % de la hausse).",
      "tags": [
       "retraites"
      ]
@@ -8635,17 +8539,14 @@
      "name": "Immigration & asile",
      "color": "#D94F26",
      "depth": 1,
-     "tooltip": "Mission LOLF : « Immigration, asile et intégration ».  🔎 S'y ajoutent ≈ 0.06 Md€ (hachures, estimation) versés au CAS par les OPÉRATEURS qu'elle finance (universités, établissements publics…), pris sur leurs subventions.",
-     "tags": [
-      "retraites"
-     ]
+     "tooltip": "Mission LOLF : « Immigration, asile et intégration ».  📈 2024→2025 : budget -0,11 Md€ ; contribution CAS +0,00 Md€."
     }
    ],
    "links": [
     {
      "source": "É · Défense, sécurité, justice",
      "target": "Défense",
-     "value": 51.59
+     "value": 51.61
     },
     {
      "source": "É · Défense, sécurité, justice",
@@ -8657,10 +8558,10 @@
     {
      "source": "É · Défense, sécurité, justice",
      "target": "Défense",
-     "value": 0.09,
+     "value": 0.07,
      "cas": true,
      "est": true,
-     "tooltip": "≈ 0.09 Md€ (hachures = ESTIMATION) versés au CAS Pensions — dont les opérateurs financés par « Défense » (universités, établissements publics…), via leurs subventions : ligne de recettes réelle du CAS (6,3 Md€/an) répartie au prorata des subventions pour charges de service public."
+     "tooltip": "≈ 0.07 Md€ (hachures = ESTIMATION) versés au CAS Pensions — dont les opérateurs financés par « Défense » (universités, établissements publics…), via leurs subventions : ligne de recettes réelle du CAS (6,3 Md€/an) répartie au prorata des subventions pour charges de service public."
     },
     {
      "source": "É · Défense, sécurité, justice",
@@ -8689,15 +8590,7 @@
     {
      "source": "É · Défense, sécurité, justice",
      "target": "Immigration & asile",
-     "value": 1.99
-    },
-    {
-     "source": "É · Défense, sécurité, justice",
-     "target": "Immigration & asile",
-     "value": 0.06,
-     "cas": true,
-     "est": true,
-     "tooltip": "≈ 0.06 Md€ (hachures = ESTIMATION) versés au CAS Pensions — dont les opérateurs financés par « Immigration & asile » (universités, établissements publics…), via leurs subventions : ligne de recettes réelle du CAS (6,3 Md€/an) répartie au prorata des subventions pour charges de service public."
+     "value": 2.05
     }
    ]
   },
@@ -8837,7 +8730,7 @@
      "name": "Charge de la dette & engagements",
      "color": "#B23A1B",
      "depth": 0,
-     "tooltip": "Mission LOLF : « Engagements financiers de l'État ». "
+     "tooltip": "Mission LOLF : « Engagements financiers de l'État ».  📈 2024→2025 : budget +0,52 Md€ ; contribution CAS +0,00 Md€."
     },
     {
      "name": "117 · Charge de la dette et trésorerie de l'État (crédits évaluatifs)",
@@ -8921,7 +8814,7 @@
      "name": "Charge de la dette & engagements",
      "color": "#B23A1B",
      "depth": 1,
-     "tooltip": "Mission LOLF : « Engagements financiers de l'État ». "
+     "tooltip": "Mission LOLF : « Engagements financiers de l'État ».  📈 2024→2025 : budget +0,52 Md€ ; contribution CAS +0,00 Md€."
     }
    ],
    "links": [
@@ -9846,7 +9739,7 @@
      "name": "Éducation nationale",
      "color": "#5C7FB8",
      "depth": 0,
-     "tooltip": "Mission LOLF : « Enseignement scolaire ». 🔎 Retraites : ≈ 25.33 Md€ de ses crédits (gris uni) partent au CAS Pensions — subvention d'équilibre prélevée sur le budget du ministère pour le système de retraites ; dont ≈ 20.43 Md€ au-delà du taux du privé, la part re-fléchée vers les pensions dans la vue d'ensemble. Taux employeur civils : 74,28 % (2013-2024) → 78,28 % en 2025 → 82,28 % en 2026 (décrets 2025-61 et 2025-1341) ; privé ≈ 16,5 %."
+     "tooltip": "Mission LOLF : « Enseignement scolaire ». 🔎 Retraites : ≈ 25.33 Md€ de ses crédits (gris uni) partent au CAS Pensions — subvention d'équilibre prélevée sur le budget du ministère pour le système de retraites ; dont ≈ 20.43 Md€ au-delà du taux du privé, la part re-fléchée vers les pensions dans la vue d'ensemble. Taux employeur civils : 74,28 % (2013-2024) → 78,28 % en 2025 → 82,28 % en 2026 (décrets 2025-61 et 2025-1341) ; privé ≈ 16,5 %. 📈 2024→2025 : budget +1,99 Md€ ; contribution CAS +1,56 Md€ (79 % de la hausse). 📄 Le rapport du Sénat confirme le mécanisme : pour le seul programme 141 (second degré), la hausse des crédits s'explique aux trois quarts par l'augmentation de la contribution au CAS Pensions. (Sénat, avis PLF 2025 « Enseignement scolaire »)."
     },
     {
      "name": "141 · Enseignement scolaire public du second degré",
@@ -9967,7 +9860,7 @@
      "name": "150 · Formations supérieures et recherche universitaire",
      "color": "#5C7FB8",
      "depth": 0,
-     "tooltip": "Universités : masse salariale, fonctionnement et immobilier des établissements. 🔎 Retraites : ≈ 0.13 Md€ de ses crédits (gris uni) partent au CAS Pensions — subvention d'équilibre pour le système de retraites. 🔎 ≈ 2.57 Md€ supplémentaires (hachures, estimation) versés au CAS par les opérateurs financés par ce programme."
+     "tooltip": "Universités : masse salariale, fonctionnement et immobilier des établissements. 🔎 Retraites : ≈ 0.13 Md€ de ses crédits (gris uni) partent au CAS Pensions — subvention d'équilibre pour le système de retraites. 🔎 ≈ 3.91 Md€ supplémentaires (hachures, estimation) versés au CAS par les opérateurs financés par ce programme. 📄 PLF 2025 : +99 M€ de crédits affichés, mais la hausse du taux CAS des opérateurs coûte ≈ 200 M€/an aux universités, non compensée (Sénat/Dgesip) : les moyens réels reculent d'≈ 100 M€. Au total, 542 M€ de dépenses non compensées (3,5 % de la SCSP). (Sénat, avis PLF 2025 « Enseignement supérieur »)."
     },
     {
      "name": "Recherche",
@@ -10020,93 +9913,93 @@
     {
      "source": "150 · Formations supérieures et recherche universitaire",
      "target": "Recherche",
-     "value": 3.52
+     "value": 3.13
     },
     {
      "source": "150 · Formations supérieures et recherche universitaire",
      "target": "Recherche",
-     "value": 0.76,
+     "value": 1.15,
      "cas": true,
      "est": true,
-     "tooltip": "≈ 0.76 Md€ (hachures = ESTIMATION) versés au CAS Pensions — dont les opérateurs financés par « Recherche » (universités, établissements publics…), via leurs subventions : ligne de recettes réelle du CAS (6,3 Md€/an) répartie au prorata des subventions pour charges de service public."
+     "tooltip": "≈ 1.15 Md€ (hachures = ESTIMATION) versés au CAS Pensions — dont les opérateurs financés par « Recherche » (universités, établissements publics…), via leurs subventions : ligne de recettes réelle du CAS (6,3 Md€/an) répartie au prorata des subventions pour charges de service public."
     },
     {
      "source": "150 · Formations supérieures et recherche universitaire",
      "target": "Formation initiale et continue du baccalauréat à la licence",
-     "value": 3.26
+     "value": 2.9
     },
     {
      "source": "150 · Formations supérieures et recherche universitaire",
      "target": "Formation initiale et continue du baccalauréat à la licence",
-     "value": 0.7,
+     "value": 1.06,
      "cas": true,
      "est": true,
-     "tooltip": "≈ 0.7 Md€ (hachures = ESTIMATION) versés au CAS Pensions — dont les opérateurs financés par « Formation initiale et continue du baccalauréat à la licence » (universités, établissements publics…), via leurs subventions : ligne de recettes réelle du CAS (6,3 Md€/an) répartie au prorata des subventions pour charges de service public."
+     "tooltip": "≈ 1.06 Md€ (hachures = ESTIMATION) versés au CAS Pensions — dont les opérateurs financés par « Formation initiale et continue du baccalauréat à la licence » (universités, établissements publics…), via leurs subventions : ligne de recettes réelle du CAS (6,3 Md€/an) répartie au prorata des subventions pour charges de service public."
     },
     {
      "source": "150 · Formations supérieures et recherche universitaire",
      "target": "Formation initiale et continue de niveau master",
-     "value": 2.28
+     "value": 2.03
     },
     {
      "source": "150 · Formations supérieures et recherche universitaire",
      "target": "Formation initiale et continue de niveau master",
-     "value": 0.48,
+     "value": 0.73,
      "cas": true,
      "est": true,
-     "tooltip": "≈ 0.48 Md€ (hachures = ESTIMATION) versés au CAS Pensions — dont les opérateurs financés par « Formation initiale et continue de niveau master » (universités, établissements publics…), via leurs subventions : ligne de recettes réelle du CAS (6,3 Md€/an) répartie au prorata des subventions pour charges de service public."
+     "tooltip": "≈ 0.73 Md€ (hachures = ESTIMATION) versés au CAS Pensions — dont les opérateurs financés par « Formation initiale et continue de niveau master » (universités, établissements publics…), via leurs subventions : ligne de recettes réelle du CAS (6,3 Md€/an) répartie au prorata des subventions pour charges de service public."
     },
     {
      "source": "150 · Formations supérieures et recherche universitaire",
      "target": "Pilotage et support du programme",
-     "value": 1.51
+     "value": 1.36
     },
     {
      "source": "150 · Formations supérieures et recherche universitaire",
      "target": "Pilotage et support du programme",
-     "value": 0.28,
+     "value": 0.43,
      "cas": true,
      "est": true,
-     "tooltip": "≈ 0.28 Md€ (hachures = ESTIMATION) versés au CAS Pensions — dont les opérateurs financés par « Pilotage et support du programme » (universités, établissements publics…), via leurs subventions : ligne de recettes réelle du CAS (6,3 Md€/an) répartie au prorata des subventions pour charges de service public."
+     "tooltip": "≈ 0.43 Md€ (hachures = ESTIMATION) versés au CAS Pensions — dont les opérateurs financés par « Pilotage et support du programme » (universités, établissements publics…), via leurs subventions : ligne de recettes réelle du CAS (6,3 Md€/an) répartie au prorata des subventions pour charges de service public."
     },
     {
      "source": "150 · Formations supérieures et recherche universitaire",
      "target": "Immobilier",
-     "value": 1.08
+     "value": 0.99
     },
     {
      "source": "150 · Formations supérieures et recherche universitaire",
      "target": "Immobilier",
-     "value": 0.17,
+     "value": 0.26,
      "cas": true,
      "est": true,
-     "tooltip": "≈ 0.17 Md€ (hachures = ESTIMATION) versés au CAS Pensions — dont les opérateurs financés par « Immobilier » (universités, établissements publics…), via leurs subventions : ligne de recettes réelle du CAS (6,3 Md€/an) répartie au prorata des subventions pour charges de service public."
+     "tooltip": "≈ 0.26 Md€ (hachures = ESTIMATION) versés au CAS Pensions — dont les opérateurs financés par « Immobilier » (universités, établissements publics…), via leurs subventions : ligne de recettes réelle du CAS (6,3 Md€/an) répartie au prorata des subventions pour charges de service public."
     },
     {
      "source": "150 · Formations supérieures et recherche universitaire",
      "target": "Formation initiale et continue de niveau doctorat",
-     "value": 0.43
+     "value": 0.38
     },
     {
      "source": "150 · Formations supérieures et recherche universitaire",
      "target": "Formation initiale et continue de niveau doctorat",
-     "value": 0.09,
+     "value": 0.14,
      "cas": true,
      "est": true,
-     "tooltip": "≈ 0.09 Md€ (hachures = ESTIMATION) versés au CAS Pensions — dont les opérateurs financés par « Formation initiale et continue de niveau doctorat » (universités, établissements publics…), via leurs subventions : ligne de recettes réelle du CAS (6,3 Md€/an) répartie au prorata des subventions pour charges de service public."
+     "tooltip": "≈ 0.14 Md€ (hachures = ESTIMATION) versés au CAS Pensions — dont les opérateurs financés par « Formation initiale et continue de niveau doctorat » (universités, établissements publics…), via leurs subventions : ligne de recettes réelle du CAS (6,3 Md€/an) répartie au prorata des subventions pour charges de service public."
     },
     {
      "source": "150 · Formations supérieures et recherche universitaire",
      "target": "Bibliothèques et documentation",
-     "value": 0.41
+     "value": 0.37
     },
     {
      "source": "150 · Formations supérieures et recherche universitaire",
      "target": "Bibliothèques et documentation",
-     "value": 0.08,
+     "value": 0.12,
      "cas": true,
      "est": true,
-     "tooltip": "≈ 0.08 Md€ (hachures = ESTIMATION) versés au CAS Pensions — dont les opérateurs financés par « Bibliothèques et documentation » (universités, établissements publics…), via leurs subventions : ligne de recettes réelle du CAS (6,3 Md€/an) répartie au prorata des subventions pour charges de service public."
+     "tooltip": "≈ 0.12 Md€ (hachures = ESTIMATION) versés au CAS Pensions — dont les opérateurs financés par « Bibliothèques et documentation » (universités, établissements publics…), via leurs subventions : ligne de recettes réelle du CAS (6,3 Md€/an) répartie au prorata des subventions pour charges de service public."
     },
     {
      "source": "150 · Formations supérieures et recherche universitaire",
@@ -10127,7 +10020,7 @@
      "name": "172 · Recherches scientifiques et technologiques pluridisciplinaires",
      "color": "#5C7FB8",
      "depth": 0,
-     "tooltip": "Recherche : subventions CNRS, Inserm, CEA civil, ANR. 🔎 ≈ 1.12 Md€ supplémentaires (hachures, estimation) versés au CAS par les opérateurs financés par ce programme."
+     "tooltip": "Recherche : subventions CNRS, Inserm, CEA civil, ANR. 🔎 ≈ 0.72 Md€ supplémentaires (hachures, estimation) versés au CAS par les opérateurs financés par ce programme."
     },
     {
      "name": "Recherches scientifiques et technologiques en sciences de la vie et de la santé",
@@ -10180,54 +10073,54 @@
     {
      "source": "172 · Recherches scientifiques et technologiques pluridisciplinaires",
      "target": "Recherches scientifiques et technologiques en sciences de la vie et de la santé",
-     "value": 1.15
+     "value": 1.23
     },
     {
      "source": "172 · Recherches scientifiques et technologiques pluridisciplinaires",
      "target": "Recherches scientifiques et technologiques en sciences de la vie et de la santé",
-     "value": 0.22,
+     "value": 0.14,
      "cas": true,
      "est": true,
-     "tooltip": "≈ 0.22 Md€ (hachures = ESTIMATION) versés au CAS Pensions — dont les opérateurs financés par « Recherches scientifiques et technologiques en sciences de la vie et de la santé » (universités, établissements publics…), via leurs subventions : ligne de recettes réelle du CAS (6,3 Md€/an) répartie au prorata des subventions pour charges de service public."
+     "tooltip": "≈ 0.14 Md€ (hachures = ESTIMATION) versés au CAS Pensions — dont les opérateurs financés par « Recherches scientifiques et technologiques en sciences de la vie et de la santé » (universités, établissements publics…), via leurs subventions : ligne de recettes réelle du CAS (6,3 Md€/an) répartie au prorata des subventions pour charges de service public."
     },
     {
      "source": "172 · Recherches scientifiques et technologiques pluridisciplinaires",
      "target": "Recherches scientifiques et technologiques dans le domaine de l'environnement",
-     "value": 1.05
+     "value": 1.12
     },
     {
      "source": "172 · Recherches scientifiques et technologiques pluridisciplinaires",
      "target": "Recherches scientifiques et technologiques dans le domaine de l'environnement",
-     "value": 0.21,
+     "value": 0.14,
      "cas": true,
      "est": true,
-     "tooltip": "≈ 0.21 Md€ (hachures = ESTIMATION) versés au CAS Pensions — dont les opérateurs financés par « Recherches scientifiques et technologiques dans le domaine de l'environnement » (universités, établissements publics…), via leurs subventions : ligne de recettes réelle du CAS (6,3 Md€/an) répartie au prorata des subventions pour charges de service public."
+     "tooltip": "≈ 0.14 Md€ (hachures = ESTIMATION) versés au CAS Pensions — dont les opérateurs financés par « Recherches scientifiques et technologiques dans le domaine de l'environnement » (universités, établissements publics…), via leurs subventions : ligne de recettes réelle du CAS (6,3 Md€/an) répartie au prorata des subventions pour charges de service public."
     },
     {
      "source": "172 · Recherches scientifiques et technologiques pluridisciplinaires",
      "target": "Moyens généraux et d'appui à la recherche",
-     "value": 0.94
+     "value": 1.02
     },
     {
      "source": "172 · Recherches scientifiques et technologiques pluridisciplinaires",
      "target": "Moyens généraux et d'appui à la recherche",
-     "value": 0.21,
+     "value": 0.13,
      "cas": true,
      "est": true,
-     "tooltip": "≈ 0.21 Md€ (hachures = ESTIMATION) versés au CAS Pensions — dont les opérateurs financés par « Moyens généraux et d'appui à la recherche » (universités, établissements publics…), via leurs subventions : ligne de recettes réelle du CAS (6,3 Md€/an) répartie au prorata des subventions pour charges de service public."
+     "tooltip": "≈ 0.13 Md€ (hachures = ESTIMATION) versés au CAS Pensions — dont les opérateurs financés par « Moyens généraux et d'appui à la recherche » (universités, établissements publics…), via leurs subventions : ligne de recettes réelle du CAS (6,3 Md€/an) répartie au prorata des subventions pour charges de service public."
     },
     {
      "source": "172 · Recherches scientifiques et technologiques pluridisciplinaires",
      "target": "Recherches scientifiques et technologiques en sciences et techniques de l'information",
-     "value": 0.92
+     "value": 0.99
     },
     {
      "source": "172 · Recherches scientifiques et technologiques pluridisciplinaires",
      "target": "Recherches scientifiques et technologiques en sciences et techniques de l'information",
-     "value": 0.2,
+     "value": 0.13,
      "cas": true,
      "est": true,
-     "tooltip": "≈ 0.2 Md€ (hachures = ESTIMATION) versés au CAS Pensions — dont les opérateurs financés par « Recherches scientifiques et technologiques en sciences et techniques de l'information » (universités, établissements publics…), via leurs subventions : ligne de recettes réelle du CAS (6,3 Md€/an) répartie au prorata des subventions pour charges de service public."
+     "tooltip": "≈ 0.13 Md€ (hachures = ESTIMATION) versés au CAS Pensions — dont les opérateurs financés par « Recherches scientifiques et technologiques en sciences et techniques de l'information » (universités, établissements publics…), via leurs subventions : ligne de recettes réelle du CAS (6,3 Md€/an) répartie au prorata des subventions pour charges de service public."
     },
     {
      "source": "172 · Recherches scientifiques et technologiques pluridisciplinaires",
@@ -10237,28 +10130,28 @@
     {
      "source": "172 · Recherches scientifiques et technologiques pluridisciplinaires",
      "target": "Recherches scientifiques et technologiques dans le domaine de l'énergie",
-     "value": 0.82
+     "value": 0.85
     },
     {
      "source": "172 · Recherches scientifiques et technologiques pluridisciplinaires",
      "target": "Recherches scientifiques et technologiques dans le domaine de l'énergie",
-     "value": 0.08,
+     "value": 0.05,
      "cas": true,
      "est": true,
-     "tooltip": "≈ 0.08 Md€ (hachures = ESTIMATION) versés au CAS Pensions — dont les opérateurs financés par « Recherches scientifiques et technologiques dans le domaine de l'énergie » (universités, établissements publics…), via leurs subventions : ligne de recettes réelle du CAS (6,3 Md€/an) répartie au prorata des subventions pour charges de service public."
+     "tooltip": "≈ 0.05 Md€ (hachures = ESTIMATION) versés au CAS Pensions — dont les opérateurs financés par « Recherches scientifiques et technologiques dans le domaine de l'énergie » (universités, établissements publics…), via leurs subventions : ligne de recettes réelle du CAS (6,3 Md€/an) répartie au prorata des subventions pour charges de service public."
     },
     {
      "source": "172 · Recherches scientifiques et technologiques pluridisciplinaires",
      "target": "Recherches scientifiques et technologiques en sciences humaines et sciences sociales",
-     "value": 0.38
+     "value": 0.41
     },
     {
      "source": "172 · Recherches scientifiques et technologiques pluridisciplinaires",
      "target": "Recherches scientifiques et technologiques en sciences humaines et sciences sociales",
-     "value": 0.08,
+     "value": 0.05,
      "cas": true,
      "est": true,
-     "tooltip": "≈ 0.08 Md€ (hachures = ESTIMATION) versés au CAS Pensions — dont les opérateurs financés par « Recherches scientifiques et technologiques en sciences humaines et sciences sociales » (universités, établissements publics…), via leurs subventions : ligne de recettes réelle du CAS (6,3 Md€/an) répartie au prorata des subventions pour charges de service public."
+     "tooltip": "≈ 0.05 Md€ (hachures = ESTIMATION) versés au CAS Pensions — dont les opérateurs financés par « Recherches scientifiques et technologiques en sciences humaines et sciences sociales » (universités, établissements publics…), via leurs subventions : ligne de recettes réelle du CAS (6,3 Md€/an) répartie au prorata des subventions pour charges de service public."
     },
     {
      "source": "172 · Recherches scientifiques et technologiques pluridisciplinaires",
@@ -10268,15 +10161,7 @@
     {
      "source": "172 · Recherches scientifiques et technologiques pluridisciplinaires",
      "target": "Autres actions (3)",
-     "value": 0.51
-    },
-    {
-     "source": "172 · Recherches scientifiques et technologiques pluridisciplinaires",
-     "target": "Autres actions (3)",
-     "value": 0.06,
-     "cas": true,
-     "est": true,
-     "tooltip": "≈ 0.06 Md€ (hachures = ESTIMATION) versés au CAS Pensions — dont les opérateurs financés par « Autres actions (3) » (universités, établissements publics…), via leurs subventions : ligne de recettes réelle du CAS (6,3 Md€/an) répartie au prorata des subventions pour charges de service public."
+     "value": 0.57
     }
    ]
   },
@@ -10287,7 +10172,7 @@
      "name": "231 · Vie étudiante",
      "color": "#5C7FB8",
      "depth": 0,
-     "tooltip": "Vie étudiante : bourses sur critères sociaux, Crous, logement étudiant. 🔎 ≈ 0.11 Md€ supplémentaires (hachures, estimation) versés au CAS par les opérateurs financés par ce programme."
+     "tooltip": "Vie étudiante : bourses sur critères sociaux, Crous, logement étudiant. 🔎 ≈ 0.07 Md€ supplémentaires (hachures, estimation) versés au CAS par les opérateurs financés par ce programme."
     },
     {
      "name": "Aides directes",
@@ -10319,15 +10204,7 @@
     {
      "source": "231 · Vie étudiante",
      "target": "Aides indirectes",
-     "value": 0.43
-    },
-    {
-     "source": "231 · Vie étudiante",
-     "target": "Aides indirectes",
-     "value": 0.07,
-     "cas": true,
-     "est": true,
-     "tooltip": "≈ 0.07 Md€ (hachures = ESTIMATION) versés au CAS Pensions — dont les opérateurs financés par « Aides indirectes » (universités, établissements publics…), via leurs subventions : ligne de recettes réelle du CAS (6,3 Md€/an) répartie au prorata des subventions pour charges de service public."
+     "value": 0.5
     },
     {
      "source": "231 · Vie étudiante",
@@ -10348,7 +10225,7 @@
      "name": "193 · Recherche spatiale",
      "color": "#5C7FB8",
      "depth": 0,
-     "tooltip": "Recherche spatiale : contribution au CNES et à l'ESA. 🔎 ≈ 0.13 Md€ supplémentaires (hachures, estimation) versés au CAS par les opérateurs financés par ce programme."
+     "tooltip": "Recherche spatiale : contribution au CNES et à l'ESA. 🔎 ≈ 0.08 Md€ supplémentaires (hachures, estimation) versés au CAS par les opérateurs financés par ce programme."
     },
     {
      "name": "Maîtrise de l'accès à l'espace",
@@ -10431,7 +10308,7 @@
      "name": "190 · Recherche dans les domaines de l'énergie, du développement et de la mobilité durables",
      "color": "#5C7FB8",
      "depth": 0,
-     "tooltip": "Recherche énergie, développement et mobilité durables : IFPEN, CEA, aviation civile. 🔎 ≈ 0.28 Md€ supplémentaires (hachures, estimation) versés au CAS par les opérateurs financés par ce programme."
+     "tooltip": "Recherche énergie, développement et mobilité durables : IFPEN, CEA, aviation civile. 🔎 ≈ 0.18 Md€ supplémentaires (hachures, estimation) versés au CAS par les opérateurs financés par ce programme."
     },
     {
      "name": "Charges nucléaires de long terme des installations du CEA",
@@ -10473,28 +10350,28 @@
     {
      "source": "190 · Recherche dans les domaines de l'énergie, du développement et de la mobilité durables",
      "target": "Charges nucléaires de long terme des installations du CEA",
-     "value": 0.64
+     "value": 0.69
     },
     {
      "source": "190 · Recherche dans les domaines de l'énergie, du développement et de la mobilité durables",
      "target": "Charges nucléaires de long terme des installations du CEA",
-     "value": 0.14,
-     "cas": true,
-     "est": true,
-     "tooltip": "≈ 0.14 Md€ (hachures = ESTIMATION) versés au CAS Pensions — dont les opérateurs financés par « Charges nucléaires de long terme des installations du CEA » (universités, établissements publics…), via leurs subventions : ligne de recettes réelle du CAS (6,3 Md€/an) répartie au prorata des subventions pour charges de service public."
-    },
-    {
-     "source": "190 · Recherche dans les domaines de l'énergie, du développement et de la mobilité durables",
-     "target": "Recherche dans le domaine de l'énergie nucléaire",
-     "value": 0.41
-    },
-    {
-     "source": "190 · Recherche dans les domaines de l'énergie, du développement et de la mobilité durables",
-     "target": "Recherche dans le domaine de l'énergie nucléaire",
      "value": 0.09,
      "cas": true,
      "est": true,
-     "tooltip": "≈ 0.09 Md€ (hachures = ESTIMATION) versés au CAS Pensions — dont les opérateurs financés par « Recherche dans le domaine de l'énergie nucléaire » (universités, établissements publics…), via leurs subventions : ligne de recettes réelle du CAS (6,3 Md€/an) répartie au prorata des subventions pour charges de service public."
+     "tooltip": "≈ 0.09 Md€ (hachures = ESTIMATION) versés au CAS Pensions — dont les opérateurs financés par « Charges nucléaires de long terme des installations du CEA » (universités, établissements publics…), via leurs subventions : ligne de recettes réelle du CAS (6,3 Md€/an) répartie au prorata des subventions pour charges de service public."
+    },
+    {
+     "source": "190 · Recherche dans les domaines de l'énergie, du développement et de la mobilité durables",
+     "target": "Recherche dans le domaine de l'énergie nucléaire",
+     "value": 0.44
+    },
+    {
+     "source": "190 · Recherche dans les domaines de l'énergie, du développement et de la mobilité durables",
+     "target": "Recherche dans le domaine de l'énergie nucléaire",
+     "value": 0.06,
+     "cas": true,
+     "est": true,
+     "tooltip": "≈ 0.06 Md€ (hachures = ESTIMATION) versés au CAS Pensions — dont les opérateurs financés par « Recherche dans le domaine de l'énergie nucléaire » (universités, établissements publics…), via leurs subventions : ligne de recettes réelle du CAS (6,3 Md€/an) répartie au prorata des subventions pour charges de service public."
     },
     {
      "source": "190 · Recherche dans les domaines de l'énergie, du développement et de la mobilité durables",
@@ -10574,7 +10451,7 @@
      "name": "192 · Recherche et enseignement supérieur en matière économique et industrielle",
      "color": "#5C7FB8",
      "depth": 0,
-     "tooltip": "🔎 ≈ 0.06 Md€ supplémentaires (hachures, estimation) versés au CAS par les opérateurs financés par ce programme."
+     "tooltip": ""
     },
     {
      "name": "Organismes de formation supérieure et de recherche",
@@ -10596,15 +10473,7 @@
     {
      "source": "192 · Recherche et enseignement supérieur en matière économique et industrielle",
      "target": "Organismes de formation supérieure et de recherche",
-     "value": 0.29
-    },
-    {
-     "source": "192 · Recherche et enseignement supérieur en matière économique et industrielle",
-     "target": "Organismes de formation supérieure et de recherche",
-     "value": 0.06,
-     "cas": true,
-     "est": true,
-     "tooltip": "≈ 0.06 Md€ (hachures = ESTIMATION) versés au CAS Pensions — dont les opérateurs financés par « Organismes de formation supérieure et de recherche » (universités, établissements publics…), via leurs subventions : ligne de recettes réelle du CAS (6,3 Md€/an) répartie au prorata des subventions pour charges de service public."
+     "value": 0.35
     },
     {
      "source": "192 · Recherche et enseignement supérieur en matière économique et industrielle",
@@ -10668,37 +10537,37 @@
      "name": "Enseignement sup. & recherche (ESR)",
      "color": "#5C7FB8",
      "depth": 0,
-     "tooltip": "Mission LOLF : « Recherche et enseignement supérieur ». 🔎 Retraites : ≈ 0.21 Md€ de ses crédits (gris uni) partent au CAS Pensions — subvention d'équilibre prélevée sur le budget du ministère pour le système de retraites ; dont ≈ 0.17 Md€ au-delà du taux du privé, la part re-fléchée vers les pensions dans la vue d'ensemble. Taux employeur civils : 74,28 % (2013-2024) → 78,28 % en 2025 → 82,28 % en 2026 (décrets 2025-61 et 2025-1341) ; privé ≈ 16,5 %. 🔎 S'y ajoutent ≈ 4.3 Md€ (hachures, estimation) versés au CAS par les OPÉRATEURS qu'elle finance (universités, établissements publics…), pris sur leurs subventions."
+     "tooltip": "Mission LOLF : « Recherche et enseignement supérieur ». 🔎 Retraites : ≈ 0.21 Md€ de ses crédits (gris uni) partent au CAS Pensions — subvention d'équilibre prélevée sur le budget du ministère pour le système de retraites ; dont ≈ 0.17 Md€ au-delà du taux du privé, la part re-fléchée vers les pensions dans la vue d'ensemble. Taux employeur civils : 74,28 % (2013-2024) → 78,28 % en 2025 → 82,28 % en 2026 (décrets 2025-61 et 2025-1341) ; privé ≈ 16,5 %. 🔎 S'y ajoutent ≈ 5.03 Md€ (hachures, estimation) versés au CAS par les OPÉRATEURS qu'elle finance (universités, établissements publics…), pris sur leurs subventions. 📈 2024→2025 : budget -0,53 Md€ ; contribution CAS -0,01 Md€. 📄 Le Sénat documente « l'absence de compensation à partir de 2025 de l'augmentation de 4 % de la contribution des opérateurs au CAS Pensions », pour un impact estimé à 200 M€/an sur le programme 150 (Dgesip) — au sein de 542 M€ de dépenses non compensées, soit 3,5 % de la subvention des établissements. (Sénat, avis PLF 2025 « Enseignement supérieur »)."
     },
     {
      "name": "150 · Formations supérieures et recherche universitaire",
      "color": "#5C7FB8",
      "depth": 1,
-     "tooltip": "Universités : masse salariale, fonctionnement et immobilier des établissements. 🔎 Retraites : ≈ 0.13 Md€ de ses crédits (gris uni) partent au CAS Pensions — subvention d'équilibre pour le système de retraites. 🔎 ≈ 2.57 Md€ supplémentaires (hachures, estimation) versés au CAS par les opérateurs financés par ce programme."
+     "tooltip": "Universités : masse salariale, fonctionnement et immobilier des établissements. 🔎 Retraites : ≈ 0.13 Md€ de ses crédits (gris uni) partent au CAS Pensions — subvention d'équilibre pour le système de retraites. 🔎 ≈ 3.91 Md€ supplémentaires (hachures, estimation) versés au CAS par les opérateurs financés par ce programme. 📄 PLF 2025 : +99 M€ de crédits affichés, mais la hausse du taux CAS des opérateurs coûte ≈ 200 M€/an aux universités, non compensée (Sénat/Dgesip) : les moyens réels reculent d'≈ 100 M€. Au total, 542 M€ de dépenses non compensées (3,5 % de la SCSP). (Sénat, avis PLF 2025 « Enseignement supérieur »)."
     },
     {
      "name": "172 · Recherches scientifiques et technologiques pluridisciplinaires",
      "color": "#5C7FB8",
      "depth": 1,
-     "tooltip": "Recherche : subventions CNRS, Inserm, CEA civil, ANR. 🔎 ≈ 1.12 Md€ supplémentaires (hachures, estimation) versés au CAS par les opérateurs financés par ce programme."
+     "tooltip": "Recherche : subventions CNRS, Inserm, CEA civil, ANR. 🔎 ≈ 0.72 Md€ supplémentaires (hachures, estimation) versés au CAS par les opérateurs financés par ce programme."
     },
     {
      "name": "231 · Vie étudiante",
      "color": "#5C7FB8",
      "depth": 1,
-     "tooltip": "Vie étudiante : bourses sur critères sociaux, Crous, logement étudiant. 🔎 ≈ 0.11 Md€ supplémentaires (hachures, estimation) versés au CAS par les opérateurs financés par ce programme."
+     "tooltip": "Vie étudiante : bourses sur critères sociaux, Crous, logement étudiant. 🔎 ≈ 0.07 Md€ supplémentaires (hachures, estimation) versés au CAS par les opérateurs financés par ce programme."
     },
     {
      "name": "193 · Recherche spatiale",
      "color": "#5C7FB8",
      "depth": 1,
-     "tooltip": "Recherche spatiale : contribution au CNES et à l'ESA. 🔎 ≈ 0.13 Md€ supplémentaires (hachures, estimation) versés au CAS par les opérateurs financés par ce programme."
+     "tooltip": "Recherche spatiale : contribution au CNES et à l'ESA. 🔎 ≈ 0.08 Md€ supplémentaires (hachures, estimation) versés au CAS par les opérateurs financés par ce programme."
     },
     {
      "name": "190 · Recherche dans les domaines de l'énergie, du développement et de la mobilité durables",
      "color": "#5C7FB8",
      "depth": 1,
-     "tooltip": "Recherche énergie, développement et mobilité durables : IFPEN, CEA, aviation civile. 🔎 ≈ 0.28 Md€ supplémentaires (hachures, estimation) versés au CAS par les opérateurs financés par ce programme."
+     "tooltip": "Recherche énergie, développement et mobilité durables : IFPEN, CEA, aviation civile. 🔎 ≈ 0.18 Md€ supplémentaires (hachures, estimation) versés au CAS par les opérateurs financés par ce programme."
     },
     {
      "name": "142 · Enseignement supérieur et recherche agricoles",
@@ -10710,7 +10579,7 @@
      "name": "192 · Recherche et enseignement supérieur en matière économique et industrielle",
      "color": "#5C7FB8",
      "depth": 1,
-     "tooltip": "🔎 ≈ 0.06 Md€ supplémentaires (hachures, estimation) versés au CAS par les opérateurs financés par ce programme."
+     "tooltip": ""
     },
     {
      "name": "191 · Recherche duale (civile et militaire)",
@@ -10723,7 +10592,7 @@
     {
      "source": "Enseignement sup. & recherche (ESR)",
      "target": "150 · Formations supérieures et recherche universitaire",
-     "value": 12.58
+     "value": 11.24
     },
     {
      "source": "Enseignement sup. & recherche (ESR)",
@@ -10735,62 +10604,62 @@
     {
      "source": "Enseignement sup. & recherche (ESR)",
      "target": "150 · Formations supérieures et recherche universitaire",
-     "value": 2.57,
+     "value": 3.91,
      "cas": true,
      "est": true,
-     "tooltip": "≈ 2.57 Md€ (hachures = ESTIMATION) versés au CAS Pensions — dont les opérateurs financés par « 150 · Formations supérieures et recherche universitaire » (universités, établissements publics…), via leurs subventions : ligne de recettes réelle du CAS (6,3 Md€/an) répartie au prorata des subventions pour charges de service public."
+     "tooltip": "≈ 3.91 Md€ (hachures = ESTIMATION) versés au CAS Pensions — dont les opérateurs financés par « 150 · Formations supérieures et recherche universitaire » (universités, établissements publics…), via leurs subventions : ligne de recettes réelle du CAS (6,3 Md€/an) répartie au prorata des subventions pour charges de service public."
     },
     {
      "source": "Enseignement sup. & recherche (ESR)",
      "target": "172 · Recherches scientifiques et technologiques pluridisciplinaires",
-     "value": 7.14
+     "value": 7.54
     },
     {
      "source": "Enseignement sup. & recherche (ESR)",
      "target": "172 · Recherches scientifiques et technologiques pluridisciplinaires",
-     "value": 1.12,
+     "value": 0.72,
      "cas": true,
      "est": true,
-     "tooltip": "≈ 1.12 Md€ (hachures = ESTIMATION) versés au CAS Pensions — dont les opérateurs financés par « 172 · Recherches scientifiques et technologiques pluridisciplinaires » (universités, établissements publics…), via leurs subventions : ligne de recettes réelle du CAS (6,3 Md€/an) répartie au prorata des subventions pour charges de service public."
+     "tooltip": "≈ 0.72 Md€ (hachures = ESTIMATION) versés au CAS Pensions — dont les opérateurs financés par « 172 · Recherches scientifiques et technologiques pluridisciplinaires » (universités, établissements publics…), via leurs subventions : ligne de recettes réelle du CAS (6,3 Md€/an) répartie au prorata des subventions pour charges de service public."
     },
     {
      "source": "Enseignement sup. & recherche (ESR)",
      "target": "231 · Vie étudiante",
-     "value": 3.14
+     "value": 3.18
     },
     {
      "source": "Enseignement sup. & recherche (ESR)",
      "target": "231 · Vie étudiante",
-     "value": 0.11,
+     "value": 0.07,
      "cas": true,
      "est": true,
-     "tooltip": "≈ 0.11 Md€ (hachures = ESTIMATION) versés au CAS Pensions — dont les opérateurs financés par « 231 · Vie étudiante » (universités, établissements publics…), via leurs subventions : ligne de recettes réelle du CAS (6,3 Md€/an) répartie au prorata des subventions pour charges de service public."
+     "tooltip": "≈ 0.07 Md€ (hachures = ESTIMATION) versés au CAS Pensions — dont les opérateurs financés par « 231 · Vie étudiante » (universités, établissements publics…), via leurs subventions : ligne de recettes réelle du CAS (6,3 Md€/an) répartie au prorata des subventions pour charges de service public."
     },
     {
      "source": "Enseignement sup. & recherche (ESR)",
      "target": "193 · Recherche spatiale",
-     "value": 1.79
+     "value": 1.84
     },
     {
      "source": "Enseignement sup. & recherche (ESR)",
      "target": "193 · Recherche spatiale",
-     "value": 0.13,
+     "value": 0.08,
      "cas": true,
      "est": true,
-     "tooltip": "≈ 0.13 Md€ (hachures = ESTIMATION) versés au CAS Pensions — dont les opérateurs financés par « 193 · Recherche spatiale » (universités, établissements publics…), via leurs subventions : ligne de recettes réelle du CAS (6,3 Md€/an) répartie au prorata des subventions pour charges de service public."
+     "tooltip": "≈ 0.08 Md€ (hachures = ESTIMATION) versés au CAS Pensions — dont les opérateurs financés par « 193 · Recherche spatiale » (universités, établissements publics…), via leurs subventions : ligne de recettes réelle du CAS (6,3 Md€/an) répartie au prorata des subventions pour charges de service public."
     },
     {
      "source": "Enseignement sup. & recherche (ESR)",
      "target": "190 · Recherche dans les domaines de l'énergie, du développement et de la mobilité durables",
-     "value": 1.35
+     "value": 1.45
     },
     {
      "source": "Enseignement sup. & recherche (ESR)",
      "target": "190 · Recherche dans les domaines de l'énergie, du développement et de la mobilité durables",
-     "value": 0.28,
+     "value": 0.18,
      "cas": true,
      "est": true,
-     "tooltip": "≈ 0.28 Md€ (hachures = ESTIMATION) versés au CAS Pensions — dont les opérateurs financés par « 190 · Recherche dans les domaines de l'énergie, du développement et de la mobilité durables » (universités, établissements publics…), via leurs subventions : ligne de recettes réelle du CAS (6,3 Md€/an) répartie au prorata des subventions pour charges de service public."
+     "tooltip": "≈ 0.18 Md€ (hachures = ESTIMATION) versés au CAS Pensions — dont les opérateurs financés par « 190 · Recherche dans les domaines de l'énergie, du développement et de la mobilité durables » (universités, établissements publics…), via leurs subventions : ligne de recettes réelle du CAS (6,3 Md€/an) répartie au prorata des subventions pour charges de service public."
     },
     {
      "source": "Enseignement sup. & recherche (ESR)",
@@ -10807,15 +10676,7 @@
     {
      "source": "Enseignement sup. & recherche (ESR)",
      "target": "192 · Recherche et enseignement supérieur en matière économique et industrielle",
-     "value": 0.31
-    },
-    {
-     "source": "Enseignement sup. & recherche (ESR)",
-     "target": "192 · Recherche et enseignement supérieur en matière économique et industrielle",
-     "value": 0.06,
-     "cas": true,
-     "est": true,
-     "tooltip": "≈ 0.06 Md€ (hachures = ESTIMATION) versés au CAS Pensions — dont les opérateurs financés par « 192 · Recherche et enseignement supérieur en matière économique et industrielle » (universités, établissements publics…), via leurs subventions : ligne de recettes réelle du CAS (6,3 Md€/an) répartie au prorata des subventions pour charges de service public."
+     "value": 0.37
     },
     {
      "source": "Enseignement sup. & recherche (ESR)",
@@ -10836,7 +10697,7 @@
      "name": "Éducation nationale",
      "color": "#5C7FB8",
      "depth": 1,
-     "tooltip": "Mission LOLF : « Enseignement scolaire ». 🔎 Retraites : ≈ 25.33 Md€ de ses crédits (gris uni) partent au CAS Pensions — subvention d'équilibre prélevée sur le budget du ministère pour le système de retraites ; dont ≈ 20.43 Md€ au-delà du taux du privé, la part re-fléchée vers les pensions dans la vue d'ensemble. Taux employeur civils : 74,28 % (2013-2024) → 78,28 % en 2025 → 82,28 % en 2026 (décrets 2025-61 et 2025-1341) ; privé ≈ 16,5 %.",
+     "tooltip": "Mission LOLF : « Enseignement scolaire ». 🔎 Retraites : ≈ 25.33 Md€ de ses crédits (gris uni) partent au CAS Pensions — subvention d'équilibre prélevée sur le budget du ministère pour le système de retraites ; dont ≈ 20.43 Md€ au-delà du taux du privé, la part re-fléchée vers les pensions dans la vue d'ensemble. Taux employeur civils : 74,28 % (2013-2024) → 78,28 % en 2025 → 82,28 % en 2026 (décrets 2025-61 et 2025-1341) ; privé ≈ 16,5 %. 📈 2024→2025 : budget +1,99 Md€ ; contribution CAS +1,56 Md€ (79 % de la hausse). 📄 Le rapport du Sénat confirme le mécanisme : pour le seul programme 141 (second degré), la hausse des crédits s'explique aux trois quarts par l'augmentation de la contribution au CAS Pensions. (Sénat, avis PLF 2025 « Enseignement scolaire »).",
      "tags": [
       "retraites"
      ]
@@ -10845,7 +10706,7 @@
      "name": "Enseignement sup. & recherche (ESR)",
      "color": "#5C7FB8",
      "depth": 1,
-     "tooltip": "Mission LOLF : « Recherche et enseignement supérieur ». 🔎 Retraites : ≈ 0.21 Md€ de ses crédits (gris uni) partent au CAS Pensions — subvention d'équilibre prélevée sur le budget du ministère pour le système de retraites ; dont ≈ 0.17 Md€ au-delà du taux du privé, la part re-fléchée vers les pensions dans la vue d'ensemble. Taux employeur civils : 74,28 % (2013-2024) → 78,28 % en 2025 → 82,28 % en 2026 (décrets 2025-61 et 2025-1341) ; privé ≈ 16,5 %. 🔎 S'y ajoutent ≈ 4.3 Md€ (hachures, estimation) versés au CAS par les OPÉRATEURS qu'elle finance (universités, établissements publics…), pris sur leurs subventions.",
+     "tooltip": "Mission LOLF : « Recherche et enseignement supérieur ». 🔎 Retraites : ≈ 0.21 Md€ de ses crédits (gris uni) partent au CAS Pensions — subvention d'équilibre prélevée sur le budget du ministère pour le système de retraites ; dont ≈ 0.17 Md€ au-delà du taux du privé, la part re-fléchée vers les pensions dans la vue d'ensemble. Taux employeur civils : 74,28 % (2013-2024) → 78,28 % en 2025 → 82,28 % en 2026 (décrets 2025-61 et 2025-1341) ; privé ≈ 16,5 %. 🔎 S'y ajoutent ≈ 5.03 Md€ (hachures, estimation) versés au CAS par les OPÉRATEURS qu'elle finance (universités, établissements publics…), pris sur leurs subventions. 📈 2024→2025 : budget -0,53 Md€ ; contribution CAS -0,01 Md€. 📄 Le Sénat documente « l'absence de compensation à partir de 2025 de l'augmentation de 4 % de la contribution des opérateurs au CAS Pensions », pour un impact estimé à 200 M€/an sur le programme 150 (Dgesip) — au sein de 542 M€ de dépenses non compensées, soit 3,5 % de la subvention des établissements. (Sénat, avis PLF 2025 « Enseignement supérieur »).",
      "tags": [
       "retraites"
      ]
@@ -10867,7 +10728,7 @@
     {
      "source": "É · Enseignement & recherche",
      "target": "Enseignement sup. & recherche (ESR)",
-     "value": 26.78
+     "value": 26.05
     },
     {
      "source": "É · Enseignement & recherche",
@@ -10879,10 +10740,10 @@
     {
      "source": "É · Enseignement & recherche",
      "target": "Enseignement sup. & recherche (ESR)",
-     "value": 4.3,
+     "value": 5.03,
      "cas": true,
      "est": true,
-     "tooltip": "≈ 4.3 Md€ (hachures = ESTIMATION) versés au CAS Pensions — dont les opérateurs financés par « Enseignement sup. & recherche (ESR) » (universités, établissements publics…), via leurs subventions : ligne de recettes réelle du CAS (6,3 Md€/an) répartie au prorata des subventions pour charges de service public."
+     "tooltip": "≈ 5.03 Md€ (hachures = ESTIMATION) versés au CAS Pensions — dont les opérateurs financés par « Enseignement sup. & recherche (ESR) » (universités, établissements publics…), via leurs subventions : ligne de recettes réelle du CAS (6,3 Md€/an) répartie au prorata des subventions pour charges de service public."
     }
    ]
   },
@@ -11178,7 +11039,7 @@
      "name": "France 2030",
      "color": "#C74E2D",
      "depth": 0,
-     "tooltip": "Mission LOLF : « Investir pour la France de 2030 ». "
+     "tooltip": "Mission LOLF : « Investir pour la France de 2030 ».  📈 2024→2025 : budget -1,90 Md€ ; contribution CAS +0,00 Md€."
     },
     {
      "name": "424 · Financement des investissements stratégiques",
@@ -11489,7 +11350,7 @@
      "name": "Économie",
      "color": "#C74E2D",
      "depth": 0,
-     "tooltip": "🔎 Retraites : ≈ 0.24 Md€ de ses crédits (gris uni) partent au CAS Pensions — subvention d'équilibre prélevée sur le budget du ministère pour le système de retraites ; dont ≈ 0.2 Md€ au-delà du taux du privé, la part re-fléchée vers les pensions dans la vue d'ensemble. Taux employeur civils : 74,28 % (2013-2024) → 78,28 % en 2025 → 82,28 % en 2026 (décrets 2025-61 et 2025-1341) ; privé ≈ 16,5 %."
+     "tooltip": "🔎 Retraites : ≈ 0.24 Md€ de ses crédits (gris uni) partent au CAS Pensions — subvention d'équilibre prélevée sur le budget du ministère pour le système de retraites ; dont ≈ 0.2 Md€ au-delà du taux du privé, la part re-fléchée vers les pensions dans la vue d'ensemble. Taux employeur civils : 74,28 % (2013-2024) → 78,28 % en 2025 → 82,28 % en 2026 (décrets 2025-61 et 2025-1341) ; privé ≈ 16,5 %. 📈 2024→2025 : budget -0,41 Md€ ; contribution CAS +0,00 Md€."
     },
     {
      "name": "134 · Développement des entreprises et régulations",
@@ -11636,7 +11497,7 @@
      "name": "Plan de relance",
      "color": "#C74E2D",
      "depth": 0,
-     "tooltip": ""
+     "tooltip": " 📈 2024→2025 : budget -1,24 Md€ ; contribution CAS +0,00 Md€."
     },
     {
      "name": "362 · Écologie",
@@ -11676,13 +11537,13 @@
      "name": "France 2030",
      "color": "#C74E2D",
      "depth": 1,
-     "tooltip": "Mission LOLF : « Investir pour la France de 2030 ». "
+     "tooltip": "Mission LOLF : « Investir pour la France de 2030 ».  📈 2024→2025 : budget -1,90 Md€ ; contribution CAS +0,00 Md€."
     },
     {
      "name": "Économie",
      "color": "#C74E2D",
      "depth": 1,
-     "tooltip": "🔎 Retraites : ≈ 0.24 Md€ de ses crédits (gris uni) partent au CAS Pensions — subvention d'équilibre prélevée sur le budget du ministère pour le système de retraites ; dont ≈ 0.2 Md€ au-delà du taux du privé, la part re-fléchée vers les pensions dans la vue d'ensemble. Taux employeur civils : 74,28 % (2013-2024) → 78,28 % en 2025 → 82,28 % en 2026 (décrets 2025-61 et 2025-1341) ; privé ≈ 16,5 %.",
+     "tooltip": "🔎 Retraites : ≈ 0.24 Md€ de ses crédits (gris uni) partent au CAS Pensions — subvention d'équilibre prélevée sur le budget du ministère pour le système de retraites ; dont ≈ 0.2 Md€ au-delà du taux du privé, la part re-fléchée vers les pensions dans la vue d'ensemble. Taux employeur civils : 74,28 % (2013-2024) → 78,28 % en 2025 → 82,28 % en 2026 (décrets 2025-61 et 2025-1341) ; privé ≈ 16,5 %. 📈 2024→2025 : budget -0,41 Md€ ; contribution CAS +0,00 Md€.",
      "tags": [
       "retraites"
      ]
@@ -11690,7 +11551,8 @@
     {
      "name": "Plan de relance",
      "color": "#C74E2D",
-     "depth": 1
+     "depth": 1,
+     "tooltip": " 📈 2024→2025 : budget -1,24 Md€ ; contribution CAS +0,00 Md€."
     }
    ],
    "links": [
@@ -12987,7 +12849,7 @@
      "2024": 0.18,
      "2025": 0.21
     },
-    "op25": 0.08
+    "op25": 0.05
    },
    "Administration territoriale (Intérieur)": {
     "cp": {
@@ -13024,7 +12886,7 @@
      "2024": 0.26,
      "2025": 0.24
     },
-    "op25": 0.1
+    "op25": 0.07
    },
    "Aide au développement": {
     "cp": {
@@ -13106,7 +12968,7 @@
      "2024": 0.21,
      "2025": 0.21
     },
-    "op25": 0.2
+    "op25": 0.13
    },
    "Services du Premier ministre": {
     "cp": {
@@ -13143,7 +13005,7 @@
      "2024": 8.35,
      "2025": 8.32
     },
-    "op25": 0.09
+    "op25": 0.07
    },
    "Charge de la dette & engagements": {
     "cp": {
@@ -13199,8 +13061,7 @@
      "2023": 2.01,
      "2024": 2.16,
      "2025": 2.05
-    },
-    "op25": 0.06
+    }
    },
    "France 2030": {
     "cp": {
@@ -13242,8 +13103,7 @@
      "2023": 0.7,
      "2024": 0.74,
      "2025": 0.72
-    },
-    "op25": 0.05
+    }
    },
    "Outre-mer": {
     "cp": {
@@ -13302,7 +13162,7 @@
      "2024": 0.22,
      "2025": 0.21
     },
-    "op25": 4.3
+    "op25": 5.03
    },
    "Dotations aux collectivités": {
     "cp": {
@@ -13360,7 +13220,7 @@
      "2024": 1.79,
      "2025": 1.58
     },
-    "op25": 0.12
+    "op25": 0.08
    },
    "Police, gendarmerie & sécurité civile": {
     "cp": {
@@ -13407,7 +13267,7 @@
      "2024": 0.17,
      "2025": 0.29
     },
-    "op25": 0.77
+    "op25": 0.49
    },
    "Écologie & transports": {
     "cp": {
@@ -13426,7 +13286,7 @@
      "2024": 0.86,
      "2025": 0.95
     },
-    "op25": 0.36
+    "op25": 0.22
    },
    "Économie": {
     "cp": {
@@ -13465,7 +13325,7 @@
      "2024": 3.78,
      "2025": 3.92
     },
-    "op25": 0.08
+    "op25": 0.05
    },
    "É · Écologie, territoires & agriculture": {
     "cp": {
@@ -13484,7 +13344,7 @@
      "2024": 1.18,
      "2025": 1.25
     },
-    "op25": 0.46
+    "op25": 0.29
    },
    "É · Solidarités, travail & santé": {
     "cp": {
@@ -13503,7 +13363,7 @@
      "2024": 0.28,
      "2025": 0.29
     },
-    "op25": 0.77
+    "op25": 0.49
    },
    "É · Culture, médias, sport": {
     "cp": {
@@ -13522,7 +13382,7 @@
      "2024": 0.25,
      "2025": 0.25
     },
-    "op25": 0.37
+    "op25": 0.21
    },
    "É · Défense, sécurité, justice": {
     "cp": {
@@ -13541,7 +13401,7 @@
      "2024": 17.15,
      "2025": 17.48
     },
-    "op25": 0.15
+    "op25": 0.07
    },
    "É · Charge de la dette": {
     "cp": {
@@ -13571,7 +13431,7 @@
      "2024": 23.98,
      "2025": 25.53
     },
-    "op25": 4.3
+    "op25": 5.03
    },
    "É · Économie & investissements d'avenir": {
     "cp": {

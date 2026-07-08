@@ -213,8 +213,16 @@ main { max-width: 1220px; margin: 0 auto; padding: 6px 12px 8px; }
   margin: 6px 0 0;
 }
 .histo-card svg { flex: 0 0 auto; display: block; }
+.histo-card .histo-charts {
+  display: flex;
+  gap: 22px;
+  align-items: flex-end;
+  flex-wrap: wrap;
+}
 .histo-card .bar-total { fill: #E8C9B8; }
 .histo-card .bar-cas { fill: #9CA3B0; }
+.histo-card .bar-neg { fill: #C13B55; }          /* moyens hors retraites en recul */
+.histo-card .histo-alert { color: var(--accent); font-weight: 700; }
 .histo-card text { font: 700 10px var(--sans); fill: var(--ink); }
 .histo-card .axis-year { font-weight: 400; fill: var(--ink-soft); }
 #chart-stage { position: relative; overflow: hidden; border-radius: 10px; }
