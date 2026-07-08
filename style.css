@@ -178,6 +178,11 @@ main { max-width: 1220px; margin: 0 auto; padding: 6px 12px 8px; }
   margin-right: 6px;
   vertical-align: -1px;
 }
+.cas-legend .swatch-est {
+  background: repeating-linear-gradient(45deg, #C9CDD6 0 3px, #6E7686 3px 5px);
+  margin-left: 10px;
+}
+.cas-legend .legend-more { color: var(--ink-soft); }
 
 /* ---------- carte « évolution du budget » (au zoom sur un ministère) ---------- */
 .histo-card[hidden] { display: none; }   /* l'attribut hidden doit gagner sur le flex */
@@ -303,6 +308,45 @@ main { max-width: 1220px; margin: 0 auto; padding: 6px 12px 8px; }
 .metho li { margin-bottom: 6px; }
 .metho .src { font-size: 12px; }
 .credits { margin-top: 14px; font-size: 12px; }
+
+/* ---------- signalement d'erreur ---------- */
+.report-btn {
+  font: 600 12px/1 var(--sans);
+  color: var(--accent);
+  background: var(--paper);
+  border: 1px solid var(--accent);
+  border-radius: 999px;
+  padding: 6px 12px;
+  margin-left: 10px;
+  cursor: pointer;
+}
+.report-btn:hover { background: #FCEDF4; }
+.report-dlg {
+  border: 1.5px solid var(--ink);
+  border-radius: 12px;
+  padding: 20px 22px;
+  max-width: 460px;
+  width: calc(100vw - 40px);
+  font-family: var(--sans);
+  color: var(--ink);
+}
+.report-dlg::backdrop { background: rgba(30, 36, 48, .45); }
+.report-dlg h3 { font-family: var(--serif); margin: 0 0 6px; }
+.report-hint { font-size: 12.5px; color: var(--ink-soft); margin: 0 0 12px; }
+.report-dlg label { display: block; font-size: 13px; font-weight: 600; margin-bottom: 10px; }
+.report-dlg textarea, .report-dlg input {
+  width: 100%;
+  font: 400 14px/1.4 var(--sans);
+  border: 1px solid var(--rule);
+  border-radius: 8px;
+  padding: 8px 10px;
+  margin-top: 4px;
+  box-sizing: border-box;
+  background: var(--bg);
+}
+.report-actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 6px; }
+.report-send { background: var(--accent); color: #fff; border-color: var(--accent); }
+.report-status { font-size: 13px; font-weight: 600; color: var(--accent); }
 
 @media (max-width: 720px) {
   #chart { height: 560px; }

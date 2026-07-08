@@ -5,9 +5,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Où va l'argent public ? — Recettes et dépenses publiques 2025</title>
   <meta name="description" content="Infographie interactive : d'où vient l'argent public français et comment il est dépensé (exercice 2025). Données open data — État, Sécurité sociale, collectivités.">
+  <meta name="author" content="Michael Colla">
   <link rel="preconnect" href="https://cdnjs.cloudflare.com">
   <!-- ?v= : cache-busting — incrémenter à chaque déploiement de style/app -->
-  <link rel="stylesheet" href="style.css?v=20260708b">
+  <link rel="stylesheet" href="style.css?v=20260709">
 </head>
 <body>
   <header class="masthead">
@@ -29,10 +30,14 @@
   </nav>
 
   <main>
-    <p class="cas-legend" id="cas-legend" hidden><span class="swatch"></span>
-      Part <strong>grisée</strong> d'un flux&nbsp;: <strong>subvention d'équilibre</strong> prélevée
+    <p class="cas-legend" id="cas-legend" hidden>
+      <span class="swatch"></span> <strong>Gris uni</strong>&nbsp;: subvention d'équilibre prélevée
       sur le budget des ministères pour le <strong>système de retraites</strong> (versée au CAS
-      Pensions — détail dans «&nbsp;Méthodologie&nbsp;» en bas de page).</p>
+      Pensions — donnée sourcée, crédits votés).
+      <span id="legend-est" hidden><span class="swatch swatch-est"></span>
+      <strong>Hachures</strong>&nbsp;: part payée par les <strong>opérateurs</strong> financés par
+      la mission (universités, établissements publics… — estimation).</span>
+      <span class="legend-more">Détail dans «&nbsp;Méthodologie&nbsp;».</span></p>
     <aside id="histo-card" class="histo-card" hidden aria-live="polite"></aside>
     <div id="chart-stage">
       <div id="chart" role="img" aria-label="Diagramme de Sankey des finances publiques françaises"></div>
@@ -49,14 +54,34 @@
       <div id="metho-body"><!-- rempli par app.js depuis meta --></div>
     </details>
     <p class="credits">
+      <strong>Un projet conçu et réalisé par Michael Colla.</strong>
       Design inspiré du poster «&nbsp;Où va l'argent public&nbsp;?&nbsp;» (<em>Le&nbsp;1 hebdo</em> n°569,
       C.&nbsp;Alet &amp; C.&nbsp;Martha, avec F.&nbsp;Ecalle/Fipeco). Données&nbsp;: data.economie.gouv.fr,
       data.gouv.fr, PLFSS (open data Assemblée nationale) — Licence Ouverte 2.0.
       Code&nbsp;: MIT. Généré le <span id="generated-at">…</span>.
+      <button type="button" class="report-btn" id="report-btn">⚑ Signaler une erreur</button>
     </p>
   </footer>
 
+  <dialog id="report-dlg" class="report-dlg" aria-label="Signaler une erreur">
+    <form id="report-form" method="dialog">
+      <h3>Signaler une erreur</h3>
+      <p class="report-hint">Un chiffre douteux, une source manquante, un bug&nbsp;? Merci&nbsp;!
+        La vue en cours est jointe automatiquement.</p>
+      <label>Votre signalement<br>
+        <textarea id="report-msg" required rows="5"
+          placeholder="Ex. : le flux X me semble faux car…"></textarea></label>
+      <label>Votre e-mail (facultatif, pour vous répondre)<br>
+        <input type="email" id="report-email" placeholder="vous@exemple.fr"></label>
+      <p class="report-status" id="report-status" hidden></p>
+      <div class="report-actions">
+        <button type="button" class="crumb" id="report-cancel">Annuler</button>
+        <button type="submit" class="crumb report-send" id="report-send">Envoyer</button>
+      </div>
+    </form>
+  </dialog>
+
   <script src="https://cdnjs.cloudflare.com/ajax/libs/echarts/5.5.0/echarts.min.js"></script>
-  <script src="app.js?v=20260708b"></script>
+  <script src="app.js?v=20260709"></script>
 </body>
 </html>

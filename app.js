@@ -79,7 +79,6 @@
 
   // Libellés courts pour les pastilles (les intitulés complets restent au survol).
   const SHORT = {
-    "Impôts & transferts affectés aux retraites": "Impôts affectés",
     "Impôts et taxes affectés (Sécu)": "Taxes affectées",
     "Pensions versées — 405 Md€": "Pensions versées",
     "É · Défense, sécurité, justice": "Défense & sécurité",
@@ -97,6 +96,34 @@
     SHORT[name] ||
     name.replace(/^É · /, "").replace(/^\d+ · /, "").replace(/ \(.*\)$/, "");
 
+  // Coupe un libellé en lignes ≤ max caractères (wrap MANUEL : le wrap natif
+  // d'ECharts tronque au lieu de replier — vécu). La pastille épouse le texte.
+  function wrapText(s, max) {
+    const words = String(s).split(" ");
+    const lines = [];
+    let cur = "";
+    for (const w of words) {
+      if (cur && (cur + " " + w).length > max) { lines.push(cur); cur = w; }
+      else cur = cur ? cur + " " + w : w;
+    }
+    if (cur) lines.push(cur);
+    return lines.join("\n");
+  }
+
+  // Motif hachuré (canvas) pour les parts CAS ESTIMÉES (opérateurs) —
+  // les parts sourcées restent en gris uni.
+  const HATCH = (function () {
+    const c = document.createElement("canvas");
+    c.width = c.height = 7;
+    const g = c.getContext("2d");
+    g.fillStyle = "#C9CDD6";
+    g.fillRect(0, 0, 7, 7);
+    g.strokeStyle = "#6E7686";
+    g.lineWidth = 2;
+    g.beginPath(); g.moveTo(-2, 9); g.lineTo(9, -2); g.stroke();
+    return { image: c, repeat: "repeat" };
+  })();
+
   /* ---------------- ordre déterministe de la vue d'ensemble ----------------
    * layoutIterations: 0 + ordre explicite. La VOIE RETRAITES longe le bord
    * GAUCHE (cotisations → pensions en bande droite : ECharts cale au bord le
@@ -105,8 +132,8 @@
    * vers les pensions, en bas à gauche.
    */
   const MACRO_COL0 = [
-    "Cotisations retraites (tous régimes)", "Impôts & transferts affectés aux retraites",
-    "Cotisations sociales", "CSG · CRDS", "Impôts et taxes affectés (Sécu)",
+    "Cotisations retraites (tous régimes)", "Unédic (assurance chômage)",
+    "CSG · CRDS", "Impôts et taxes affectés (Sécu)", "Cotisations sociales",
     "Autres recettes Sécu", "Émission de dette (Déficit)",
     "TVA", "Impôt sur le revenu", "Impôt sur les sociétés", "Autres impôts d'État",
     "Recettes non fiscales",
@@ -169,13 +196,14 @@
       if (show && !isRoot) {
         const k = labIdx[col] || 0;
         labIdx[col] = k + 1;
+        const st = opts.stagger || 28;   // écart du quinconce (plus grand sur mobile)
         if (col === 0) {
-          if (k % 2) offset = [0, -36];
+          if (k % 2) offset = [0, -(st + 8)];
         } else if (col === opts.lastCol) {
-          if (k % 2) offset = [0, 36];
+          if (k % 2) offset = [0, st + 8];
         } else {
           // rangées médianes chargées : quinconce à 3 niveaux
-          offset = [[0, 0], [0, 28], [0, -28]][k % 3];
+          offset = [[0, 0], [0, st], [0, -st]][k % 3];
         }
         // voie retraites collée au bord gauche : sur écran étroit, on rentre
         // les pastilles vers l'intérieur pour qu'elles ne soient pas rognées.
@@ -192,11 +220,11 @@
         label: {
           show: show,
           offset: offset,
-          formatter: "{t|" + short + "}\n{v|" + fmt0(v) + " Md€}",
+          formatter: "{t|" + wrapText(short, isRoot ? 34 : opts.wrapChars || 14) +
+                     "}\n{v|" + fmt0(v) + " Md€}",
           rich: {
             t: { color: isDette ? "#1E2430" : "#FFFFFF", fontSize: isRoot ? 13 : 11,
-                 fontWeight: 700, lineHeight: isRoot ? 15 : 13,
-                 width: isRoot ? 300 : labelWidth, overflow: "break", align: "center" },
+                 fontWeight: 700, lineHeight: isRoot ? 15 : 13, align: "center" },
             v: { color: isDette ? "#1E2430" : "rgba(255,255,255,.92)", fontSize: isRoot ? 11 : 10,
                  fontWeight: 700, align: "center" },
           },
@@ -233,11 +261,13 @@
         data: data,
         links: links.map((l) => ({
           source: l.source, target: l.target, value: l.value, tooltip: l.tooltip,
-          // part CAS Pensions : ruban GRIS (subvention d'équilibre retraites,
-          // déjà comprise dans les crédits — cf. légende sous le fil d'ariane)
-          lineStyle: l.cas
-            ? { color: "#9CA3B0", opacity: 0.62, curveness: 0.5 }
-            : { color: "gradient", opacity: 0.34, curveness: 0.5 },
+          // part CAS Pensions : GRIS UNI = contribution directe sourcée ;
+          // HACHURES = part opérateurs estimée (cf. légende sous le fil d'ariane)
+          lineStyle: l.est
+            ? { color: HATCH, opacity: 0.85, curveness: 0.5 }
+            : l.cas
+              ? { color: "#9CA3B0", opacity: 0.62, curveness: 0.5 }
+              : { color: "gradient", opacity: 0.34, curveness: 0.5 },
         })),
         orient: "vertical",
         nodeAlign: "justify",
@@ -261,17 +291,20 @@
 
   function renderMacro() {
     viewStack = [];
-    chartEl.style.height = Math.max(820, Math.min(1080, window.innerWidth * 0.74)) + "px";
+    // Mobile : poster nettement plus HAUT (l'écran étroit se rattrape en
+    // vertical) et seuls les GRANDS nœuds portent une pastille (le reste au
+    // tap) — à 390 px, dix pastilles par rangée se chevauchent inévitablement.
+    const narrow = window.innerWidth < 700;
+    chartEl.style.height = (narrow
+      ? Math.max(1000, Math.round(window.innerHeight * 1.25))
+      : Math.max(820, Math.min(1080, window.innerWidth * 0.74))) + "px";
     chart.resize();
     const nodes = macroSorted(DATA.nodes);
-    // Mobile : seuls les GRANDS nœuds portent une pastille (le reste au tap) —
-    // à 390 px, dix pastilles par rangée se chevauchent inévitablement.
-    const narrow = window.innerWidth < 700;
     chart.setOption(buildOption(nodes, DATA.links,
-      { lastCol: lastCol(nodes), iterations: 0, top: 88,
-        labelWidth: narrow ? 80 : 78, labelMin: narrow ? 110 : undefined,
+      { lastCol: lastCol(nodes), iterations: 0, top: narrow ? 104 : 88,
+        wrapChars: narrow ? 11 : 14, labelMin: narrow ? 110 : undefined,
         left: narrow ? 8 : 16, right: narrow ? 8 : 22,
-        laneNudge: narrow ? 44 : 0 }), true);
+        stagger: narrow ? 42 : 28, laneNudge: narrow ? 46 : 0 }), true);
     retPanel.classList.remove("open");
     casLegendEl.hidden = true;
     histoEl.hidden = true;
@@ -302,8 +335,10 @@
           rootWide: true }), true);
       retPanel.classList.remove("open");
     }
-    // légende du grisé CAS Pensions : seulement si la vue contient un flux scindé
+    // légende du grisé CAS Pensions : seulement si la vue contient un flux
+    // scindé ; la puce « hachures » seulement si une part opérateurs existe
     casLegendEl.hidden = !(d.links || []).some((l) => l.cas);
+    document.getElementById("legend-est").hidden = !(d.links || []).some((l) => l.est);
     // carte historique : plongée dans une famille de dépenses de l'État
     renderHistoCard(key);
     renderBreadcrumb();
@@ -456,25 +491,38 @@
     });
     svg += "</svg>";
 
-    // — l'addition qui résume la période —
+    // — l'addition qui résume la période (formulations selon le signe) —
     const dCp = serie.cp[y1] - serie.cp[y0];
     const pct = Math.round((dCp / serie.cp[y0]) * 100);
-    let punch = "De " + y0 + " à " + y1 + " : budget <b>" + (dCp >= 0 ? "+" : "") +
-                fmt0(dCp) + " Md€</b> (" + (pct >= 0 ? "+" : "") + pct + " %)";
+    let punch = "De " + y0 + " à " + y1 + " : budget <b>" + (dCp >= 0 ? "+" : "−") +
+                fmt0(Math.abs(dCp)) + " Md€</b> (" + (pct >= 0 ? "+" : "−") +
+                Math.abs(pct) + " %)";
     if (hasCas) {
       const dCas = cas[y1] - cas[y0];
-      const part = dCp > 0 ? Math.round((dCas / dCp) * 100) : null;
-      punch += " — dont <b>≈ " + fmt0(dCas) + " Md€</b> de contributions retraites en plus " +
-               "(CAS Pensions)" + (part != null && part > 0 && part <= 100
-               ? ", soit <b>" + part + " %</b> de la hausse" : "") + ".";
+      const part = dCp > 0 && dCas > 0 ? Math.round((dCas / dCp) * 100) : null;
+      if (dCas >= 0.05) {
+        punch += " — dont <b>≈ " + fmt0(dCas) + " Md€</b> de contributions retraites en plus " +
+                 "(CAS Pensions)" + (part != null && part > 0 && part <= 100
+                 ? ", soit <b>" + part + " %</b> de la hausse" : "") + ".";
+      } else if (dCas <= -0.05) {
+        punch += " — la part retraites (CAS Pensions) a, elle, baissé de <b>≈ " +
+                 fmt0(Math.abs(dCas)) + " Md€</b>.";
+      } else {
+        punch += " — la part retraites (CAS Pensions) est restée stable.";
+      }
     } else {
       punch += ".";
+    }
+    let noteOp = "";
+    if (serie.op25) {
+      noteOp = " Hors part payée par les opérateurs financés (≈ " + fmt0(serie.op25) +
+               " Md€ en 2025, estimation — hachures du diagramme).";
     }
     histoEl.innerHTML =
       '<div class="histo-text"><h3>Évolution du budget ' + y0 + " → " + y1 + "</h3>" +
       '<p class="histo-punch">' + punch + "</p>" +
       '<p class="histo-note">Crédits de paiement votés (LFI ; 2024 : PLF), budget général. ' +
-      esc(H.note_cas || "") + "</p></div>" + svg;
+      esc(H.note_cas || "") + esc(noteOp) + "</p></div>" + svg;
     histoEl.hidden = false;
   }
 
@@ -532,23 +580,25 @@
       "<p>Le <strong>compte d'affectation spéciale « Pensions »</strong> (créé par la LOLF, en " +
       "vigueur depuis 2006) encaisse les cotisations des fonctionnaires de l'État et les " +
       "« contributions employeur » des ministères, et verse leurs pensions. Comme il doit être " +
-      "équilibré en permanence, le taux de contribution employeur a été relevé par paliers pour " +
-      "combler le déséquilibre démographique&nbsp;: <strong>≈ 50&nbsp;% du traitement indiciaire " +
-      "des civils en 2006 → 74,28&nbsp;% depuis 2013</strong> (militaires&nbsp;: ≈ 100&nbsp;% → " +
-      "<strong>126,07&nbsp;%</strong>), taux toujours en vigueur en 2026 — à comparer aux " +
-      "≈ 16,5&nbsp;% de cotisation retraite employeur du privé. Cette hausse est une " +
+      "équilibré en permanence, le taux de contribution employeur a été relevé de façon " +
+      "continue de 2006 à 2013 pour combler le déséquilibre démographique&nbsp;— civils " +
+      "(en % du traitement indiciaire)&nbsp;: <strong>49,9&nbsp;% (2006)</strong> · 55,71 (2008) " +
+      "· 62,14 (2010) · 68,59 (2012) · <strong>74,28&nbsp;% depuis 2013</strong>, stable depuis, " +
+      "y compris en 2026 (militaires&nbsp;: 100&nbsp;% → <strong>126,07&nbsp;%</strong>) — à " +
+      "comparer aux ≈ 16,5&nbsp;% de cotisation retraite employeur du privé. Cette hausse est une " +
       "<strong>subvention d'équilibre du système de retraites prélevée sur le budget de chaque " +
       "ministère</strong>&nbsp;: ce n'est <strong>ni une augmentation du salaire des " +
       "fonctionnaires, ni une ouverture de droits supplémentaires</strong> — la retenue payée " +
       "par l'agent (11,10&nbsp;%) est, elle, alignée sur le privé depuis la réforme de 2010.</p>" +
-      "<p>Dans le diagramme&nbsp;: la <strong>part grisée</strong> des flux = la contribution " +
-      "employeur <strong>totale</strong> versée au CAS Pensions (catégorie 22 des crédits votés, " +
-      "calibrée sur les recettes réelles du CAS)&nbsp;; la <strong>voie retraites</strong> de la " +
-      "vue d'ensemble ne re-flèche vers les pensions que la part <strong>au-delà du taux du " +
-      "privé</strong> (39,5&nbsp;Md€ en 2025), pour ne compter chaque euro qu'une fois. Les " +
-      "personnels des <strong>opérateurs</strong> (universités, CNRS, musées…) n'apparaissent " +
-      "pas dans ces crédits&nbsp;: leurs établissements versent ≈ 5,8&nbsp;Md€/an au CAS, " +
-      "financés via leurs subventions.</p>" +
+      "<p>Dans le diagramme&nbsp;: <strong>gris uni</strong> = contribution directe versée au " +
+      "CAS Pensions (catégorie 22 des crédits votés, calibrée sur les recettes réelles du " +
+      "CAS — donnée sourcée)&nbsp;; <strong>hachures</strong> = contribution des " +
+      "<strong>opérateurs</strong> financés par la mission (universités, CNRS, musées… — leurs " +
+      "établissements versent ≈ 5,9&nbsp;Md€/an au CAS, ligne réelle de recettes, répartie ici " +
+      "au prorata des subventions pour charges de service public&nbsp;: une estimation). La " +
+      "<strong>voie retraites</strong> de la vue d'ensemble ne re-flèche vers les pensions que " +
+      "la part <strong>au-delà du taux du privé</strong> (39,5&nbsp;Md€ + opérateurs 4,6 en " +
+      "2025), pour ne compter chaque euro qu'une fois.</p>" +
       "<p><strong>Contrôle d'équilibre</strong> (axiome n°2)&nbsp;: recettes hors dette " +
       fmt(c.recettes_hors_dette) + " + émission de dette " + fmt(c.dette) +
       " = dépenses totales " + fmt(c.depenses_totales) + ".</p>" +
@@ -609,6 +659,49 @@
     renderRetraitesPanel(json.meta || {});
     renderMacro();
   }
+
+  /* ---------------- « Signaler une erreur » ----------------
+   * Envoi via FormSubmit (service e-mail pour sites statiques) vers l'adresse
+   * de l'auteur ; en cas d'échec réseau, repli sur un mailto: prérempli.
+   * La vue en cours est jointe pour situer le signalement.
+   */
+  const REPORT_TO = "papayes_29amphore@icloud.com";
+  const reportDlg = document.getElementById("report-dlg");
+  document.getElementById("report-btn").addEventListener("click", () => {
+    document.getElementById("report-status").hidden = true;
+    reportDlg.showModal();
+  });
+  document.getElementById("report-cancel").addEventListener("click", () => reportDlg.close());
+  document.getElementById("report-form").addEventListener("submit", (e) => {
+    e.preventDefault();
+    const msg = document.getElementById("report-msg").value.trim();
+    if (!msg) return;
+    const email = document.getElementById("report-email").value.trim();
+    const vue = viewStack.length ? viewStack.map((v) => v.label).join(" › ") : "Vue d'ensemble";
+    const status = document.getElementById("report-status");
+    status.hidden = false;
+    status.textContent = "Envoi en cours…";
+    fetch("https://formsubmit.co/ajax/" + REPORT_TO, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", "Accept": "application/json" },
+      body: JSON.stringify({
+        _subject: "[Où va l'argent public] Signalement d'erreur",
+        vue: vue, message: msg, email: email || "(non renseigné)",
+        page: location.href,
+      }),
+    }).then((r) => {
+      if (!r.ok) throw new Error("HTTP " + r.status);
+      status.textContent = "Merci ! Votre signalement a bien été envoyé.";
+      document.getElementById("report-msg").value = "";
+      setTimeout(() => reportDlg.close(), 1600);
+    }).catch(() => {
+      // repli : ouvre le client mail prérempli
+      status.textContent = "Envoi direct impossible — ouverture de votre messagerie…";
+      location.href = "mailto:" + REPORT_TO +
+        "?subject=" + encodeURIComponent("[Où va l'argent public] Signalement d'erreur") +
+        "&body=" + encodeURIComponent("Vue : " + vue + "\n\n" + msg);
+    });
+  });
 
   // hook de debug/tests (non documenté) : window.__ouva.dive("nom de nœud")
   window.__ouva = { chart: chart, dive: (name) => drillInto(name, {}), surface: surface };
