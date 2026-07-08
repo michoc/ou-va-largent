@@ -40,6 +40,13 @@
 
   const PENS = "Pensions versées — 405 Md€";
   const DETTE_NAMES = ["Émission de dette (Déficit)", "Déficit résiduel (dette sociale)"];
+  // nœuds de la voie retraites (bord gauche) — pastilles rentrées sur mobile
+  const LANE_NODES = {
+    "Cotisations retraites (tous régimes)": 1,
+    "Système de retraites (tous régimes)": 1,
+    "Régimes de base & complémentaires": 1,
+    "Pensions versées — 405 Md€": 1,
+  };
   const REDUCED_MOTION = window.matchMedia &&
     window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
@@ -75,6 +82,16 @@
     "Impôts & transferts affectés aux retraites": "Impôts affectés",
     "Impôts et taxes affectés (Sécu)": "Taxes affectées",
     "Pensions versées — 405 Md€": "Pensions versées",
+    "É · Défense, sécurité, justice": "Défense & sécurité",
+    "É · Solidarités, travail & santé": "Solidarités & santé",
+    "É · Écologie, territoires & agriculture": "Écologie & territoires",
+    "É · Économie & investissements d'avenir": "Économie & invest.",
+    "É · Administration & autres missions": "Administration",
+    "É · Enseignement & recherche": "Éducation & recherche",
+    "Collectivités territoriales": "Collectivités",
+    "É · Culture, médias, sport": "Culture & sport",
+    "É · Charge de la dette": "Charge de la dette",
+    "Régimes de base & complémentaires": "Régimes de retraite",
   };
   const shortLabel = (name) =>
     SHORT[name] ||
@@ -152,7 +169,17 @@
       if (show && !isRoot) {
         const k = labIdx[col] || 0;
         labIdx[col] = k + 1;
-        if (k % 2) offset = col === 0 ? [0, -36] : col === opts.lastCol ? [0, 36] : [0, 26];
+        if (col === 0) {
+          if (k % 2) offset = [0, -36];
+        } else if (col === opts.lastCol) {
+          if (k % 2) offset = [0, 36];
+        } else {
+          // rangées médianes chargées : quinconce à 3 niveaux
+          offset = [[0, 0], [0, 28], [0, -28]][k % 3];
+        }
+        // voie retraites collée au bord gauche : sur écran étroit, on rentre
+        // les pastilles vers l'intérieur pour qu'elles ne soient pas rognées.
+        if (opts.laneNudge && LANE_NODES[n.name]) offset = [offset[0] + opts.laneNudge, offset[1]];
       }
       return {
         name: n.name,
@@ -237,11 +264,14 @@
     chartEl.style.height = Math.max(820, Math.min(1080, window.innerWidth * 0.74)) + "px";
     chart.resize();
     const nodes = macroSorted(DATA.nodes);
-    const narrow = window.innerWidth < 700;   // mobile : moins de pastilles, plus étroites
+    // Mobile : seuls les GRANDS nœuds portent une pastille (le reste au tap) —
+    // à 390 px, dix pastilles par rangée se chevauchent inévitablement.
+    const narrow = window.innerWidth < 700;
     chart.setOption(buildOption(nodes, DATA.links,
       { lastCol: lastCol(nodes), iterations: 0, top: 88,
-        labelWidth: narrow ? 62 : 78, labelMin: narrow ? 50 : undefined,
-        left: narrow ? 8 : 16, right: narrow ? 8 : 16 }), true);
+        labelWidth: narrow ? 80 : 78, labelMin: narrow ? 110 : undefined,
+        left: narrow ? 8 : 16, right: narrow ? 8 : 22,
+        laneNudge: narrow ? 44 : 0 }), true);
     retPanel.classList.remove("open");
     casLegendEl.hidden = true;
     histoEl.hidden = true;
@@ -391,7 +421,7 @@
    */
   function renderHistoCard(key) {
     const H = DATA.historique;
-    const serie = H && H.familles && H.familles[key];
+    const serie = H && ((H.familles && H.familles[key]) || (H.missions && H.missions[key]));
     if (!serie || !serie.cp || Object.keys(serie.cp).length < 2) {
       histoEl.hidden = true;
       return;
@@ -434,8 +464,8 @@
     if (hasCas) {
       const dCas = cas[y1] - cas[y0];
       const part = dCp > 0 ? Math.round((dCas / dCp) * 100) : null;
-      punch += " — dont <b>≈ " + fmt0(dCas) + " Md€</b> destinés à équilibrer le système de " +
-               "retraites (CAS Pensions)" + (part != null && part > 0 && part <= 100
+      punch += " — dont <b>≈ " + fmt0(dCas) + " Md€</b> de contributions retraites en plus " +
+               "(CAS Pensions)" + (part != null && part > 0 && part <= 100
                ? ", soit <b>" + part + " %</b> de la hausse" : "") + ".";
     } else {
       punch += ".";
@@ -480,9 +510,9 @@
       fmt0(f.cnracl || 8.8) + "), impôts &amp; taxes affectés ≈ 15 % (" + fmt0(f.itaf || 56.6) + " Md€), " +
       "subventions d'équilibre et transferts ≈ 8 % (" + fmt0((f.transferts_branches || 16.8) + (f.subventions_regimes_speciaux || 7.8)) +
       " Md€).</p>" +
-      "<p>Le canal budgétaire de l'État est le <b>CAS Pensions</b> (compte spécial, hors budget général) : " +
-      "des contributions employeur imputées sur les crédits de chaque ministère — la dépense retraite cachée " +
-      "du budget de l'État, visible dans la vue d'ensemble (chaque flux au survol) :</p>" +
+      "<p>Le canal budgétaire de l'État est le <b>CAS Pensions</b> : une subvention d'équilibre " +
+      "prélevée sur le budget de chaque ministère pour le système de retraites (contribution " +
+      "employeur totale, déjà comprise dans ses crédits — part grisée des flux) :</p>" +
       "<table>" + rows + "</table>" +
       '<p class="ret-src">Sources : COR (rapport juin 2025), iFRAP (fév. 2025), PLFSS 2026 — détail dans data/reference/retraites_2025.json.</p>';
   }
@@ -498,12 +528,35 @@
     const caveats = (meta.caveats || []).map((x) => "<li>" + esc(x) + "</li>").join("");
     document.getElementById("metho-body").innerHTML =
       "<ul>" + caveats + "</ul>" +
+      "<h4>Le CAS Pensions — la « subvention d'équilibre » cachée dans le budget des ministères</h4>" +
+      "<p>Le <strong>compte d'affectation spéciale « Pensions »</strong> (créé par la LOLF, en " +
+      "vigueur depuis 2006) encaisse les cotisations des fonctionnaires de l'État et les " +
+      "« contributions employeur » des ministères, et verse leurs pensions. Comme il doit être " +
+      "équilibré en permanence, le taux de contribution employeur a été relevé par paliers pour " +
+      "combler le déséquilibre démographique&nbsp;: <strong>≈ 50&nbsp;% du traitement indiciaire " +
+      "des civils en 2006 → 74,28&nbsp;% depuis 2013</strong> (militaires&nbsp;: ≈ 100&nbsp;% → " +
+      "<strong>126,07&nbsp;%</strong>), taux toujours en vigueur en 2026 — à comparer aux " +
+      "≈ 16,5&nbsp;% de cotisation retraite employeur du privé. Cette hausse est une " +
+      "<strong>subvention d'équilibre du système de retraites prélevée sur le budget de chaque " +
+      "ministère</strong>&nbsp;: ce n'est <strong>ni une augmentation du salaire des " +
+      "fonctionnaires, ni une ouverture de droits supplémentaires</strong> — la retenue payée " +
+      "par l'agent (11,10&nbsp;%) est, elle, alignée sur le privé depuis la réforme de 2010.</p>" +
+      "<p>Dans le diagramme&nbsp;: la <strong>part grisée</strong> des flux = la contribution " +
+      "employeur <strong>totale</strong> versée au CAS Pensions (catégorie 22 des crédits votés, " +
+      "calibrée sur les recettes réelles du CAS)&nbsp;; la <strong>voie retraites</strong> de la " +
+      "vue d'ensemble ne re-flèche vers les pensions que la part <strong>au-delà du taux du " +
+      "privé</strong> (39,5&nbsp;Md€ en 2025), pour ne compter chaque euro qu'une fois. Les " +
+      "personnels des <strong>opérateurs</strong> (universités, CNRS, musées…) n'apparaissent " +
+      "pas dans ces crédits&nbsp;: leurs établissements versent ≈ 5,8&nbsp;Md€/an au CAS, " +
+      "financés via leurs subventions.</p>" +
       "<p><strong>Contrôle d'équilibre</strong> (axiome n°2)&nbsp;: recettes hors dette " +
       fmt(c.recettes_hors_dette) + " + émission de dette " + fmt(c.dette) +
       " = dépenses totales " + fmt(c.depenses_totales) + ".</p>" +
       '<p class="src"><strong>Sources</strong> — État&nbsp;: ' + esc(src.etat_depenses || "") +
       "&nbsp;· Recettes&nbsp;: " + esc(src.etat_recettes || "") +
-      "&nbsp;· Sécu&nbsp;: " + esc(src.secu || "") + "</p>" +
+      "&nbsp;· Sécu&nbsp;: " + esc(src.secu || "") +
+      "&nbsp;· CAS Pensions&nbsp;: recettes par ligne, PLF 2024 (data.economie.gouv.fr) ; taux " +
+      "de contribution&nbsp;: décrets 2012-1507/1508.</p>" +
       (meta.seed ? '<p class="src">⚠ ' + esc(meta.seed_note || "") + "</p>" : "");
   }
 
@@ -512,6 +565,9 @@
   // Plongée dans un nœud OU un flux (toute la zone du flux est cliquable).
   function drillInto(name, p) {
     if (!DATA.drill || !DATA.drill[name]) return false;
+    // jamais re-plonger dans la vue courante (ex. clic sur un flux dont la
+    // source est le nœud racine de la vue affichée)
+    if (viewStack.length && viewStack[viewStack.length - 1].key === name) return false;
     const rect = clickedRect(p);
     const label = DATA.drill[name].kind === "retraites" ? "Retraites" : shortLabel(name);
     viewStack.push({ key: name, label: label, rect: rect });
