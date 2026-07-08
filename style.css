@@ -256,6 +256,19 @@ main { max-width: 1220px; margin: 0 auto; padding: 6px 12px 8px; }
   font-size: 13px;
   margin: 10px 0 0;
 }
+.hint .alt-view {
+  display: inline-block;
+  margin-left: 10px;
+  color: var(--accent);
+  font-weight: 600;
+}
+#treemap {
+  width: 100%;
+  background: var(--paper);
+  border: 1px solid var(--rule);
+  border-radius: 10px;
+  box-shadow: 0 2px 14px rgba(30, 36, 48, .06);
+}
 .hint kbd {
   font: 600 11px/1 var(--sans);
   border: 1px solid var(--rule);

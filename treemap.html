@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Où va l'argent public ? — Treemap des dépenses 2025</title>
+  <meta name="description" content="Treemap interactif des dépenses publiques françaises 2025 : chaque euro dépensé, du bloc au programme — avec le trou de financement des retraites mis en évidence.">
+  <meta name="author" content="Michael Colla">
+  <link rel="preconnect" href="https://cdnjs.cloudflare.com">
+  <link rel="stylesheet" href="style.css?v=20260709c">
+</head>
+<body>
+  <header class="masthead">
+    <div class="masthead-inner">
+      <p class="kicker">Vue treemap · dépenses · exercice 2025</p>
+      <h1><span class="hl">Où va l'argent public&nbsp;?</span></h1>
+      <p class="standfirst">
+        La même donnée que le <a href="index.html">grand poster</a>, en <strong>rectangles
+        proportionnels</strong> : chaque euro dépensé, une seule fois. Au sein des
+        <strong>pensions (405&nbsp;Md€)</strong>, la part que les cotisations ne couvrent pas —
+        le «&nbsp;trou&nbsp;» comblé par les impôts, les ministères et la dette — est en
+        <strong>rouge</strong>. Cliquez pour plonger, fil d'ariane pour remonter.
+      </p>
+      <div class="statband" id="statband" aria-label="Total des dépenses"></div>
+    </div>
+  </header>
+
+  <main>
+    <div id="chart-stage">
+      <div id="treemap" role="img" aria-label="Treemap des dépenses publiques françaises 2025"></div>
+    </div>
+    <p class="hint">Les blocs des administrations sont présentés <strong>nets</strong> de ce
+      qu'ils re-versent au système de retraites (ces montants vivent dans le bloc
+      «&nbsp;Pensions&nbsp;») : la somme des rectangles = les dépenses totales du bandeau,
+      sans double compte. <a href="index.html">← Retour au poster (flux)</a></p>
+  </main>
+
+  <footer class="metho">
+    <p class="credits">
+      <strong>Un projet conçu et réalisé par Michael Colla.</strong>
+      Données&nbsp;: data.economie.gouv.fr, data.gouv.fr, PLFSS (open data Assemblée nationale),
+      rapports Sénat PLF 2025 — Licence Ouverte 2.0. Code&nbsp;: MIT.
+      Méthodologie détaillée sur la <a href="index.html">page principale</a>.
+    </p>
+  </footer>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/echarts/5.5.0/echarts.min.js"></script>
+  <script src="treemap.js?v=20260709c"></script>
+</body>
+</html>

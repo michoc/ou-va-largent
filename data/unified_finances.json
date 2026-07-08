@@ -2,7 +2,7 @@
  "meta": {
   "exercice": 2025,
   "unit": "Md€",
-  "generated_at": "2026-07-08T23:07:02+00:00",
+  "generated_at": "2026-07-08T23:26:12+00:00",
   "sources": {
    "etat_depenses": "plf25-depenses-2025-selon-destination (PLF (crédits demandés))",
    "etat_recettes": "plf25-recettes-du-budget-general + Voies & moyens (partages TVA/PSR, cf. data/reference)",
@@ -847,7 +847,7 @@
      "name": "Finances publiques (Bercy)",
      "color": "#E5A07A",
      "depth": 0,
-     "tooltip": "Mission LOLF : « Gestion des finances publiques ». 🔎 Retraites : ≈ 2.58 Md€ de ses crédits (gris uni) partent au CAS Pensions — subvention d'équilibre prélevée sur le budget du ministère pour le système de retraites ; dont ≈ 2.08 Md€ au-delà du taux du privé, la part re-fléchée vers les pensions dans la vue d'ensemble. Taux employeur civils : 74,28 % (2013-2024) → 78,28 % en 2025 → 82,28 % en 2026 (décrets 2025-61 et 2025-1341) ; privé ≈ 16,5 %. 📈 2024→2025 : budget +0,07 Md€ ; contribution CAS +0,08 Md€ — la hausse du CAS DÉPASSE celle du budget : les moyens hors retraites reculent."
+     "tooltip": "Mission LOLF : « Gestion des finances publiques ». 🔎 Retraites : ≈ 2.58 Md€ de ses crédits (gris uni) partent au CAS Pensions — subvention d'équilibre prélevée sur le budget du ministère pour le système de retraites ; dont ≈ 2.08 Md€ au-delà du taux du privé, la part re-fléchée vers les pensions dans la vue d'ensemble. Taux employeur civils : 74,28 % (2013-2024) → 78,28 % en 2025 → 82,28 % en 2026 (décrets 2025-61 et 2025-1341) ; privé ≈ 16,5 %. 📈 2024→2025 : budget +0,07 Md€ ; contribution CAS +0,08 Md€ — la hausse du CAS DÉPASSE celle du budget : les moyens hors retraites reculent. 📄 Le Sénat relève que tous les postes de la mission sont stabilisés ou en baisse SAUF le titre 2 (+112,5 M€, +1,28 %), tiré par le GVT et « le dynamisme de la contribution au CAS Pensions » (+86,3 M€ sur le seul programme 156) — alors même que le schéma d'emplois est négatif : moins d'agents, plus de charge retraites. (Sénat, rapport PLF 2025 « Gestion des finances publiques »)."
     },
     {
      "name": "156 · Gestion fiscale et financière de l'État et du secteur public local",
@@ -2797,7 +2797,7 @@
      "name": "Finances publiques (Bercy)",
      "color": "#E5A07A",
      "depth": 1,
-     "tooltip": "Mission LOLF : « Gestion des finances publiques ». 🔎 Retraites : ≈ 2.58 Md€ de ses crédits (gris uni) partent au CAS Pensions — subvention d'équilibre prélevée sur le budget du ministère pour le système de retraites ; dont ≈ 2.08 Md€ au-delà du taux du privé, la part re-fléchée vers les pensions dans la vue d'ensemble. Taux employeur civils : 74,28 % (2013-2024) → 78,28 % en 2025 → 82,28 % en 2026 (décrets 2025-61 et 2025-1341) ; privé ≈ 16,5 %. 📈 2024→2025 : budget +0,07 Md€ ; contribution CAS +0,08 Md€ — la hausse du CAS DÉPASSE celle du budget : les moyens hors retraites reculent.",
+     "tooltip": "Mission LOLF : « Gestion des finances publiques ». 🔎 Retraites : ≈ 2.58 Md€ de ses crédits (gris uni) partent au CAS Pensions — subvention d'équilibre prélevée sur le budget du ministère pour le système de retraites ; dont ≈ 2.08 Md€ au-delà du taux du privé, la part re-fléchée vers les pensions dans la vue d'ensemble. Taux employeur civils : 74,28 % (2013-2024) → 78,28 % en 2025 → 82,28 % en 2026 (décrets 2025-61 et 2025-1341) ; privé ≈ 16,5 %. 📈 2024→2025 : budget +0,07 Md€ ; contribution CAS +0,08 Md€ — la hausse du CAS DÉPASSE celle du budget : les moyens hors retraites reculent. 📄 Le Sénat relève que tous les postes de la mission sont stabilisés ou en baisse SAUF le titre 2 (+112,5 M€, +1,28 %), tiré par le GVT et « le dynamisme de la contribution au CAS Pensions » (+86,3 M€ sur le seul programme 156) — alors même que le schéma d'emplois est négatif : moins d'agents, plus de charge retraites. (Sénat, rapport PLF 2025 « Gestion des finances publiques »).",
      "tags": [
       "retraites"
      ]
@@ -8259,7 +8259,7 @@
      "name": "Justice",
      "color": "#D94F26",
      "depth": 0,
-     "tooltip": "🔎 Retraites : ≈ 2.16 Md€ de ses crédits (gris uni) partent au CAS Pensions — subvention d'équilibre prélevée sur le budget du ministère pour le système de retraites ; dont ≈ 1.75 Md€ au-delà du taux du privé, la part re-fléchée vers les pensions dans la vue d'ensemble. Taux employeur civils : 74,28 % (2013-2024) → 78,28 % en 2025 → 82,28 % en 2026 (décrets 2025-61 et 2025-1341) ; privé ≈ 16,5 %. 📈 2024→2025 : budget +0,30 Md€ ; contribution CAS +0,10 Md€ (33 % de la hausse)."
+     "tooltip": "🔎 Retraites : ≈ 2.16 Md€ de ses crédits (gris uni) partent au CAS Pensions — subvention d'équilibre prélevée sur le budget du ministère pour le système de retraites ; dont ≈ 1.75 Md€ au-delà du taux du privé, la part re-fléchée vers les pensions dans la vue d'ensemble. Taux employeur civils : 74,28 % (2013-2024) → 78,28 % en 2025 → 82,28 % en 2026 (décrets 2025-61 et 2025-1341) ; privé ≈ 16,5 %. 📈 2024→2025 : budget +0,30 Md€ ; contribution CAS +0,10 Md€ (33 % de la hausse). 📄 Le Sénat chiffre le mécanisme : la contribution de la mission au CAS Pensions augmente de 139,7 M€ (+5,7 %) en 2025, quand la masse salariale brute hors CAS ne progresse que de 39,9 M€ (+1,8 %) — la charge retraites croît trois fois plus vite que les rémunérations. (Sénat, rapport PLF 2025 « Justice »)."
     },
     {
      "name": "107 · Administration pénitentiaire",
@@ -8530,7 +8530,7 @@
      "name": "Justice",
      "color": "#D94F26",
      "depth": 1,
-     "tooltip": "🔎 Retraites : ≈ 2.16 Md€ de ses crédits (gris uni) partent au CAS Pensions — subvention d'équilibre prélevée sur le budget du ministère pour le système de retraites ; dont ≈ 1.75 Md€ au-delà du taux du privé, la part re-fléchée vers les pensions dans la vue d'ensemble. Taux employeur civils : 74,28 % (2013-2024) → 78,28 % en 2025 → 82,28 % en 2026 (décrets 2025-61 et 2025-1341) ; privé ≈ 16,5 %. 📈 2024→2025 : budget +0,30 Md€ ; contribution CAS +0,10 Md€ (33 % de la hausse).",
+     "tooltip": "🔎 Retraites : ≈ 2.16 Md€ de ses crédits (gris uni) partent au CAS Pensions — subvention d'équilibre prélevée sur le budget du ministère pour le système de retraites ; dont ≈ 1.75 Md€ au-delà du taux du privé, la part re-fléchée vers les pensions dans la vue d'ensemble. Taux employeur civils : 74,28 % (2013-2024) → 78,28 % en 2025 → 82,28 % en 2026 (décrets 2025-61 et 2025-1341) ; privé ≈ 16,5 %. 📈 2024→2025 : budget +0,30 Md€ ; contribution CAS +0,10 Md€ (33 % de la hausse). 📄 Le Sénat chiffre le mécanisme : la contribution de la mission au CAS Pensions augmente de 139,7 M€ (+5,7 %) en 2025, quand la masse salariale brute hors CAS ne progresse que de 39,9 M€ (+1,8 %) — la charge retraites croît trois fois plus vite que les rémunérations. (Sénat, rapport PLF 2025 « Justice »).",
      "tags": [
       "retraites"
      ]
@@ -12553,6 +12553,31 @@
    "note": "De haut en bas : chaque ministère alimente les retraites via le CAS Pensions (dépense retraite cachée de l'État), qui rejoint les autres ressources (nomenclature COR juin 2025), transitent par les régimes et convergent vers les 405 Md€ versés.",
    "kind": "retraites"
   }
+ },
+ "surco": {
+  "Défense": 6.76,
+  "Anciens combattants": 0.01,
+  "Éducation nationale": 20.44,
+  "Santé": 0.01,
+  "Justice": 1.76,
+  "Enseignement sup. & recherche (ESR)": 3.84,
+  "Culture": 0.26,
+  "Conseil et contrôle de l'État": 0.15,
+  "Économie": 0.21,
+  "Immigration & asile": 0.03,
+  "Transformation et fonction publiques": 0.02,
+  "Finances publiques (Bercy)": 2.08,
+  "Agriculture": 0.24,
+  "Outre-mer": 0.04,
+  "Logement & territoires": 0.01,
+  "Police, gendarmerie & sécurité civile": 5.64,
+  "Travail & emploi": 0.6,
+  "Services du Premier ministre": 0.08,
+  "Administration territoriale (Intérieur)": 0.68,
+  "Sport & jeunesse": 0.09,
+  "Médias & livre": 0.02,
+  "Écologie & transports": 0.93,
+  "Diplomatie (Quai d'Orsay)": 0.21
  },
  "retraites_view": {
   "title": "Qui paie les 405 Md€ de retraites ?",
