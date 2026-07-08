@@ -6,7 +6,8 @@
   <title>Où va l'argent public ? — Recettes et dépenses publiques 2025</title>
   <meta name="description" content="Infographie interactive : d'où vient l'argent public français et comment il est dépensé (exercice 2025). Données open data — État, Sécurité sociale, collectivités.">
   <link rel="preconnect" href="https://cdnjs.cloudflare.com">
-  <link rel="stylesheet" href="style.css">
+  <!-- ?v= : cache-busting — incrémenter à chaque déploiement de style/app -->
+  <link rel="stylesheet" href="style.css?v=20260708">
 </head>
 <body>
   <header class="masthead">
@@ -28,9 +29,16 @@
   </nav>
 
   <main>
-    <div id="chart" role="img" aria-label="Diagramme de Sankey des finances publiques françaises"></div>
+    <p class="cas-legend" id="cas-legend" hidden><span class="swatch"></span>
+      Part <strong>grisée</strong> d'un flux&nbsp;: budget du ministère consacré à une
+      <strong>subvention d'équilibre du système de retraites</strong> (contribution au CAS Pensions,
+      déjà comprise dans ses crédits).</p>
+    <aside id="histo-card" class="histo-card" hidden aria-live="polite"></aside>
+    <div id="chart-stage">
+      <div id="chart" role="img" aria-label="Diagramme de Sankey des finances publiques françaises"></div>
+    </div>
     <p class="hint" id="hint">Cliquez sur une famille de dépenses, une branche de la Sécu ou le nœud
-      <strong>« Retraites — 405 Md€ »</strong> — ou directement sur un flux — pour <strong>zoomer</strong>
+      <strong>« Pensions versées — 405 Md€ »</strong> — ou directement sur un flux — pour <strong>zoomer</strong>
       dessus. <kbd>Échap</kbd> ou clic sur le fond pour dézoomer.</p>
     <aside id="panel-retraites" class="panel-retraites" aria-live="polite"></aside>
   </main>
@@ -49,6 +57,6 @@
   </footer>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/echarts/5.5.0/echarts.min.js"></script>
-  <script src="app.js"></script>
+  <script src="app.js?v=20260708"></script>
 </body>
 </html>

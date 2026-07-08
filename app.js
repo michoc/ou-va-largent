@@ -1,31 +1,47 @@
 /* ==========================================================================
- * Où va l'argent public ? — Sankey ECharts façon « poster »
+ * Où va l'argent public ? — Sankey ECharts façon « poster »  (front, zéro build)
  * --------------------------------------------------------------------------
- * - Vue d'ensemble VERTICALE (recettes → administrations → dépenses).
- * - Clic sur un nœud : ZOOM en place sur ses flux (détail missions →
- *   programmes → dispositifs), avec animation « on ne quitte jamais le
- *   diagramme » ; pile de vues + breadcrumb cliquable, Échap/clic-fond pour
- *   dézoomer.
- * - Étage « pensions » PERMANENT sous le diagramme principal : d'où viennent
- *   les 405 Md€ de pensions (tous régimes, nomenclature COR juin 2025), avec
- *   les flux de chaque ministère (CAS Pensions) et de chaque financeur.
+ * Rôle : charger data/unified_finances.json (généré par scraper.py) et le
+ * rendre en un unique diagramme de Sankey interactif. Aucun framework : cette
+ * IIFE + ECharts 5 (CDN) suffisent. Toute la donnée vient du JSON ; ce fichier
+ * ne fait que du rendu et de la navigation.
+ *
+ * Le diagramme est UNIFIÉ (une seule instance ECharts) :
+ *   • Vue d'ensemble VERTICALE : recettes → blocs État/Sécu → dépenses, avec la
+ *     VOIE RETRAITES sur le côté droit — cotisations (269) et impôts affectés
+ *     descendent directement vers le nœud terminal « Pensions versées —
+ *     405 Md€ » (constante PENS), rejoints par les apports re-fléchés de
+ *     l'État (CAS Pensions), des Collectivités (CNRACL) et de la Sécu.
+ *     L'ordre gauche→droite est DÉTERMINISTE (MACRO_COL0 + macroRank) pour
+ *     garder la voie retraites au bord droit.
+ *   • PLONGÉE (clic sur un nœud OU sur un flux) : toutes les vues restent
+ *     VERTICALES ; la nouvelle vue naît du rectangle exact du nœud cliqué
+ *     pendant que l'ancienne grossit et se dissout (diveTransition) — on ne
+ *     quitte jamais le diagramme, on s'y enfonce. Breadcrumb pour remonter.
+ *   • Échap ou clic sur le fond = ressortir d'un niveau (animation inverse).
+ *
+ * Structure du JSON consommé : voir BRIEF.md § « Modèle de données ».
  * ========================================================================== */
 
 (function () {
   "use strict";
 
   const chartEl = document.getElementById("chart");
+  const stageEl = document.getElementById("chart-stage");
   const crumbEl = document.getElementById("breadcrumb");
   const statEl = document.getElementById("statband");
+  const casLegendEl = document.getElementById("cas-legend");
+  const histoEl = document.getElementById("histo-card");
   const retPanel = document.getElementById("panel-retraites");
   const chart = echarts.init(chartEl, null, { renderer: "canvas" });
 
   let DATA = null;
-  let viewStack = [];          // [] = vue d'ensemble ; sinon [{key,label}, …]
-  let zoomOrigin = null;       // point de clic (px) pour l'origine du zoom
+  let viewStack = [];          // [] = vue d'ensemble ; sinon [{key,label,rect}, …]
 
-  const PENS = "Retraites — 405 Md€";
+  const PENS = "Pensions versées — 405 Md€";
   const DETTE_NAMES = ["Émission de dette (Déficit)", "Déficit résiduel (dette sociale)"];
+  const REDUCED_MOTION = window.matchMedia &&
+    window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
   /* ---------------- utilitaires ---------------- */
 
@@ -54,43 +70,107 @@
     return Math.max(vIn, vOut);
   }
 
+  // Libellés courts pour les pastilles (les intitulés complets restent au survol).
+  const SHORT = {
+    "Impôts & transferts affectés aux retraites": "Impôts affectés",
+    "Impôts et taxes affectés (Sécu)": "Taxes affectées",
+    "Pensions versées — 405 Md€": "Pensions versées",
+  };
   const shortLabel = (name) =>
+    SHORT[name] ||
     name.replace(/^É · /, "").replace(/^\d+ · /, "").replace(/ \(.*\)$/, "");
+
+  /* ---------------- ordre déterministe de la vue d'ensemble ----------------
+   * layoutIterations: 0 + ordre explicite. La VOIE RETRAITES longe le bord
+   * GAUCHE (cotisations → pensions en bande droite : ECharts cale au bord le
+   * nœud unique de la dernière colonne) ; puis Sécu, dette au centre, État à
+   * droite. Les contributions CAS des ministères « redescendent » en biais
+   * vers les pensions, en bas à gauche.
+   */
+  const MACRO_COL0 = [
+    "Cotisations retraites (tous régimes)", "Impôts & transferts affectés aux retraites",
+    "Cotisations sociales", "CSG · CRDS", "Impôts et taxes affectés (Sécu)",
+    "Autres recettes Sécu", "Émission de dette (Déficit)",
+    "TVA", "Impôt sur le revenu", "Impôt sur les sociétés", "Autres impôts d'État",
+    "Recettes non fiscales",
+  ];
+  function macroSorted(nodes) {
+    const rank = (n, i) => {
+      if (n.col === 0) { const k = MACRO_COL0.indexOf(n.name); return k < 0 ? 49 : k; }
+      if (n.col === 1) {
+        if (n.name.indexOf("Système de retraites") === 0) return 0;
+        return n.name.indexOf("État") === 0 ? 2 : 1;
+      }
+      if (n.col === 2) {
+        if (n.name.indexOf("Régimes de base") === 0) return 5;     // épine de la voie
+        if (n.name.indexOf("É · ") === 0) return 50 + i;           // familles (déjà par valeur)
+        if (n.name === "Collectivités territoriales") return 40;
+        if (n.name === "Union européenne") return 41;
+        return 10 + i;                                             // branches Sécu
+      }
+      return 0;                                                    // col 3 : pensions
+    };
+    return nodes.map((n, i) => [n, rank(n, i)])
+      .sort((a, b) => (a[0].col - b[0].col) || (a[1] - b[1]))
+      .map((p) => p[0]);
+  }
 
   /* ---------------- option ECharts ---------------- */
 
+  // Construit l'option ECharts d'une vue Sankey (toujours VERTICALE : poster
+  // haut→bas, cohérent entre la vue d'ensemble et les plongées).
+  // La colonne d'un nœud = n.col (macro/pensions) ou n.depth (drills).
+  // opts :
+  //   lastCol    : index de la dernière colonne (place le label des nœuds finaux)
+  //   noDrill    : n'affiche pas l'invite « cliquer pour zoomer » (vues terminales)
+  //   labelMin   : valeur mini (Md€) pour afficher un label (sinon seuil = % du total)
+  //   labelWidth : largeur du label (px) — fait passer les libellés longs
+  //   nodeGap    : écart entre nœuds d'une même colonne
+  //   left/right : marges (px) — élargies dans la vue pensions pour les libellés
+  //   iterations : layoutIterations ECharts (0 = ordre des données respecté)
+  //   n.noLabel  : masque le label d'un nœud précis (info au survol)
   function buildOption(nodes, links, opts) {
-    const vertical = !!opts.vertical;
     const totalAll = links.reduce((s, l) => s + l.value, 0);
-    const labelThreshold = opts.labelMin != null
-      ? opts.labelMin
-      : totalAll * (vertical ? 0.012 : 0.004);
-    const labelWidth = opts.labelWidth || (vertical ? 86 : undefined);
+    const labelThreshold = opts.labelMin != null ? opts.labelMin : totalAll * 0.012;
+    const labelWidth = opts.labelWidth || 86;
     const nodeMeta = {};
     nodes.forEach((n) => (nodeMeta[n.name] = n));
+    const colOf = (n) => (n.col != null ? n.col : n.depth);
 
+    // Quinconce : dans une même rangée, une pastille sur deux est décalée pour
+    // éviter les chevauchements (l'intitulé complet reste au survol).
+    const labIdx = {};
     const data = nodes.map((n) => {
       const v = nodeValue(links, n.name);
       const isDette = DETTE_NAMES.includes(n.name) || n.color === "#FFFFFF";
       const short = shortLabel(n.name);
       const drillable = !!(DATA.drill && DATA.drill[n.name]) && !opts.noDrill;
+      const col = colOf(n);
+      const show = !n.noLabel && v >= labelThreshold;
+      const isRoot = !!opts.rootWide && col === 0;   // racine d'une plongée : pastille large
+      let offset = [0, 0];
+      if (show && !isRoot) {
+        const k = labIdx[col] || 0;
+        labIdx[col] = k + 1;
+        if (k % 2) offset = col === 0 ? [0, -36] : col === opts.lastCol ? [0, 36] : [0, 26];
+      }
       return {
         name: n.name,
-        depth: n.col != null ? n.col : n.depth,
+        depth: col,
         itemStyle: {
           color: isDette ? "#FDFCF8" : n.color,
           borderColor: isDette ? "#1E2430" : n.color,
           borderWidth: isDette ? 1.6 : 0,
         },
         label: {
-          show: !n.noLabel && v >= labelThreshold,
-          formatter: vertical
-            ? "{t|" + short + "}\n{v|" + fmt0(v) + " Md€}"
-            : "{t|" + short + "}  {v|" + fmt0(v) + " Md€}",
+          show: show,
+          offset: offset,
+          formatter: "{t|" + short + "}\n{v|" + fmt0(v) + " Md€}",
           rich: {
-            t: { color: isDette ? "#1E2430" : "#FFFFFF", fontSize: 11, fontWeight: 700,
-                 lineHeight: 13, width: labelWidth, overflow: "break", align: "center" },
-            v: { color: isDette ? "#1E2430" : "rgba(255,255,255,.92)", fontSize: 10,
+            t: { color: isDette ? "#1E2430" : "#FFFFFF", fontSize: isRoot ? 13 : 11,
+                 fontWeight: 700, lineHeight: isRoot ? 15 : 13,
+                 width: isRoot ? 300 : labelWidth, overflow: "break", align: "center" },
+            v: { color: isDette ? "#1E2430" : "rgba(255,255,255,.92)", fontSize: isRoot ? 11 : 10,
                  fontWeight: 700, align: "center" },
           },
           backgroundColor: isDette ? "#FFFFFF" : n.color,
@@ -98,10 +178,7 @@
           borderWidth: isDette ? 1.4 : 1,
           borderRadius: 9,
           padding: [4, 7],
-          position: vertical
-            ? ((n.col != null ? n.col : n.depth) === 0 ? "top"
-               : (n.col != null ? n.col : n.depth) === opts.lastCol ? "bottom" : "inside")
-            : "right",
+          position: col === 0 ? "top" : col === opts.lastCol ? "bottom" : "inside",
         },
         _tooltip: n.tooltip || "",
         _drillable: drillable,
@@ -120,7 +197,7 @@
           }
           const meta = nodeMeta[p.name] || {};
           let note = meta.tooltip || "";
-          if (p.data._drillable) note += (note ? " " : "") + "➜ Cliquer pour zoomer sur ce nœud.";
+          if (p.data._drillable) note += (note ? " " : "") + "➜ Cliquer pour plonger dans ce nœud.";
           return tooltipHtml(p.name, nodeValue(links, p.name), note);
         },
       },
@@ -129,17 +206,21 @@
         data: data,
         links: links.map((l) => ({
           source: l.source, target: l.target, value: l.value, tooltip: l.tooltip,
-          lineStyle: { color: "gradient", opacity: 0.4, curveness: 0.5 },
+          // part CAS Pensions : ruban GRIS (subvention d'équilibre retraites,
+          // déjà comprise dans les crédits — cf. légende sous le fil d'ariane)
+          lineStyle: l.cas
+            ? { color: "#9CA3B0", opacity: 0.62, curveness: 0.5 }
+            : { color: "gradient", opacity: 0.34, curveness: 0.5 },
         })),
-        orient: vertical ? "vertical" : "horizontal",
+        orient: "vertical",
         nodeAlign: "justify",
-        nodeGap: opts.nodeGap != null ? opts.nodeGap : (vertical ? 22 : 10),
-        nodeWidth: vertical ? 20 : 14,
-        layoutIterations: 80,
-        left: opts.left != null ? opts.left : (vertical ? 10 : 14),
-        top: vertical ? 46 : 26,
-        right: opts.right != null ? opts.right : (vertical ? 10 : 210),
-        bottom: vertical ? 52 : 18,
+        nodeGap: opts.nodeGap != null ? opts.nodeGap : 22,
+        nodeWidth: 20,
+        layoutIterations: opts.iterations != null ? opts.iterations : 0,
+        left: opts.left != null ? opts.left : 10,
+        top: opts.top != null ? opts.top : 46,
+        right: opts.right != null ? opts.right : 10,
+        bottom: opts.bottom != null ? opts.bottom : 52,
         emphasis: { focus: "adjacency" },
         blur: { itemStyle: { opacity: 0.25 }, lineStyle: { opacity: 0.08 } },
         label: { fontFamily: "Helvetica Neue, Arial, sans-serif" },
@@ -155,30 +236,46 @@
     viewStack = [];
     chartEl.style.height = Math.max(820, Math.min(1080, window.innerWidth * 0.74)) + "px";
     chart.resize();
-    chart.setOption(buildOption(DATA.nodes, DATA.links,
-      { vertical: true, lastCol: lastCol(DATA.nodes) }), true);
+    const nodes = macroSorted(DATA.nodes);
+    const narrow = window.innerWidth < 700;   // mobile : moins de pastilles, plus étroites
+    chart.setOption(buildOption(nodes, DATA.links,
+      { lastCol: lastCol(nodes), iterations: 0, top: 88,
+        labelWidth: narrow ? 62 : 78, labelMin: narrow ? 50 : undefined,
+        left: narrow ? 8 : 16, right: narrow ? 8 : 16 }), true);
     retPanel.classList.remove("open");
+    casLegendEl.hidden = true;
+    histoEl.hidden = true;
     renderBreadcrumb();
   }
 
   function renderDrill() {
     const key = viewStack[viewStack.length - 1].key;
     const d = DATA.drill[key];
-    if (key === PENS) {
-      // Zoom sur les retraites : décomposition verticale façon poster (COR juin 2025),
+    if (d.kind === "retraites") {
+      // Plongée retraites : décomposition verticale façon poster (COR juin 2025),
       // financeurs (ministères CAS Pensions + sources) → régimes → 405.
       chartEl.style.height = Math.max(940, Math.min(1180, window.innerWidth * 0.78)) + "px";
       chart.resize();
       chart.setOption(buildOption(d.nodes, d.links,
-        { vertical: true, lastCol: lastCol(d.nodes), noDrill: true,
-          labelMin: 1.5, labelWidth: 96, nodeGap: 30, left: 150, right: 205 }), true);
+        { lastCol: lastCol(d.nodes), noDrill: true, iterations: 0,
+          labelMin: 1.5, labelWidth: 96, nodeGap: 26, left: 20, right: 20 }), true);
       retPanel.classList.add("open");
     } else {
-      chartEl.style.height = Math.max(560, Math.min(1500, d.nodes.length * 30)) + "px";
+      // Plongée standard (famille → missions → programmes…) : VERTICALE elle
+      // aussi — le nœud parent devient la bande-source colorée en haut.
+      const depthMax = lastCol(d.nodes);
+      chartEl.style.height =
+        Math.max(540, Math.min(860, 340 + depthMax * 150 + d.nodes.length * 4)) + "px";
       chart.resize();
-      chart.setOption(buildOption(d.nodes, d.links, { vertical: false }), true);
+      chart.setOption(buildOption(d.nodes, d.links,
+        { lastCol: depthMax, iterations: 0, nodeGap: 14, labelWidth: 92, bottom: 96,
+          rootWide: true }), true);
       retPanel.classList.remove("open");
     }
+    // légende du grisé CAS Pensions : seulement si la vue contient un flux scindé
+    casLegendEl.hidden = !(d.links || []).some((l) => l.cas);
+    // carte historique : plongée dans une famille de dépenses de l'État
+    renderHistoCard(key);
     renderBreadcrumb();
   }
 
@@ -187,26 +284,75 @@
     else renderMacro();
   }
 
-  /* ---------------- transition « zoom » ---------------- */
-  // dir "in"  : on plonge dans le nœud cliqué (l'ancienne vue grossit & disparaît,
-  //             la nouvelle apparaît depuis un état réduit) ;
-  // dir "out" : on prend du recul (effet inverse).
-  function zoom(fn, dir) {
-    if (zoomOrigin) {
-      chartEl.style.transformOrigin = zoomOrigin.x + "px " + zoomOrigin.y + "px";
-    } else {
-      chartEl.style.transformOrigin = "50% 40%";
+  /* ---------------- transition « plongée » ----------------
+   * dir "in"  : l'ancienne vue (capturée en image) grossit autour du nœud
+   *             cliqué et se dissout, pendant que la nouvelle vue NAÎT du
+   *             rectangle exact de ce nœud et s'étend — on s'enfonce.
+   * dir "out" : la vue détaillée se résorbe dans le rectangle d'origine du
+   *             nœud tandis que la vue parente réapparaît en dessous.
+   * rect : {x,y,w,h} en px, coordonnées du conteneur ; null → centre.
+   */
+  function diveTransition(renderFn, dir, rect) {
+    if (REDUCED_MOTION) { renderFn(); return; }
+    const W = chartEl.clientWidth, H = chartEl.clientHeight;
+    const r = rect || { x: W / 2 - 60, y: H * 0.4 - 20, w: 120, h: 40 };
+    const cx = r.x + r.w / 2, cy = r.y + r.h / 2;
+    const K = Math.min(5, Math.max(1.7, W / Math.max(60, r.w)));   // grossissement caméra
+    const s0 = Math.min(0.8, Math.max(0.14, r.w / W));             // naissance dans le nœud
+
+    // 1) capture de la vue actuelle → calque fantôme au-dessus de la scène
+    let ghost = null;
+    try {
+      const url = chart.getDataURL({ pixelRatio: 1, backgroundColor: "#FFFFFF" });
+      ghost = document.createElement("div");
+      ghost.className = "dive-ghost";
+      ghost.style.height = H + "px";
+      ghost.style.backgroundImage = "url(" + url + ")";
+      ghost.style.transformOrigin = cx + "px " + cy + "px";
+      stageEl.appendChild(ghost);
+    } catch (e) { /* capture impossible → transition simple */ }
+
+    // 2) nouvelle vue rendue sous le fantôme, posée à son état de départ
+    renderFn();
+    chartEl.style.transition = "none";
+    chartEl.style.transformOrigin = cx + "px " + cy + "px";
+    chartEl.style.transform = dir === "in" ? "scale(" + s0 + ")" : "scale(" + (1 / K) * 1.6 + ")";
+    chartEl.style.opacity = dir === "in" ? "0.3" : "0.35";
+    void chartEl.offsetWidth;                       // reflow : fige l'état de départ
+
+    // 3) animation (FLIP synchrone — pas de rAF : throttlé en arrière-plan)
+    const ease = "cubic-bezier(.22,.61,.21,1)";
+    chartEl.style.transition = "transform .5s " + ease + ", opacity .42s ease";
+    chartEl.style.transform = "scale(1)";
+    chartEl.style.opacity = "1";
+    if (ghost) {
+      ghost.style.transition = "transform .5s " + ease + ", opacity .38s ease";
+      ghost.style.transform = dir === "in" ? "scale(" + K + ")" : "scale(" + s0 + ")";
+      ghost.style.opacity = "0";
     }
-    chartEl.classList.remove("zoom-enter-in", "zoom-enter-out");
-    chartEl.classList.add(dir === "in" ? "zoom-exit-in" : "zoom-exit-out");
-    setTimeout(() => {
-      fn();
-      chartEl.classList.remove("zoom-exit-in", "zoom-exit-out");
-      chartEl.classList.add(dir === "in" ? "zoom-enter-in" : "zoom-enter-out");
-      void chartEl.offsetWidth;                 // reflow → l'anim part de l'état réduit/agrandi
-      chartEl.classList.remove("zoom-enter-in", "zoom-enter-out");
-      zoomOrigin = null;
-    }, 190);
+    clearTimeout(diveTransition._t);
+    diveTransition._t = setTimeout(() => {
+      chartEl.style.transition = chartEl.style.transform =
+        chartEl.style.transformOrigin = chartEl.style.opacity = "";
+      stageEl.querySelectorAll(".dive-ghost").forEach((g) => g.remove());
+    }, 540);
+  }
+
+  // Rectangle (px, coordonnées conteneur) de l'élément graphique cliqué —
+  // le nœud rectangle OU le ruban d'un flux ; repli sur le point de clic.
+  function clickedRect(p) {
+    try {
+      const el = p.event && p.event.target;
+      if (el && el.getBoundingRect) {
+        const b = el.getBoundingRect().clone();
+        if (el.transform) b.applyTransform(el.transform);
+        return { x: b.x, y: b.y, w: b.width, h: b.height };
+      }
+    } catch (e) { /* structure interne inattendue → repli */ }
+    if (p.event && p.event.offsetX != null) {
+      return { x: p.event.offsetX - 50, y: p.event.offsetY - 16, w: 100, h: 32 };
+    }
+    return null;
   }
 
   /* ---------------- breadcrumb (pile de vues) ---------------- */
@@ -222,16 +368,84 @@
       return b;
     };
     crumbEl.appendChild(mk("Vue d'ensemble", !viewStack.length, () => {
-      zoomOrigin = null; viewStack = []; zoom(renderMacro, "out");
+      const rect = viewStack.length ? viewStack[0].rect : null;
+      viewStack = [];
+      diveTransition(renderMacro, "out", rect);
     }));
     viewStack.forEach((v, i) => {
       const sep = document.createElement("span"); sep.className = "sep"; sep.textContent = "›";
       crumbEl.appendChild(sep);
       crumbEl.appendChild(mk(v.label, i === viewStack.length - 1, () => {
+        const rect = viewStack[i + 1] ? viewStack[i + 1].rect : null;
         viewStack = viewStack.slice(0, i + 1);
-        zoomOrigin = null; zoom(renderDrill, "out");
+        diveTransition(renderDrill, "out", rect);
       }));
     });
+  }
+
+  /* ---------------- carte « évolution du budget » ----------------
+   * Affichée en tête de la plongée dans une famille de dépenses de l'État :
+   * barres 2020→2025 (crédits votés), segment GRIS = part retraites estimée
+   * (CAS Pensions), et l'addition qui résume la période. Données :
+   * DATA.historique (build_historique.py + scraper.py).
+   */
+  function renderHistoCard(key) {
+    const H = DATA.historique;
+    const serie = H && H.familles && H.familles[key];
+    if (!serie || !serie.cp || Object.keys(serie.cp).length < 2) {
+      histoEl.hidden = true;
+      return;
+    }
+    const years = H.annees.map(String).filter((y) => serie.cp[y] != null);
+    const y0 = years[0], y1 = years[years.length - 1];
+    const cas = serie.cas || {};
+    const hasCas = cas[y0] != null && cas[y1] != null;
+
+    // — mini graphique en barres (SVG inline, thème poster) —
+    const bw = 34, gap = 14, hMax = 74, pad = 4;
+    const vMax = Math.max.apply(null, years.map((y) => serie.cp[y]));
+    const W = years.length * (bw + gap) - gap + pad * 2;
+    const HT = hMax + 34;
+    let svg = '<svg width="' + W + '" height="' + HT + '" viewBox="0 0 ' + W + " " + HT +
+              '" role="img" aria-label="Évolution du budget par année">';
+    years.forEach((y, i) => {
+      const x = pad + i * (bw + gap);
+      const h = Math.max(3, (serie.cp[y] / vMax) * hMax);
+      const yTop = 14 + (hMax - h);
+      svg += '<rect class="bar-total" x="' + x + '" y="' + yTop + '" width="' + bw +
+             '" height="' + h + '" rx="2"></rect>';
+      if (cas[y] != null) {
+        const hc = Math.max(2, (cas[y] / vMax) * hMax);
+        svg += '<rect class="bar-cas" x="' + x + '" y="' + (14 + hMax - hc) + '" width="' + bw +
+               '" height="' + hc + '" rx="2"></rect>';
+      }
+      svg += '<text x="' + (x + bw / 2) + '" y="' + (yTop - 3) + '" text-anchor="middle">' +
+             fmt0(serie.cp[y]) + "</text>";
+      svg += '<text class="axis-year" x="' + (x + bw / 2) + '" y="' + (14 + hMax + 12) +
+             '" text-anchor="middle">' + y + "</text>";
+    });
+    svg += "</svg>";
+
+    // — l'addition qui résume la période —
+    const dCp = serie.cp[y1] - serie.cp[y0];
+    const pct = Math.round((dCp / serie.cp[y0]) * 100);
+    let punch = "De " + y0 + " à " + y1 + " : budget <b>" + (dCp >= 0 ? "+" : "") +
+                fmt0(dCp) + " Md€</b> (" + (pct >= 0 ? "+" : "") + pct + " %)";
+    if (hasCas) {
+      const dCas = cas[y1] - cas[y0];
+      const part = dCp > 0 ? Math.round((dCas / dCp) * 100) : null;
+      punch += " — dont <b>≈ " + fmt0(dCas) + " Md€</b> destinés à équilibrer le système de " +
+               "retraites (CAS Pensions)" + (part != null && part > 0 && part <= 100
+               ? ", soit <b>" + part + " %</b> de la hausse" : "") + ".";
+    } else {
+      punch += ".";
+    }
+    histoEl.innerHTML =
+      '<div class="histo-text"><h3>Évolution du budget ' + y0 + " → " + y1 + "</h3>" +
+      '<p class="histo-punch">' + punch + "</p>" +
+      '<p class="histo-note">Crédits de paiement votés (LFI ; 2024 : PLF), budget général. ' +
+      esc(H.note_cas || "") + "</p></div>" + svg;
+    histoEl.hidden = false;
   }
 
   /* ---------------- bande de chiffres ---------------- */
@@ -268,7 +482,7 @@
       " Md€).</p>" +
       "<p>Le canal budgétaire de l'État est le <b>CAS Pensions</b> (compte spécial, hors budget général) : " +
       "des contributions employeur imputées sur les crédits de chaque ministère — la dépense retraite cachée " +
-      "du budget de l'État, visible en haut du diagramme (chaque flux au survol) :</p>" +
+      "du budget de l'État, visible dans la vue d'ensemble (chaque flux au survol) :</p>" +
       "<table>" + rows + "</table>" +
       '<p class="ret-src">Sources : COR (rapport juin 2025), iFRAP (fév. 2025), PLFSS 2026 — détail dans data/reference/retraites_2025.json.</p>';
   }
@@ -295,35 +509,39 @@
 
   /* ---------------- événements ---------------- */
 
-  // Zoom sur un nœud OU sur un flux (toute la zone du flux est cliquable).
+  // Plongée dans un nœud OU un flux (toute la zone du flux est cliquable).
   function drillInto(name, p) {
     if (!DATA.drill || !DATA.drill[name]) return false;
-    zoomOrigin = (p && p.event && p.event.offsetX != null)
-      ? { x: p.event.offsetX, y: p.event.offsetY } : null;
-    viewStack.push({ key: name, label: name === PENS ? "Retraites" : shortLabel(name) });
-    zoom(renderDrill, "in");
+    const rect = clickedRect(p);
+    const label = DATA.drill[name].kind === "retraites" ? "Retraites" : shortLabel(name);
+    viewStack.push({ key: name, label: label, rect: rect });
+    diveTransition(renderDrill, "in", rect);
     return true;
   }
   chart.on("click", (p) => {
     if (p.dataType === "node") {
       drillInto(p.name, p);
     } else if (p.dataType === "edge" && p.data) {
-      // un flux mène d'une source à une cible : on zoome sur la cible éclatable,
-      // sinon sur la source — pour que toute la bande soit utile.
+      // un flux mène d'une source à une cible : on plonge dans la cible
+      // éclatable, sinon dans la source — toute la bande est utile.
       if (!drillInto(p.data.target, p)) drillInto(p.data.source, p);
     }
   });
+  function surface() {
+    if (!viewStack.length) return;
+    const popped = viewStack.pop();
+    diveTransition(currentRender, "out", popped.rect);
+  }
   document.addEventListener("keydown", (e) => {
-    if (e.key !== "Escape" || !viewStack.length) return;
-    viewStack.pop(); zoomOrigin = null; zoom(currentRender, "out");
+    if (e.key === "Escape") surface();
   });
   chart.getZr().on("click", (e) => {
-    if (!e.target && viewStack.length) { viewStack.pop(); zoomOrigin = null; zoom(currentRender, "out"); }
+    if (!e.target) surface();
   });
   let resizeT = null;
   window.addEventListener("resize", () => {
     clearTimeout(resizeT);
-    resizeT = setTimeout(() => { chart.resize(); if (!viewStack.length) currentRender(); }, 120);
+    resizeT = setTimeout(() => { chart.resize(); currentRender(); }, 120);
   });
 
   /* ---------------- boot ---------------- */
@@ -335,6 +553,9 @@
     renderRetraitesPanel(json.meta || {});
     renderMacro();
   }
+
+  // hook de debug/tests (non documenté) : window.__ouva.dive("nom de nœud")
+  window.__ouva = { chart: chart, dive: (name) => drillInto(name, {}), surface: surface };
 
   if (window.__DATA__) {
     boot(window.__DATA__);

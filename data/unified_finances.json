@@ -2,17 +2,18 @@
  "meta": {
   "exercice": 2025,
   "unit": "Md€",
-  "generated_at": "2026-07-05T23:14:49+00:00",
+  "generated_at": "2026-07-08T12:21:07+00:00",
   "sources": {
    "etat_depenses": "plf25-depenses-2025-selon-destination (PLF (crédits demandés))",
    "etat_recettes": "plf25-recettes-du-budget-general + Voies & moyens (partages TVA/PSR, cf. data/reference)",
    "secu": "PLFSS 2026, art. 1er (rectification 2025) — texte AN n°1907, open data Assemblée nationale"
   },
   "checks": {
-   "recettes_hors_dette": 1080.51,
-   "dette": 157.1,
-   "depenses_totales": 1237.6,
-   "ecart": 0.01
+   "recettes_hors_dette": 1133.46,
+   "dette": 153.2,
+   "depenses_totales": 1286.65,
+   "ecart": 0.01,
+   "pensions_tous_regimes": 405.0
   },
   "missions_non_mappees": [],
   "retraites": {
@@ -33,8 +34,9 @@
    }
   },
   "caveats": [
-   "Périmètre : État (BG net) + Sécu (ROBSS+FSV consolidés) + siphon Collectivités/UE — pas le total APU Insee.",
-   "Branches Sécu retraitées proportionnellement pour neutraliser les transferts inter-branches (valeurs brutes en tooltip).",
+   "Périmètre : État (BG net) + Sécu hors retraites (branches consolidées) + voie retraites TOUS RÉGIMES (405 Md€, COR juin 2025, y compris Agirc-Arrco) + siphon Collectivités/UE — pas le total APU Insee.",
+   "Voie retraites : les contributions déjà comptées ailleurs (CAS Pensions dans les crédits des ministères, CNRACL chez les collectivités, transferts de branches dans la Sécu) sont re-fléchées vers les pensions SANS double compte dans le total du bandeau.",
+   "Branches Sécu retraitées proportionnellement pour neutraliser les transferts inter-branches (valeurs brutes en tooltip) ; recettes Sécu hors vieillesse : répartition indicative.",
    "Dépenses fiscales documentées en tooltips uniquement (axiome n°4)."
   ]
  },
@@ -43,7 +45,7 @@
    "name": "Cotisations sociales",
    "col": 0,
    "color": "#7E6BB8",
-   "tooltip": "Les allègements généraux de cotisations patronales (≈ 80 Md EUR) sont compensés à la Sécu, notamment par l'affectation de fractions de TVA (« TVA sociale »)."
+   "tooltip": "Les allègements généraux de cotisations patronales (≈ 80 Md EUR) sont compensés à la Sécu, notamment par l'affectation de fractions de TVA (« TVA sociale »). Hors cotisations retraites, isolées dans la voie dédiée (à gauche)."
   },
   {
    "name": "CSG · CRDS",
@@ -94,10 +96,22 @@
    "tooltip": "Dividendes, amendes, produits du domaine…"
   },
   {
+   "name": "Cotisations retraites (tous régimes)",
+   "col": 0,
+   "color": "#7E6BB8",
+   "tooltip": "269 Md€ de cotisations vieillesse, TOUS RÉGIMES (CNAV, MSA, Agirc-Arrco, fonction publique…), comptées au taux du privé (≈ 28 %) : ≈ 2/3 des ressources du système de retraites (COR, juin 2025). Elles descendent directement vers les pensions versées, le long du bord gauche."
+  },
+  {
+   "name": "Impôts & transferts affectés aux retraites",
+   "col": 0,
+   "color": "#7B68B5",
+   "tooltip": "≈ 60.5 Md€ : fractions de TVA et impôts de production affectés à la CNAV, CSG affectée au FSV (minimum vieillesse) pour 56.6 Md€, et transfert Unédic (validation des périodes de chômage) pour 3.9 Md€."
+  },
+  {
    "name": "Émission de dette (Déficit)",
    "col": 0,
    "color": "#FFFFFF",
-   "tooltip": "L'État ne rembourse jamais le capital de sa dette : il la « fait rouler ». Seuls les intérêts (charge de la dette) constituent une dépense budgétaire. Nœud d'équilibre calculé : total 157.1 Md€ en 2025."
+   "tooltip": "L'État ne rembourse jamais le capital de sa dette : il la « fait rouler ». Seuls les intérêts (charge de la dette) constituent une dépense budgétaire. Nœud d'équilibre calculé : total 153.2 Md€ en 2025."
   },
   {
    "name": "État (budget général)",
@@ -106,16 +120,16 @@
    "tooltip": "Dépenses nettes du budget général 2025 (hors mission Remboursements et dégrèvements). Source : plf25-depenses-2025-selon-destination (PLF (crédits demandés))."
   },
   {
-   "name": "Sécurité sociale (ROBSS + FSV)",
+   "name": "Sécurité sociale (hors retraites)",
    "col": 1,
    "color": "#EE8FB4",
-   "tooltip": "Régimes obligatoires de base + Fonds de solidarité vieillesse, consolidés hors transferts entre branches (PLFSS 2026, rectification 2025)."
+   "tooltip": "Branches maladie, famille, autonomie et AT-MP (ROBSS consolidés, PLFSS 2026, rectification 2025). La branche vieillesse et le FSV sont détaillés dans la voie retraites, à gauche."
   },
   {
    "name": "Collectivités territoriales",
    "col": 2,
    "color": "#D9A441",
-   "tooltip": "Siphon statique (pas de détail) : part des recettes partagées qui ne finance ni l'État ni la Sécu — fractions de TVA + prélèvements sur recettes (DGF…). Les impôts locaux propres (foncier…) sont hors périmètre."
+   "tooltip": "Siphon statique (pas de détail) : part des recettes partagées qui ne finance ni l'État ni la Sécu — fractions de TVA + prélèvements sur recettes (DGF…). Les impôts locaux propres (foncier…) sont hors périmètre. Une part re-descend vers les retraites : surcotisations CNRACL des agents territoriaux et hospitaliers."
   },
   {
    "name": "Union européenne",
@@ -184,15 +198,6 @@
    "tooltip": "Le rapport d'enquête du Sénat (juillet 2025) évalue les aides publiques aux entreprises à ≈ 211 Md EUR (2023), dont l'essentiel en exonérations, crédits d'impôt (CIR ≈ 7,7 Md EUR) et taux réduits : des absences de recettes, volontairement NON tracées comme flux ici."
   },
   {
-   "name": "Retraites (vieillesse)",
-   "col": 2,
-   "color": "#D64A85",
-   "tooltip": "Valeur consolidée (hors transferts entre branches). Dépenses brutes officielles de la branche : 303.4 Md€.",
-   "tags": [
-    "retraites"
-   ]
-  },
-  {
    "name": "Santé (maladie)",
    "col": 2,
    "color": "#E56BA0",
@@ -217,49 +222,55 @@
    "tooltip": "Valeur consolidée (hors transferts entre branches). Dépenses brutes officielles de la branche : 17.5 Md€."
   },
   {
-   "name": "Retraites — 405 Md€",
-   "col": 3,
-   "color": "#C13B55",
-   "tooltip": "≈ 405.0 Md€ de pensions versées chaque année, tous régimes. Alimenté par la branche vieillesse, la contribution employeur de chaque ministère (CAS Pensions) et les régimes complémentaires. ➜ Cliquez pour zoomer sur le détail (COR juin 2025)."
+   "name": "Système de retraites (tous régimes)",
+   "col": 1,
+   "color": "#C2527A",
+   "tooltip": "Le système de retraites tous régimes (CNAV, MSA, Agirc-Arrco, fonction publique, régimes spéciaux…), présenté À CÔTÉ de l'État et de la Sécu : ses ressources propres (cotisations, impôts affectés) ne suffisent pas — chaque étage montre les apports des autres administrations qui complètent jusqu'aux 405 Md€ versés."
   },
   {
-   "name": "Régimes complémentaires & autres (Agirc-Arrco…)",
+   "name": "Régimes de base & complémentaires",
    "col": 2,
-   "color": "#EE8FB4",
-   "tooltip": "≈ 64.06 Md€ : pensions hors branche vieillesse (ROBSS) et hors CAS Pensions de l'État — essentiellement les régimes complémentaires (Agirc-Arrco). Détail des 405 Md€ au clic sur « Retraites — 405 Md€ »."
+   "color": "#C94A6E",
+   "tooltip": "≈ 344.3 Md€ transitent par les caisses (régimes de base : CNAV, SRE, CNRACL, MSA… et complémentaires : Agirc-Arrco…), rejoints par les contributions des ministères (CAS Pensions) et des collectivités (CNRACL) pour former les 405 Md€ de pensions."
+  },
+  {
+   "name": "Pensions versées — 405 Md€",
+   "col": 3,
+   "color": "#C13B55",
+   "tooltip": "≈ 405 Md€ de pensions versées chaque année, tous régimes — ≈ un quart de la dépense publique. Les cotisations (269 Md€, au taux du privé) n'en couvrent que les 2/3 : le reste vient d'impôts affectés, du budget de l'État (CAS Pensions des ministères, régimes spéciaux), des collectivités (CNRACL) et de transferts de la Sécu. ➜ Cliquez pour zoomer sur le détail du financement (COR juin 2025)."
   }
  ],
  "links": [
   {
    "source": "Cotisations sociales",
-   "target": "Sécurité sociale (ROBSS + FSV)",
-   "value": 321.55
+   "target": "Sécurité sociale (hors retraites)",
+   "value": 183.28
   },
   {
    "source": "CSG · CRDS",
-   "target": "Sécurité sociale (ROBSS + FSV)",
-   "value": 109.33
+   "target": "Sécurité sociale (hors retraites)",
+   "value": 62.31
   },
   {
    "source": "TVA",
-   "target": "Sécurité sociale (ROBSS + FSV)",
-   "value": 60.0,
+   "target": "Sécurité sociale (hors retraites)",
+   "value": 34.2,
    "tooltip": "« TVA sociale » : compensation des allègements de cotisations."
   },
   {
    "source": "Impôts et taxes affectés (Sécu)",
-   "target": "Sécurité sociale (ROBSS + FSV)",
-   "value": 122.0
+   "target": "Sécurité sociale (hors retraites)",
+   "value": 69.54
   },
   {
    "source": "Autres recettes Sécu",
-   "target": "Sécurité sociale (ROBSS + FSV)",
-   "value": 30.23
+   "target": "Sécurité sociale (hors retraites)",
+   "value": 17.23
   },
   {
    "source": "Émission de dette (Déficit)",
-   "target": "Sécurité sociale (ROBSS + FSV)",
-   "value": 23.0
+   "target": "Sécurité sociale (hors retraites)",
+   "value": 17.2
   },
   {
    "source": "TVA",
@@ -349,64 +360,88 @@
    "value": 9.85
   },
   {
-   "source": "Sécurité sociale (ROBSS + FSV)",
-   "target": "Retraites (vieillesse)",
-   "value": 295.24
-  },
-  {
-   "source": "Sécurité sociale (ROBSS + FSV)",
+   "source": "Sécurité sociale (hors retraites)",
    "target": "Santé (maladie)",
    "value": 255.25
   },
   {
-   "source": "Sécurité sociale (ROBSS + FSV)",
+   "source": "Sécurité sociale (hors retraites)",
    "target": "Famille",
    "value": 57.71
   },
   {
-   "source": "Sécurité sociale (ROBSS + FSV)",
+   "source": "Sécurité sociale (hors retraites)",
    "target": "Autonomie",
    "value": 40.87
   },
   {
-   "source": "Sécurité sociale (ROBSS + FSV)",
+   "source": "Sécurité sociale (hors retraites)",
    "target": "Accidents du travail",
    "value": 17.03
   },
   {
-   "source": "Retraites (vieillesse)",
-   "target": "Retraites — 405 Md€",
-   "value": 295.24,
-   "tooltip": "Branche vieillesse (ROBSS + FSV) : la part « Sécu » des pensions."
+   "source": "Cotisations retraites (tous régimes)",
+   "target": "Système de retraites (tous régimes)",
+   "value": 269.0,
+   "tooltip": "Cotisations vieillesse tous régimes au taux du privé (≈ 28 %) : la part contributive."
+  },
+  {
+   "source": "Impôts & transferts affectés aux retraites",
+   "target": "Système de retraites (tous régimes)",
+   "value": 60.5,
+   "tooltip": "Impôts affectés (TVA, CSG-FSV… 56.6) + Unédic (3.9)."
+  },
+  {
+   "source": "Émission de dette (Déficit)",
+   "target": "Système de retraites (tous régimes)",
+   "value": 1.9,
+   "tooltip": "Déficit résiduel du système de retraites tous régimes (couvert par la dette sociale)."
+  },
+  {
+   "source": "Système de retraites (tous régimes)",
+   "target": "Régimes de base & complémentaires",
+   "value": 331.4
+  },
+  {
+   "source": "Sécurité sociale (hors retraites)",
+   "target": "Régimes de base & complémentaires",
+   "value": 12.9,
+   "tooltip": "Transferts des autres branches : CNAF 10,9 (AVPF, majorations pour enfants), CNAM 1,1, divers 0,9."
+  },
+  {
+   "source": "Régimes de base & complémentaires",
+   "target": "Pensions versées — 405 Md€",
+   "value": 344.3
   },
   {
    "source": "É · Enseignement & recherche",
-   "target": "Retraites — 405 Md€",
-   "value": 20.5,
-   "tooltip": "Contribution employeur de « Enseignement & recherche » au CAS Pensions (retraites des fonctionnaires), déjà comprise dans ses crédits."
+   "target": "Pensions versées — 405 Md€",
+   "value": 25.1,
+   "tooltip": "Contribution « employeur » de « Enseignement & recherche » au CAS Pensions (surcotisations au-delà du taux privé) — déjà comprise dans ses crédits : la dépense retraite cachée du budget de l'État."
   },
   {
    "source": "É · Défense, sécurité, justice",
-   "target": "Retraites — 405 Md€",
+   "target": "Pensions versées — 405 Md€",
    "value": 15.8,
-   "tooltip": "Contribution employeur de « Défense, sécurité, justice » au CAS Pensions (retraites des fonctionnaires), déjà comprise dans ses crédits."
+   "tooltip": "Contribution « employeur » de « Défense, sécurité, justice » au CAS Pensions (surcotisations au-delà du taux privé) — déjà comprise dans ses crédits : la dépense retraite cachée du budget de l'État."
   },
   {
    "source": "É · Solidarités, travail & santé",
-   "target": "Retraites — 405 Md€",
-   "value": 6.2,
-   "tooltip": "Contribution employeur de « Solidarités, travail & santé » au CAS Pensions (retraites des fonctionnaires), déjà comprise dans ses crédits."
+   "target": "Pensions versées — 405 Md€",
+   "value": 7.8,
+   "tooltip": "Contribution « employeur » de « Solidarités, travail & santé » au CAS Pensions (surcotisations au-delà du taux privé) — déjà comprise dans ses crédits : la dépense retraite cachée du budget de l'État."
   },
   {
    "source": "É · Administration & autres missions",
-   "target": "Retraites — 405 Md€",
+   "target": "Pensions versées — 405 Md€",
    "value": 3.2,
-   "tooltip": "Contribution employeur de « Administration & autres missions » au CAS Pensions (retraites des fonctionnaires), déjà comprise dans ses crédits."
+   "tooltip": "Contribution « employeur » de « Administration & autres missions » au CAS Pensions (surcotisations au-delà du taux privé) — déjà comprise dans ses crédits : la dépense retraite cachée du budget de l'État."
   },
   {
-   "source": "Régimes complémentaires & autres (Agirc-Arrco…)",
-   "target": "Retraites — 405 Md€",
-   "value": 64.06
+   "source": "Collectivités territoriales",
+   "target": "Pensions versées — 405 Md€",
+   "value": 8.8,
+   "tooltip": "Surcotisations CNRACL : employeurs territoriaux et hospitaliers, au-delà du taux privé."
   }
  ],
  "drill": {
@@ -2221,7 +2256,14 @@
     {
      "source": "É · Administration & autres missions",
      "target": "Gestion des finances publiques",
-     "value": 10.97
+     "value": 8.47
+    },
+    {
+     "source": "É · Administration & autres missions",
+     "target": "Gestion des finances publiques",
+     "value": 2.5,
+     "cas": true,
+     "tooltip": "≈ 2.5 Md€ des crédits de « Gestion des finances publiques » : contribution « employeur » au CAS Pensions — la part du budget du ministère consacrée à une subvention d'équilibre pour combler le déficit du système de retraites (surcotisations au-delà du taux du privé). Ordre de grandeur RAP/iFRAP."
     },
     {
      "source": "Gestion des finances publiques",
@@ -6958,7 +7000,14 @@
     {
      "source": "É · Défense, sécurité, justice",
      "target": "Défense",
-     "value": 60.0
+     "value": 50.5
+    },
+    {
+     "source": "É · Défense, sécurité, justice",
+     "target": "Défense",
+     "value": 9.5,
+     "cas": true,
+     "tooltip": "≈ 9.5 Md€ des crédits de « Défense » : contribution « employeur » au CAS Pensions — la part du budget du ministère consacrée à une subvention d'équilibre pour combler le déficit du système de retraites (surcotisations au-delà du taux du privé). Ordre de grandeur RAP/iFRAP."
     },
     {
      "source": "Défense",
@@ -6983,7 +7032,14 @@
     {
      "source": "É · Défense, sécurité, justice",
      "target": "Sécurités",
-     "value": 25.22
+     "value": 20.72
+    },
+    {
+     "source": "É · Défense, sécurité, justice",
+     "target": "Sécurités",
+     "value": 4.5,
+     "cas": true,
+     "tooltip": "≈ 4.5 Md€ des crédits de « Sécurités » : contribution « employeur » au CAS Pensions — la part du budget du ministère consacrée à une subvention d'équilibre pour combler le déficit du système de retraites (surcotisations au-delà du taux du privé). Ordre de grandeur RAP/iFRAP."
     },
     {
      "source": "Sécurités",
@@ -7008,7 +7064,14 @@
     {
      "source": "É · Défense, sécurité, justice",
      "target": "Justice",
-     "value": 12.46
+     "value": 10.66
+    },
+    {
+     "source": "É · Défense, sécurité, justice",
+     "target": "Justice",
+     "value": 1.8,
+     "cas": true,
+     "tooltip": "≈ 1.8 Md€ des crédits de « Justice » : contribution « employeur » au CAS Pensions — la part du budget du ministère consacrée à une subvention d'équilibre pour combler le déficit du système de retraites (surcotisations au-delà du taux du privé). Ordre de grandeur RAP/iFRAP."
     },
     {
      "source": "Justice",
@@ -8476,7 +8539,14 @@
     {
      "source": "É · Enseignement & recherche",
      "target": "Enseignement scolaire",
-     "value": 88.82
+     "value": 71.32
+    },
+    {
+     "source": "É · Enseignement & recherche",
+     "target": "Enseignement scolaire",
+     "value": 17.5,
+     "cas": true,
+     "tooltip": "≈ 17.5 Md€ des crédits de « Enseignement scolaire » : contribution « employeur » au CAS Pensions — la part du budget du ministère consacrée à une subvention d'équilibre pour combler le déficit du système de retraites (surcotisations au-delà du taux du privé). Ordre de grandeur RAP/iFRAP."
     },
     {
      "source": "Enseignement scolaire",
@@ -8511,7 +8581,14 @@
     {
      "source": "É · Enseignement & recherche",
      "target": "Recherche et enseignement supérieur",
-     "value": 31.29
+     "value": 28.29
+    },
+    {
+     "source": "É · Enseignement & recherche",
+     "target": "Recherche et enseignement supérieur",
+     "value": 3.0,
+     "cas": true,
+     "tooltip": "≈ 3.0 Md€ des crédits de « Recherche et enseignement supérieur » : contribution « employeur » au CAS Pensions — la part du budget du ministère consacrée à une subvention d'équilibre pour combler le déficit du système de retraites (surcotisations au-delà du taux du privé). Ordre de grandeur RAP/iFRAP."
     },
     {
      "source": "Recherche et enseignement supérieur",
@@ -9379,78 +9456,6 @@
     }
    ]
   },
-  "Retraites (vieillesse)": {
-   "title": "Retraites (vieillesse)",
-   "nodes": [
-    {
-     "name": "Retraites (vieillesse)",
-     "color": "#D64A85",
-     "depth": 0,
-     "tooltip": "Répartition indicative (structure DREES/CCSS) appliquée au total officiel de la branche.",
-     "tags": [
-      "retraites"
-     ]
-    },
-    {
-     "name": "Pensions de droit direct",
-     "color": "#D64A85",
-     "depth": 1,
-     "tooltip": "Répartition indicative (structure DREES/CCSS) appliquée au total officiel de la branche.",
-     "tags": [
-      "retraites"
-     ]
-    },
-    {
-     "name": "Pensions de réversion",
-     "color": "#D64A85",
-     "depth": 1,
-     "tooltip": "Répartition indicative (structure DREES/CCSS) appliquée au total officiel de la branche.",
-     "tags": [
-      "retraites"
-     ]
-    },
-    {
-     "name": "Minimum vieillesse & solidarité (FSV)",
-     "color": "#D64A85",
-     "depth": 1,
-     "tooltip": "Répartition indicative (structure DREES/CCSS) appliquée au total officiel de la branche.",
-     "tags": [
-      "retraites"
-     ]
-    },
-    {
-     "name": "Gestion & autres",
-     "color": "#D64A85",
-     "depth": 1,
-     "tooltip": "Répartition indicative (structure DREES/CCSS) appliquée au total officiel de la branche.",
-     "tags": [
-      "retraites"
-     ]
-    }
-   ],
-   "links": [
-    {
-     "source": "Retraites (vieillesse)",
-     "target": "Pensions de droit direct",
-     "value": 250.96
-    },
-    {
-     "source": "Retraites (vieillesse)",
-     "target": "Pensions de réversion",
-     "value": 25.1
-    },
-    {
-     "source": "Retraites (vieillesse)",
-     "target": "Minimum vieillesse & solidarité (FSV)",
-     "value": 10.33
-    },
-    {
-     "source": "Retraites (vieillesse)",
-     "target": "Gestion & autres",
-     "value": 8.86
-    }
-   ]
-  },
   "Famille": {
    "title": "Famille",
    "nodes": [
@@ -9600,7 +9605,7 @@
     }
    ]
   },
-  "Retraites — 405 Md€": {
+  "Pensions versées — 405 Md€": {
    "title": "Qui paie les 405 Md€ de retraites ?",
    "nodes": [
     {
@@ -9736,7 +9741,7 @@
      "tooltip": "≈ 101.6 Md€, gérés par les partenaires sociaux — hors LFSS."
     },
     {
-     "name": "Retraites — 405 Md€",
+     "name": "Pensions versées — 405 Md€",
      "col": 3,
      "color": "#C13B55",
      "tooltip": "≈ 405.0 Md€ de pensions versées en 2025, tous régimes, dont ≈ 34 Md€ de réversion. ≈ un quart de la dépense publique. Sources : COR (rapport juin 2025), iFRAP, PLFSS 2026.",
@@ -9825,16 +9830,491 @@
     },
     {
      "source": "Régimes de base (CNAV, SRE, CNRACL, MSA…)",
-     "target": "Retraites — 405 Md€",
+     "target": "Pensions versées — 405 Md€",
      "value": 303.4
     },
     {
      "source": "Régimes complémentaires (Agirc-Arrco…)",
-     "target": "Retraites — 405 Md€",
+     "target": "Pensions versées — 405 Md€",
      "value": 101.6
     }
    ],
-   "note": "De haut en bas : chaque ministère alimente les retraites via le CAS Pensions (dépense retraite cachée de l'État), qui rejoint les autres ressources (nomenclature COR juin 2025), transitent par les régimes et convergent vers les 405 Md€ versés."
+   "note": "De haut en bas : chaque ministère alimente les retraites via le CAS Pensions (dépense retraite cachée de l'État), qui rejoint les autres ressources (nomenclature COR juin 2025), transitent par les régimes et convergent vers les 405 Md€ versés.",
+   "kind": "retraites"
+  },
+  "Système de retraites (tous régimes)": {
+   "title": "Qui paie les 405 Md€ de retraites ?",
+   "nodes": [
+    {
+     "name": "CAS Pensions — Enseignement scolaire",
+     "col": 0,
+     "color": "#5C7FB8",
+     "tooltip": "≈ 17,5 Md€ — Enseignement scolaire, Contribution « employeur » au CAS Pensions (compte spécial hors budget général), imputée sur les crédits de titre 2 : la dépense retraite cachée de ce ministère. Taux réels 74–126 %, très au-delà du privé (28 %). Source : iFRAP, RAP.",
+     "tags": [
+      "retraites"
+     ],
+     "noLabel": true
+    },
+    {
+     "name": "CAS Pensions — Défense",
+     "col": 0,
+     "color": "#D94F26",
+     "tooltip": "≈ 9,5 Md€ — Défense, Contribution « employeur » au CAS Pensions (compte spécial hors budget général), imputée sur les crédits de titre 2 : la dépense retraite cachée de ce ministère. Taux réels 74–126 %, très au-delà du privé (28 %). Source : iFRAP, RAP.",
+     "tags": [
+      "retraites"
+     ],
+     "noLabel": true
+    },
+    {
+     "name": "CAS Pensions — Sécurités",
+     "col": 0,
+     "color": "#D94F26",
+     "tooltip": "≈ 4,5 Md€ — Sécurités, Contribution « employeur » au CAS Pensions (compte spécial hors budget général), imputée sur les crédits de titre 2 : la dépense retraite cachée de ce ministère. Taux réels 74–126 %, très au-delà du privé (28 %). Source : iFRAP, RAP.",
+     "tags": [
+      "retraites"
+     ],
+     "noLabel": true
+    },
+    {
+     "name": "CAS Pensions — Recherche et enseignement supérieur",
+     "col": 0,
+     "color": "#5C7FB8",
+     "tooltip": "≈ 3,0 Md€ — Recherche et enseignement supérieur, Contribution « employeur » au CAS Pensions (compte spécial hors budget général), imputée sur les crédits de titre 2 : la dépense retraite cachée de ce ministère. Taux réels 74–126 %, très au-delà du privé (28 %). Source : iFRAP, RAP.",
+     "tags": [
+      "retraites"
+     ],
+     "noLabel": true
+    },
+    {
+     "name": "CAS Pensions — Gestion des finances publiques",
+     "col": 0,
+     "color": "#E5A07A",
+     "tooltip": "≈ 2,5 Md€ — Gestion des finances publiques, Contribution « employeur » au CAS Pensions (compte spécial hors budget général), imputée sur les crédits de titre 2 : la dépense retraite cachée de ce ministère. Taux réels 74–126 %, très au-delà du privé (28 %). Source : iFRAP, RAP.",
+     "tags": [
+      "retraites"
+     ],
+     "noLabel": true
+    },
+    {
+     "name": "CAS Pensions — Justice",
+     "col": 0,
+     "color": "#D94F26",
+     "tooltip": "≈ 1,8 Md€ — Justice, Contribution « employeur » au CAS Pensions (compte spécial hors budget général), imputée sur les crédits de titre 2 : la dépense retraite cachée de ce ministère. Taux réels 74–126 %, très au-delà du privé (28 %). Source : iFRAP, RAP.",
+     "tags": [
+      "retraites"
+     ],
+     "noLabel": true
+    },
+    {
+     "name": "CAS Pensions — autres ministères",
+     "col": 0,
+     "color": "#E5A07A",
+     "tooltip": "≈ 0,7 Md€ — autres ministères, Contribution « employeur » au CAS Pensions (compte spécial hors budget général), imputée sur les crédits de titre 2 : la dépense retraite cachée de ce ministère. Taux réels 74–126 %, très au-delà du privé (28 %). Source : iFRAP, RAP.",
+     "tags": [
+      "retraites"
+     ],
+     "noLabel": true
+    },
+    {
+     "name": "Surcotisations opérateurs (universités, CNRS…)",
+     "col": 0,
+     "color": "#D64A85",
+     "tooltip": "≈ 4,6 Md€ — Surcotisations opérateurs (universités, CNRS…), Surcotisation publique versée au-delà du taux privé pour ses fonctionnaires.",
+     "tags": [
+      "retraites"
+     ],
+     "noLabel": true
+    },
+    {
+     "name": "Surcotisations locaux & hospitaliers (CNRACL)",
+     "col": 0,
+     "color": "#D64A85",
+     "tooltip": "≈ 8,8 Md€ — Surcotisations locaux & hospitaliers (CNRACL), Surcotisation publique versée au-delà du taux privé pour ses fonctionnaires.",
+     "tags": [
+      "retraites"
+     ],
+     "noLabel": true
+    },
+    {
+     "name": "Cotisations salariés & employeurs (taux privé)",
+     "col": 1,
+     "color": "#7E6BB8",
+     "tooltip": "269.0 Md€, soit ≈ 2/3 des ressources (COR : 65 %). Taux publics plafonnés au niveau du privé (27,9 %) ; l'excédent public est isolé à l'étage du dessus. https://www.ifrap.org/retraite/retraites-de-la-fonction-publique-regardez-lelephant-dans-la-piece"
+    },
+    {
+     "name": "Contributions publiques",
+     "col": 1,
+     "color": "#E5A07A",
+     "tooltip": "≈ 52.9 Md€ (COR juin 2025 : ≈ 12 % « contributions de l'État employeur »). Récapitulatif des flux ministériels ci-dessus — CAS Pensions par ministère : Enseignement scolaire 17,5 · Défense 9,5 · Sécurités 4,5 · Recherche et enseignement supérieur 3,0 · Gestion des finances publiques 2,5 · Justice 1,8 · autres ministères 0,7 — auxquels s'ajoutent les surcotisations des opérateurs (4,6) et de la CNRACL (8,8). Ces employeurs publics cotisent AU-DELÀ du taux privé : la Cour des comptes et l'iFRAP requalifient l'excédent en subvention d'équilibre.",
+     "tags": [
+      "retraites"
+     ]
+    },
+    {
+     "name": "Impôts & taxes affectés",
+     "col": 1,
+     "color": "#7E6BB8",
+     "tooltip": "≈ 56,6 Md€ (COR : 15 %) : fractions de TVA, impôts de production vers la CNAV, CSG affectée au FSV."
+    },
+    {
+     "name": "Subventions & transferts",
+     "col": 1,
+     "color": "#D64A85",
+     "tooltip": "≈ 26,5 Md€ (COR : ≈ 8 %) : subventions d'équilibre aux régimes spéciaux (SNCF, RATP, mines… 7,8), transferts d'autres branches (CNAF 10,9, Unédic 3,9, CNAM 1,1… 16,8) et solde couvert par la dette sociale (1,9).",
+     "tags": [
+      "retraites"
+     ]
+    },
+    {
+     "name": "Régimes de base (CNAV, SRE, CNRACL, MSA…)",
+     "col": 2,
+     "color": "#F09D86",
+     "tooltip": "303.4 Md€ (branche vieillesse ROBSS 2025, PLFSS 2026) : CNAV, Service des retraites de l'État, CNRACL, MSA, régimes spéciaux."
+    },
+    {
+     "name": "Régimes complémentaires (Agirc-Arrco…)",
+     "col": 2,
+     "color": "#EE8FB4",
+     "tooltip": "≈ 101.6 Md€, gérés par les partenaires sociaux — hors LFSS."
+    },
+    {
+     "name": "Pensions versées — 405 Md€",
+     "col": 3,
+     "color": "#C13B55",
+     "tooltip": "≈ 405.0 Md€ de pensions versées en 2025, tous régimes, dont ≈ 34 Md€ de réversion. ≈ un quart de la dépense publique. Sources : COR (rapport juin 2025), iFRAP, PLFSS 2026.",
+     "tags": [
+      "retraites"
+     ]
+    }
+   ],
+   "links": [
+    {
+     "source": "CAS Pensions — Enseignement scolaire",
+     "target": "Contributions publiques",
+     "value": 17.5
+    },
+    {
+     "source": "CAS Pensions — Défense",
+     "target": "Contributions publiques",
+     "value": 9.5
+    },
+    {
+     "source": "CAS Pensions — Sécurités",
+     "target": "Contributions publiques",
+     "value": 4.5
+    },
+    {
+     "source": "CAS Pensions — Recherche et enseignement supérieur",
+     "target": "Contributions publiques",
+     "value": 3.0
+    },
+    {
+     "source": "CAS Pensions — Gestion des finances publiques",
+     "target": "Contributions publiques",
+     "value": 2.5
+    },
+    {
+     "source": "CAS Pensions — Justice",
+     "target": "Contributions publiques",
+     "value": 1.8
+    },
+    {
+     "source": "CAS Pensions — autres ministères",
+     "target": "Contributions publiques",
+     "value": 0.7
+    },
+    {
+     "source": "Surcotisations opérateurs (universités, CNRS…)",
+     "target": "Contributions publiques",
+     "value": 4.6
+    },
+    {
+     "source": "Surcotisations locaux & hospitaliers (CNRACL)",
+     "target": "Contributions publiques",
+     "value": 8.8
+    },
+    {
+     "source": "Contributions publiques",
+     "target": "Régimes de base (CNAV, SRE, CNRACL, MSA…)",
+     "value": 52.9
+    },
+    {
+     "source": "Cotisations salariés & employeurs (taux privé)",
+     "target": "Régimes de base (CNAV, SRE, CNRACL, MSA…)",
+     "value": 171.3,
+     "tooltip": "Part affectée aux régimes de base (répartition indicative)."
+    },
+    {
+     "source": "Cotisations salariés & employeurs (taux privé)",
+     "target": "Régimes complémentaires (Agirc-Arrco…)",
+     "value": 97.7
+    },
+    {
+     "source": "Impôts & taxes affectés",
+     "target": "Régimes de base (CNAV, SRE, CNRACL, MSA…)",
+     "value": 56.6
+    },
+    {
+     "source": "Subventions & transferts",
+     "target": "Régimes de base (CNAV, SRE, CNRACL, MSA…)",
+     "value": 22.6
+    },
+    {
+     "source": "Subventions & transferts",
+     "target": "Régimes complémentaires (Agirc-Arrco…)",
+     "value": 3.9,
+     "tooltip": "Unédic → Agirc-Arrco/Ircantec : validation des périodes de chômage."
+    },
+    {
+     "source": "Régimes de base (CNAV, SRE, CNRACL, MSA…)",
+     "target": "Pensions versées — 405 Md€",
+     "value": 303.4
+    },
+    {
+     "source": "Régimes complémentaires (Agirc-Arrco…)",
+     "target": "Pensions versées — 405 Md€",
+     "value": 101.6
+    }
+   ],
+   "note": "De haut en bas : chaque ministère alimente les retraites via le CAS Pensions (dépense retraite cachée de l'État), qui rejoint les autres ressources (nomenclature COR juin 2025), transitent par les régimes et convergent vers les 405 Md€ versés.",
+   "kind": "retraites"
+  },
+  "Régimes de base & complémentaires": {
+   "title": "Qui paie les 405 Md€ de retraites ?",
+   "nodes": [
+    {
+     "name": "CAS Pensions — Enseignement scolaire",
+     "col": 0,
+     "color": "#5C7FB8",
+     "tooltip": "≈ 17,5 Md€ — Enseignement scolaire, Contribution « employeur » au CAS Pensions (compte spécial hors budget général), imputée sur les crédits de titre 2 : la dépense retraite cachée de ce ministère. Taux réels 74–126 %, très au-delà du privé (28 %). Source : iFRAP, RAP.",
+     "tags": [
+      "retraites"
+     ],
+     "noLabel": true
+    },
+    {
+     "name": "CAS Pensions — Défense",
+     "col": 0,
+     "color": "#D94F26",
+     "tooltip": "≈ 9,5 Md€ — Défense, Contribution « employeur » au CAS Pensions (compte spécial hors budget général), imputée sur les crédits de titre 2 : la dépense retraite cachée de ce ministère. Taux réels 74–126 %, très au-delà du privé (28 %). Source : iFRAP, RAP.",
+     "tags": [
+      "retraites"
+     ],
+     "noLabel": true
+    },
+    {
+     "name": "CAS Pensions — Sécurités",
+     "col": 0,
+     "color": "#D94F26",
+     "tooltip": "≈ 4,5 Md€ — Sécurités, Contribution « employeur » au CAS Pensions (compte spécial hors budget général), imputée sur les crédits de titre 2 : la dépense retraite cachée de ce ministère. Taux réels 74–126 %, très au-delà du privé (28 %). Source : iFRAP, RAP.",
+     "tags": [
+      "retraites"
+     ],
+     "noLabel": true
+    },
+    {
+     "name": "CAS Pensions — Recherche et enseignement supérieur",
+     "col": 0,
+     "color": "#5C7FB8",
+     "tooltip": "≈ 3,0 Md€ — Recherche et enseignement supérieur, Contribution « employeur » au CAS Pensions (compte spécial hors budget général), imputée sur les crédits de titre 2 : la dépense retraite cachée de ce ministère. Taux réels 74–126 %, très au-delà du privé (28 %). Source : iFRAP, RAP.",
+     "tags": [
+      "retraites"
+     ],
+     "noLabel": true
+    },
+    {
+     "name": "CAS Pensions — Gestion des finances publiques",
+     "col": 0,
+     "color": "#E5A07A",
+     "tooltip": "≈ 2,5 Md€ — Gestion des finances publiques, Contribution « employeur » au CAS Pensions (compte spécial hors budget général), imputée sur les crédits de titre 2 : la dépense retraite cachée de ce ministère. Taux réels 74–126 %, très au-delà du privé (28 %). Source : iFRAP, RAP.",
+     "tags": [
+      "retraites"
+     ],
+     "noLabel": true
+    },
+    {
+     "name": "CAS Pensions — Justice",
+     "col": 0,
+     "color": "#D94F26",
+     "tooltip": "≈ 1,8 Md€ — Justice, Contribution « employeur » au CAS Pensions (compte spécial hors budget général), imputée sur les crédits de titre 2 : la dépense retraite cachée de ce ministère. Taux réels 74–126 %, très au-delà du privé (28 %). Source : iFRAP, RAP.",
+     "tags": [
+      "retraites"
+     ],
+     "noLabel": true
+    },
+    {
+     "name": "CAS Pensions — autres ministères",
+     "col": 0,
+     "color": "#E5A07A",
+     "tooltip": "≈ 0,7 Md€ — autres ministères, Contribution « employeur » au CAS Pensions (compte spécial hors budget général), imputée sur les crédits de titre 2 : la dépense retraite cachée de ce ministère. Taux réels 74–126 %, très au-delà du privé (28 %). Source : iFRAP, RAP.",
+     "tags": [
+      "retraites"
+     ],
+     "noLabel": true
+    },
+    {
+     "name": "Surcotisations opérateurs (universités, CNRS…)",
+     "col": 0,
+     "color": "#D64A85",
+     "tooltip": "≈ 4,6 Md€ — Surcotisations opérateurs (universités, CNRS…), Surcotisation publique versée au-delà du taux privé pour ses fonctionnaires.",
+     "tags": [
+      "retraites"
+     ],
+     "noLabel": true
+    },
+    {
+     "name": "Surcotisations locaux & hospitaliers (CNRACL)",
+     "col": 0,
+     "color": "#D64A85",
+     "tooltip": "≈ 8,8 Md€ — Surcotisations locaux & hospitaliers (CNRACL), Surcotisation publique versée au-delà du taux privé pour ses fonctionnaires.",
+     "tags": [
+      "retraites"
+     ],
+     "noLabel": true
+    },
+    {
+     "name": "Cotisations salariés & employeurs (taux privé)",
+     "col": 1,
+     "color": "#7E6BB8",
+     "tooltip": "269.0 Md€, soit ≈ 2/3 des ressources (COR : 65 %). Taux publics plafonnés au niveau du privé (27,9 %) ; l'excédent public est isolé à l'étage du dessus. https://www.ifrap.org/retraite/retraites-de-la-fonction-publique-regardez-lelephant-dans-la-piece"
+    },
+    {
+     "name": "Contributions publiques",
+     "col": 1,
+     "color": "#E5A07A",
+     "tooltip": "≈ 52.9 Md€ (COR juin 2025 : ≈ 12 % « contributions de l'État employeur »). Récapitulatif des flux ministériels ci-dessus — CAS Pensions par ministère : Enseignement scolaire 17,5 · Défense 9,5 · Sécurités 4,5 · Recherche et enseignement supérieur 3,0 · Gestion des finances publiques 2,5 · Justice 1,8 · autres ministères 0,7 — auxquels s'ajoutent les surcotisations des opérateurs (4,6) et de la CNRACL (8,8). Ces employeurs publics cotisent AU-DELÀ du taux privé : la Cour des comptes et l'iFRAP requalifient l'excédent en subvention d'équilibre.",
+     "tags": [
+      "retraites"
+     ]
+    },
+    {
+     "name": "Impôts & taxes affectés",
+     "col": 1,
+     "color": "#7E6BB8",
+     "tooltip": "≈ 56,6 Md€ (COR : 15 %) : fractions de TVA, impôts de production vers la CNAV, CSG affectée au FSV."
+    },
+    {
+     "name": "Subventions & transferts",
+     "col": 1,
+     "color": "#D64A85",
+     "tooltip": "≈ 26,5 Md€ (COR : ≈ 8 %) : subventions d'équilibre aux régimes spéciaux (SNCF, RATP, mines… 7,8), transferts d'autres branches (CNAF 10,9, Unédic 3,9, CNAM 1,1… 16,8) et solde couvert par la dette sociale (1,9).",
+     "tags": [
+      "retraites"
+     ]
+    },
+    {
+     "name": "Régimes de base (CNAV, SRE, CNRACL, MSA…)",
+     "col": 2,
+     "color": "#F09D86",
+     "tooltip": "303.4 Md€ (branche vieillesse ROBSS 2025, PLFSS 2026) : CNAV, Service des retraites de l'État, CNRACL, MSA, régimes spéciaux."
+    },
+    {
+     "name": "Régimes complémentaires (Agirc-Arrco…)",
+     "col": 2,
+     "color": "#EE8FB4",
+     "tooltip": "≈ 101.6 Md€, gérés par les partenaires sociaux — hors LFSS."
+    },
+    {
+     "name": "Pensions versées — 405 Md€",
+     "col": 3,
+     "color": "#C13B55",
+     "tooltip": "≈ 405.0 Md€ de pensions versées en 2025, tous régimes, dont ≈ 34 Md€ de réversion. ≈ un quart de la dépense publique. Sources : COR (rapport juin 2025), iFRAP, PLFSS 2026.",
+     "tags": [
+      "retraites"
+     ]
+    }
+   ],
+   "links": [
+    {
+     "source": "CAS Pensions — Enseignement scolaire",
+     "target": "Contributions publiques",
+     "value": 17.5
+    },
+    {
+     "source": "CAS Pensions — Défense",
+     "target": "Contributions publiques",
+     "value": 9.5
+    },
+    {
+     "source": "CAS Pensions — Sécurités",
+     "target": "Contributions publiques",
+     "value": 4.5
+    },
+    {
+     "source": "CAS Pensions — Recherche et enseignement supérieur",
+     "target": "Contributions publiques",
+     "value": 3.0
+    },
+    {
+     "source": "CAS Pensions — Gestion des finances publiques",
+     "target": "Contributions publiques",
+     "value": 2.5
+    },
+    {
+     "source": "CAS Pensions — Justice",
+     "target": "Contributions publiques",
+     "value": 1.8
+    },
+    {
+     "source": "CAS Pensions — autres ministères",
+     "target": "Contributions publiques",
+     "value": 0.7
+    },
+    {
+     "source": "Surcotisations opérateurs (universités, CNRS…)",
+     "target": "Contributions publiques",
+     "value": 4.6
+    },
+    {
+     "source": "Surcotisations locaux & hospitaliers (CNRACL)",
+     "target": "Contributions publiques",
+     "value": 8.8
+    },
+    {
+     "source": "Contributions publiques",
+     "target": "Régimes de base (CNAV, SRE, CNRACL, MSA…)",
+     "value": 52.9
+    },
+    {
+     "source": "Cotisations salariés & employeurs (taux privé)",
+     "target": "Régimes de base (CNAV, SRE, CNRACL, MSA…)",
+     "value": 171.3,
+     "tooltip": "Part affectée aux régimes de base (répartition indicative)."
+    },
+    {
+     "source": "Cotisations salariés & employeurs (taux privé)",
+     "target": "Régimes complémentaires (Agirc-Arrco…)",
+     "value": 97.7
+    },
+    {
+     "source": "Impôts & taxes affectés",
+     "target": "Régimes de base (CNAV, SRE, CNRACL, MSA…)",
+     "value": 56.6
+    },
+    {
+     "source": "Subventions & transferts",
+     "target": "Régimes de base (CNAV, SRE, CNRACL, MSA…)",
+     "value": 22.6
+    },
+    {
+     "source": "Subventions & transferts",
+     "target": "Régimes complémentaires (Agirc-Arrco…)",
+     "value": 3.9,
+     "tooltip": "Unédic → Agirc-Arrco/Ircantec : validation des périodes de chômage."
+    },
+    {
+     "source": "Régimes de base (CNAV, SRE, CNRACL, MSA…)",
+     "target": "Pensions versées — 405 Md€",
+     "value": 303.4
+    },
+    {
+     "source": "Régimes complémentaires (Agirc-Arrco…)",
+     "target": "Pensions versées — 405 Md€",
+     "value": 101.6
+    }
+   ],
+   "note": "De haut en bas : chaque ministère alimente les retraites via le CAS Pensions (dépense retraite cachée de l'État), qui rejoint les autres ressources (nomenclature COR juin 2025), transitent par les régimes et convergent vers les 405 Md€ versés.",
+   "kind": "retraites"
   }
  },
  "retraites_view": {
@@ -9973,7 +10453,7 @@
     "tooltip": "≈ 101.6 Md€, gérés par les partenaires sociaux — hors LFSS."
    },
    {
-    "name": "Retraites — 405 Md€",
+    "name": "Pensions versées — 405 Md€",
     "col": 3,
     "color": "#C13B55",
     "tooltip": "≈ 405.0 Md€ de pensions versées en 2025, tous régimes, dont ≈ 34 Md€ de réversion. ≈ un quart de la dépense publique. Sources : COR (rapport juin 2025), iFRAP, PLFSS 2026.",
@@ -10062,15 +10542,552 @@
    },
    {
     "source": "Régimes de base (CNAV, SRE, CNRACL, MSA…)",
-    "target": "Retraites — 405 Md€",
+    "target": "Pensions versées — 405 Md€",
     "value": 303.4
    },
    {
     "source": "Régimes complémentaires (Agirc-Arrco…)",
-    "target": "Retraites — 405 Md€",
+    "target": "Pensions versées — 405 Md€",
     "value": 101.6
    }
   ],
   "note": "De haut en bas : chaque ministère alimente les retraites via le CAS Pensions (dépense retraite cachée de l'État), qui rejoint les autres ressources (nomenclature COR juin 2025), transitent par les régimes et convergent vers les 405 Md€ versés."
+ },
+ "historique": {
+  "annees": [
+   2020,
+   2021,
+   2022,
+   2023,
+   2024,
+   2025
+  ],
+  "sources": {
+   "2021": "LFI 2021 — LFI2021_crédits-AE_CP.csv (data.economie.gouv.fr, projet-de-loi-de-finances-initiale-pour-2021-lfi-2021)",
+   "2022": "LFI 2022 — LFI2022_detaillee.csv (data.economie.gouv.fr, projet-de-loi-de-finances-initiale-pour-2022-lfi-2022)",
+   "2020": "LFI 2020 — LFI2020-crédits.csv (codes mission décodés via la nomenclature LFI 2021)",
+   "2023": "LFI 2023 (PLF + amendements) — credits-ae-et-cp-votes-nomenclature-par-destination-et-nature-lfi-2023",
+   "2024": "PLF 2024 (LFI 2024 non publiée en tabulaire) — plf-2024-depenses-2024-selon-nomenclatures-destination-et-nature",
+   "2025": "PLF/LFI 2025 — plf25-depenses-2025-selon-destination"
+  },
+  "cas_total": {
+   "2020": 59.61,
+   "2021": 60.22,
+   "2022": 61.1,
+   "2023": 64.36,
+   "2024": 67.58,
+   "2025": 68.48
+  },
+  "note_cas": "Part retraites par mission : estimation — contribution au CAS Pensions 2025 (RAP/iFRAP, ordres de grandeur) indexée sur l'évolution réelle des dépenses du CAS Pensions (59,6 → 68,5 Md€ de 2020 à 2025).",
+  "missions": {
+   "Action extérieure de l'État": {
+    "cp": {
+     "2020": 2.87,
+     "2021": 2.93,
+     "2022": 3.06,
+     "2023": 3.22,
+     "2024": 3.51,
+     "2025": 3.53
+    }
+   },
+   "Administration générale et territoriale de l'État": {
+    "cp": {
+     "2020": 3.97,
+     "2021": 4.2,
+     "2022": 4.39,
+     "2023": 4.57,
+     "2024": 4.66,
+     "2025": 4.96
+    }
+   },
+   "Agriculture, alimentation, forêt et affaires rurales": {
+    "cp": {
+     "2020": 2.94,
+     "2021": 3.04,
+     "2022": 3.01,
+     "2023": 3.86,
+     "2024": 4.75,
+     "2025": 4.44
+    }
+   },
+   "Aide publique au développement": {
+    "cp": {
+     "2020": 3.27,
+     "2021": 5.39,
+     "2022": 5.1,
+     "2023": 5.92,
+     "2024": 5.93,
+     "2025": 5.15
+    }
+   },
+   "Anciens combattants, mémoire et liens avec la Nation": {
+    "cp": {
+     "2020": 2.16,
+     "2021": 2.09,
+     "2022": 2.08,
+     "2023": 1.93,
+     "2024": 1.92,
+     "2025": 1.91
+    }
+   },
+   "Audiovisuel public": {
+    "cp": {
+     "2025": 4.03
+    }
+   },
+   "Cohésion des territoires": {
+    "cp": {
+     "2020": 15.15,
+     "2021": 15.95,
+     "2022": 17.18,
+     "2023": 17.92,
+     "2024": 19.37,
+     "2025": 23.78
+    }
+   },
+   "Conseil et contrôle de l'État": {
+    "cp": {
+     "2020": 0.7,
+     "2021": 0.72,
+     "2022": 0.75,
+     "2023": 0.82,
+     "2024": 0.88,
+     "2025": 0.9
+    }
+   },
+   "Crédits non répartis": {
+    "cp": {
+     "2020": 0.14,
+     "2021": 0.32,
+     "2022": 0.55,
+     "2023": 1.15,
+     "2024": 0.51,
+     "2025": 0.2
+    }
+   },
+   "Culture": {
+    "cp": {
+     "2020": 2.96,
+     "2021": 3.2,
+     "2022": 3.46,
+     "2023": 3.72,
+     "2024": 3.9,
+     "2025": 3.92
+    }
+   },
+   "Direction de l'action du Gouvernement": {
+    "cp": {
+     "2020": 0.79,
+     "2021": 0.86,
+     "2022": 0.96,
+     "2023": 0.93,
+     "2024": 1.05,
+     "2025": 1.07
+    }
+   },
+   "Défense": {
+    "cp": {
+     "2020": 46.08,
+     "2021": 47.7,
+     "2022": 49.56,
+     "2023": 53.12,
+     "2024": 56.78,
+     "2025": 60.0
+    },
+    "cas": {
+     "2020": 8.27,
+     "2021": 8.35,
+     "2022": 8.48,
+     "2023": 8.93,
+     "2024": 9.38,
+     "2025": 9.5
+    }
+   },
+   "Engagements financiers de l'État": {
+    "cp": {
+     "2020": 38.5,
+     "2021": 38.91,
+     "2022": 44.34,
+     "2023": 60.29,
+     "2024": 60.82,
+     "2025": 61.34
+    }
+   },
+   "Enseignement scolaire": {
+    "cp": {
+     "2020": 74.01,
+     "2021": 75.9,
+     "2022": 77.79,
+     "2023": 82.4,
+     "2024": 86.83,
+     "2025": 88.82
+    },
+    "cas": {
+     "2020": 15.23,
+     "2021": 15.39,
+     "2022": 15.61,
+     "2023": 16.45,
+     "2024": 17.27,
+     "2025": 17.5
+    }
+   },
+   "Gestion des finances publiques": {
+    "cp": {
+     "2020": 10.44,
+     "2021": 10.1,
+     "2022": 10.0,
+     "2023": 10.54,
+     "2024": 10.9,
+     "2025": 10.97
+    },
+    "cas": {
+     "2020": 2.18,
+     "2021": 2.2,
+     "2022": 2.23,
+     "2023": 2.35,
+     "2024": 2.47,
+     "2025": 2.5
+    }
+   },
+   "Immigration, asile et intégration": {
+    "cp": {
+     "2020": 1.81,
+     "2021": 1.84,
+     "2022": 1.9,
+     "2023": 2.01,
+     "2024": 2.16,
+     "2025": 2.05
+    }
+   },
+   "Investir pour la France de 2030": {
+    "cp": {
+     "2022": 7.0,
+     "2023": 6.09,
+     "2024": 7.7,
+     "2025": 5.8
+    }
+   },
+   "Investissements d'avenir": {
+    "cp": {
+     "2020": 2.06,
+     "2021": 3.98
+    }
+   },
+   "Justice": {
+    "cp": {
+     "2020": 9.39,
+     "2021": 10.06,
+     "2022": 10.74,
+     "2023": 11.57,
+     "2024": 12.16,
+     "2025": 12.46
+    },
+    "cas": {
+     "2020": 1.57,
+     "2021": 1.58,
+     "2022": 1.61,
+     "2023": 1.69,
+     "2024": 1.78,
+     "2025": 1.8
+    }
+   },
+   "Médias, livre et industries culturelles": {
+    "cp": {
+     "2020": 0.59,
+     "2021": 0.6,
+     "2022": 0.68,
+     "2023": 0.7,
+     "2024": 0.74,
+     "2025": 0.72
+    }
+   },
+   "Outre-mer": {
+    "cp": {
+     "2020": 2.37,
+     "2021": 2.44,
+     "2022": 2.47,
+     "2023": 2.54,
+     "2024": 2.66,
+     "2025": 2.56
+    }
+   },
+   "Plan d'urgence face à la crise sanitaire": {
+    "cp": {
+     "2021": 6.03,
+     "2022": 0.2
+    }
+   },
+   "Plan de relance": {
+    "cp": {
+     "2021": 21.84,
+     "2022": 13.01,
+     "2023": 4.4,
+     "2024": 1.41,
+     "2025": 0.17
+    }
+   },
+   "Pouvoirs publics": {
+    "cp": {
+     "2020": 0.99,
+     "2021": 0.99,
+     "2022": 1.05,
+     "2023": 1.08,
+     "2024": 1.14,
+     "2025": 1.16
+    }
+   },
+   "Recherche et enseignement supérieur": {
+    "cp": {
+     "2020": 28.66,
+     "2021": 28.48,
+     "2022": 29.24,
+     "2023": 30.81,
+     "2024": 31.82,
+     "2025": 31.29
+    },
+    "cas": {
+     "2020": 2.61,
+     "2021": 2.64,
+     "2022": 2.68,
+     "2023": 2.82,
+     "2024": 2.96,
+     "2025": 3.0
+    }
+   },
+   "Relations avec les collectivités territoriales": {
+    "cp": {
+     "2020": 3.47,
+     "2021": 3.92,
+     "2022": 4.35,
+     "2023": 4.49,
+     "2024": 4.28,
+     "2025": 4.06
+    }
+   },
+   "Régimes sociaux et de retraite": {
+    "cp": {
+     "2020": 6.23,
+     "2021": 6.15,
+     "2022": 6.1,
+     "2023": 6.14,
+     "2024": 6.23,
+     "2025": 6.0
+    },
+    "cas": {
+     "2020": 5.4,
+     "2021": 5.45,
+     "2022": 5.53,
+     "2023": 5.83,
+     "2024": 6.12,
+     "2025": 6.2
+    }
+   },
+   "Santé": {
+    "cp": {
+     "2020": 1.13,
+     "2021": 1.32,
+     "2022": 1.3,
+     "2023": 3.37,
+     "2024": 2.35,
+     "2025": 1.64
+    }
+   },
+   "Solidarité, insertion et égalité des chances": {
+    "cp": {
+     "2020": 26.28,
+     "2021": 26.25,
+     "2022": 27.65,
+     "2023": 29.48,
+     "2024": 30.85,
+     "2025": 30.37
+    }
+   },
+   "Sport, jeunesse et vie associative": {
+    "cp": {
+     "2020": 1.22,
+     "2021": 1.36,
+     "2022": 1.72,
+     "2023": 1.83,
+     "2024": 1.79,
+     "2025": 1.58
+    }
+   },
+   "Sécurités": {
+    "cp": {
+     "2020": 20.48,
+     "2021": 20.72,
+     "2022": 21.56,
+     "2023": 23.07,
+     "2024": 24.17,
+     "2025": 25.22
+    },
+    "cas": {
+     "2020": 3.92,
+     "2021": 3.96,
+     "2022": 4.02,
+     "2023": 4.23,
+     "2024": 4.44,
+     "2025": 4.5
+    }
+   },
+   "Transformation et fonction publiques": {
+    "cp": {
+     "2020": 0.43,
+     "2021": 0.69,
+     "2022": 0.8,
+     "2023": 1.16,
+     "2024": 1.1,
+     "2025": 0.8
+    }
+   },
+   "Travail, emploi et administration des ministères sociaux": {
+    "cp": {
+     "2020": 12.98,
+     "2021": 13.54,
+     "2022": 14.64,
+     "2023": 20.88,
+     "2024": 22.56,
+     "2025": 21.63
+    }
+   },
+   "Écologie, développement et mobilité durables": {
+    "cp": {
+     "2020": 13.25,
+     "2021": 20.73,
+     "2022": 21.25,
+     "2023": 37.49,
+     "2024": 21.63,
+     "2025": 20.5
+    }
+   },
+   "Économie": {
+    "cp": {
+     "2020": 2.36,
+     "2021": 2.69,
+     "2022": 4.02,
+     "2023": 7.92,
+     "2024": 4.29,
+     "2025": 3.88
+    }
+   }
+  },
+  "familles": {
+   "É · Administration & autres missions": {
+    "cp": {
+     "2020": 29.13,
+     "2021": 40.13,
+     "2022": 31.21,
+     "2023": 33.88,
+     "2024": 33.96,
+     "2025": 32.8
+    },
+    "cas": {
+     "2020": 2.18,
+     "2021": 2.2,
+     "2022": 2.23,
+     "2023": 2.35,
+     "2024": 2.47,
+     "2025": 2.5
+    }
+   },
+   "É · Écologie, territoires & agriculture": {
+    "cp": {
+     "2020": 33.71,
+     "2021": 42.16,
+     "2022": 43.91,
+     "2023": 61.81,
+     "2024": 48.41,
+     "2025": 51.28
+    },
+    "cas": {}
+   },
+   "É · Solidarités, travail & santé": {
+    "cp": {
+     "2020": 48.78,
+     "2021": 49.35,
+     "2022": 51.77,
+     "2023": 61.8,
+     "2024": 63.91,
+     "2025": 61.55
+    },
+    "cas": {
+     "2020": 5.4,
+     "2021": 5.45,
+     "2022": 5.53,
+     "2023": 5.83,
+     "2024": 6.12,
+     "2025": 6.2
+    }
+   },
+   "É · Culture, médias, sport": {
+    "cp": {
+     "2025": 10.25,
+     "2020": 4.77,
+     "2021": 5.16,
+     "2022": 5.86,
+     "2023": 6.25,
+     "2024": 6.43
+    },
+    "cas": {}
+   },
+   "É · Défense, sécurité, justice": {
+    "cp": {
+     "2020": 77.76,
+     "2021": 80.32,
+     "2022": 83.76,
+     "2023": 89.77,
+     "2024": 95.27,
+     "2025": 99.73
+    },
+    "cas": {
+     "2020": 13.76,
+     "2021": 13.89,
+     "2022": 14.11,
+     "2023": 14.85,
+     "2024": 15.6,
+     "2025": 15.8
+    }
+   },
+   "É · Charge de la dette": {
+    "cp": {
+     "2020": 38.5,
+     "2021": 38.91,
+     "2022": 44.34,
+     "2023": 60.29,
+     "2024": 60.82,
+     "2025": 61.34
+    },
+    "cas": {}
+   },
+   "É · Enseignement & recherche": {
+    "cp": {
+     "2020": 102.67,
+     "2021": 104.38,
+     "2022": 107.03,
+     "2023": 113.21,
+     "2024": 118.65,
+     "2025": 120.11
+    },
+    "cas": {
+     "2020": 17.84,
+     "2021": 18.03,
+     "2022": 18.29,
+     "2023": 19.27,
+     "2024": 20.23,
+     "2025": 20.5
+    }
+   },
+   "É · Économie & investissements d'avenir": {
+    "cp": {
+     "2022": 24.03,
+     "2023": 18.41,
+     "2024": 13.4,
+     "2025": 9.85,
+     "2021": 24.53,
+     "2020": 2.36
+    },
+    "cas": {}
+   }
+  }
  }
 }
