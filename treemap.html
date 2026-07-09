@@ -3,56 +3,70 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Où va l'argent public ? — Treemap des dépenses 2025</title>
-  <meta name="description" content="Treemap interactif des dépenses publiques françaises 2025 : chaque euro dépensé, du bloc au programme — avec le trou de financement des retraites mis en évidence.">
+  <title>Le Mondrian des dépenses publiques — Où va l'argent public ? 2025</title>
+  <meta name="description" content="Le Mondrian des dépenses publiques françaises 2025 : chaque euro en rectangles proportionnels, le déséquilibre des retraites en évidence, un comparateur d'ordres de grandeur et un switch qui révèle le maquillage comptable.">
   <meta name="author" content="Michael Colla">
+  <meta property="og:image" content="assets/preview-mondrian.svg">
   <link rel="preconnect" href="https://cdnjs.cloudflare.com">
-  <link rel="stylesheet" href="style.css?v=20260709f">
+  <link rel="stylesheet" href="style.css?v=20260710">
 </head>
-<body>
+<body data-mode="realite">
   <header class="masthead">
     <div class="masthead-inner">
-      <p class="kicker">Vue treemap · dépenses · exercice 2025</p>
-      <h1><span class="hl">Où va l'argent public&nbsp;?</span></h1>
+      <p class="kicker"><a class="home-link" href="index.html">← Accueil</a>
+        &nbsp;·&nbsp; Le Mondrian · dépenses · exercice 2025</p>
+      <h1><span class="hl">Le Mondrian des dépenses publiques</span></h1>
       <p class="standfirst">
-        La même donnée que le <a href="index.html">grand poster</a>, en <strong>rectangles
-        proportionnels</strong> : chaque euro dépensé, une seule fois. Au sein des
-        <strong>pensions (405&nbsp;Md€)</strong>, la part que les cotisations ne couvrent pas —
-        le «&nbsp;trou&nbsp;» comblé par les impôts, les ministères et la dette — est en
-        <strong>rouge</strong>. Cliquez pour plonger, fil d'ariane pour remonter.
+        Chaque euro dépensé, en <strong>rectangles proportionnels</strong> — une seule fois.
+        Cliquez pour <strong>plonger</strong> (jusqu'au programme et à l'action), survolez pour
+        isoler un bloc. Le <strong style="color:#C13B55">déséquilibre des retraites</strong>
+        (136&nbsp;Md€, hachures rouges) vit au sein du bloc «&nbsp;Retraites&nbsp;».
       </p>
       <div class="statband" id="statband" aria-label="Total des dépenses"></div>
     </div>
   </header>
 
   <main>
+    <div class="mode-bar">
+      <div class="mode-switch">
+        <span class="mode-lbl">Budget <strong>tel que présenté</strong></span>
+        <label class="switch" title="Basculer entre présentation officielle et réalité">
+          <input type="checkbox" id="mode-toggle" checked>
+          <span class="slider"></span>
+        </label>
+        <span class="mode-lbl">Budget <strong>tel qu'il finance les retraites</strong></span>
+        <button type="button" class="mode-info" id="mode-info-btn" aria-label="Comprendre ce réglage">?</button>
+      </div>
+      <p class="mode-caption" id="mode-caption"></p>
+    </div>
+
     <p class="cas-legend">
-      <button type="button" class="report-btn" id="compare-btn">⚖ Comparateur (masquer/afficher)</button>
-      <span class="legend-more">Cliquez un bloc (à n'importe quelle profondeur), puis comparez-le
-      au déficit des retraites ou à d'autres ordres de grandeur.</span></p>
+      <button type="button" class="report-btn active" id="compare-btn">⚖ Comparateur</button>
+      <span class="legend-more">Cliquez un bloc à n'importe quelle profondeur pour le comparer
+      au déséquilibre des retraites ou à d'autres ordres de grandeur.</span></p>
+
     <aside id="compare-panel" class="histo-card compare-panel" aria-live="polite">
       <div class="histo-text">
         <h3>⚖ Comparateur</h3>
         <div class="cmp-selects">
           <label class="cmp-label">Comparer&nbsp;:
             <select id="compare-a"></select></label>
+          <button type="button" class="cmp-swap" id="compare-swap" title="Inverser">⇄</button>
           <label class="cmp-label">avec&nbsp;:
             <select id="compare-b"></select></label>
         </div>
         <div id="compare-body"></div>
-        <p class="histo-note">Aires proportionnelles aux montants. Références externes&nbsp;:
-          ordres de grandeur indicatifs (compilation de l'auteur).</p>
+        <p class="histo-note">Aires proportionnelles aux montants. Ordres de grandeur externes&nbsp;:
+          indicatifs (compilation de l'auteur).</p>
       </div>
     </aside>
+
     <div id="chart-stage">
-      <div id="treemap" role="img" aria-label="Treemap des dépenses publiques françaises 2025"></div>
+      <div id="treemap" role="img" aria-label="Mondrian des dépenses publiques françaises 2025"></div>
     </div>
-    <p class="hint">Les blocs des administrations sont présentés <strong>nets</strong> de ce
-      qu'ils re-versent au système de retraites (ces montants vivent dans le bloc
-      «&nbsp;Pensions&nbsp;», où le <strong style="color:#C13B55">déficit de financement
-      (hachures rouges)</strong> = pensions 405 − cotisations 269). La somme des rectangles =
-      les dépenses totales du bandeau, sans double compte.
-      <a class="alt-view" href="index.html">← Retour au poster (flux)</a></p>
+    <p class="hint">Somme des rectangles = <strong>dépenses totales</strong> du bandeau, sans double
+      compte, quel que soit le mode.
+      <a class="alt-view" href="sankey.html">↔ Voir le flux (Sankey)</a></p>
   </main>
 
   <footer class="metho">
@@ -60,11 +74,50 @@
       <strong>Un projet conçu et réalisé par Michael Colla.</strong>
       Données&nbsp;: data.economie.gouv.fr, data.gouv.fr, PLFSS (open data Assemblée nationale),
       rapports Sénat PLF 2025 — Licence Ouverte 2.0. Code&nbsp;: MIT.
-      Méthodologie détaillée sur la <a href="index.html">page principale</a>.
+      Méthodologie détaillée sur la <a href="sankey.html">page du flux</a>.
     </p>
   </footer>
 
+  <dialog id="mode-dlg" class="report-dlg mode-dlg" aria-label="Le maquillage comptable des retraites">
+    <h3>Pourquoi deux budgets&nbsp;?</h3>
+    <p>Les retraites versées coûtent <strong>405&nbsp;Md€</strong> par an. Les cotisations n'en
+      rapportent que <strong>269&nbsp;Md€</strong> : il manque <strong>136&nbsp;Md€</strong>.</p>
+    <p>Une partie de ce trou — <strong>74&nbsp;Md€</strong> — est comblée par des
+      <strong>subventions d'équilibre</strong> que l'État fait passer pour du budget des
+      ministères&nbsp;: la «&nbsp;contribution employeur au CAS Pensions&nbsp;». Elle est adossée à
+      la rémunération des fonctionnaires, alors que ceux-ci l'ignorent&nbsp;: elle
+      <strong>n'augmente pas leur salaire</strong> et <strong>n'ouvre aucun droit</strong>
+      supplémentaire. Le reste du trou est pris dans les impôts, taxes affectées et la dette.</p>
+    <ul>
+      <li><strong>Budget tel que présenté</strong> — les 74&nbsp;Md€ restent logés dans les budgets
+        des ministères, de la Sécu et des collectivités (parts hachurées) : les retraites ne
+        «&nbsp;semblent&nbsp;» coûter que 331&nbsp;Md€ en direct.</li>
+      <li><strong>Budget tel qu'il finance les retraites</strong> — on neutralise le maquillage :
+        ces 74&nbsp;Md€ rejoignent le bloc «&nbsp;Retraites&nbsp;», qui affiche ses vrais
+        405&nbsp;Md€, dont 136 de déséquilibre en rouge.</li>
+    </ul>
+    <div class="report-actions">
+      <button type="button" class="crumb report-send" id="mode-dlg-close">Compris</button>
+    </div>
+  </dialog>
+
   <script src="https://cdnjs.cloudflare.com/ajax/libs/echarts/5.5.0/echarts.min.js"></script>
-  <script src="treemap.js?v=20260709f"></script>
+  <script src="treemap.js?v=20260710"></script>
+  <script>
+    // légende dynamique du switch + dialogue d'explication
+    (function () {
+      const cap = document.getElementById("mode-caption");
+      const texts = {
+        realite: "Réalité : administrations nettes, et le bloc « Retraites » affiche ses vrais 405 Md€ (dont 136 de déséquilibre).",
+        officiel: "Présentation officielle : 74 Md€ de retraites sont cachés dans les budgets des ministères (hachures) — les retraites semblent ne coûter que 331 Md€.",
+      };
+      function refresh() { cap.textContent = texts[document.body.dataset.mode] || texts.realite; }
+      new MutationObserver(refresh).observe(document.body, { attributes: true, attributeFilter: ["data-mode"] });
+      refresh();
+      const dlg = document.getElementById("mode-dlg");
+      document.getElementById("mode-info-btn").addEventListener("click", () => dlg.showModal());
+      document.getElementById("mode-dlg-close").addEventListener("click", () => dlg.close());
+    })();
+  </script>
 </body>
 </html>

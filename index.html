@@ -3,87 +3,94 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Où va l'argent public ? — Recettes et dépenses publiques 2025</title>
-  <meta name="description" content="Infographie interactive : d'où vient l'argent public français et comment il est dépensé (exercice 2025). Données open data — État, Sécurité sociale, collectivités.">
+  <title>Où va l'argent public ? — Les dépenses publiques 2025, deux visions</title>
+  <meta name="description" content="Où va l'argent public français en 2025 ? Deux visualisations interactives des mêmes 1 286 Md€ de dépenses : le flux (Sankey) et le Mondrian. Données open data, sourcées et auditées.">
   <meta name="author" content="Michael Colla">
+  <meta property="og:title" content="Où va l'argent public ? — 2025">
+  <meta property="og:description" content="Deux façons de regarder les mêmes 1 286 Md€ de dépenses publiques : le flux (Sankey) et le Mondrian.">
+  <meta property="og:image" content="assets/preview-mondrian.svg">
   <link rel="preconnect" href="https://cdnjs.cloudflare.com">
   <!-- ?v= : cache-busting — incrémenter à chaque déploiement de style/app -->
-  <link rel="stylesheet" href="style.css?v=20260709f">
+  <link rel="stylesheet" href="style.css?v=20260710">
 </head>
-<body>
+<body class="landing">
   <header class="masthead">
     <div class="masthead-inner">
-      <p class="kicker">Grand poster interactif · exercice <span id="exercice">2025</span></p>
+      <p class="kicker">Les finances publiques françaises · exercice <span id="exercice">2025</span></p>
       <h1><span class="hl">Où va l'argent public&nbsp;?</span></h1>
       <p class="standfirst">
-        Pour comprendre en (presque) un clin d'œil d'où vient l'argent public et comment il est
-        dépensé. Chaque flux est en <strong>milliards d'euros</strong>&nbsp;; les données sont
-        sourcées dans l'open data officielle (État&nbsp;: LOLF&nbsp;· Sécu&nbsp;: LFSS) et le
-        diagramme est <strong>comptablement équilibré</strong>&nbsp;: recettes + dette = dépenses.
+        <strong>Deux façons</strong> de regarder les mêmes <strong id="tot-dep">1&nbsp;286&nbsp;Md€</strong>
+        de dépenses publiques&nbsp;: en <strong>flux</strong>, pour suivre chaque euro de sa recette à
+        sa destination&nbsp;; en <strong>rectangles</strong>, pour comparer les masses d'un coup d'œil.
+        Données open data officielles, sourcées, auditées.
       </p>
       <div class="statband" id="statband" aria-label="Totaux de l'exercice"></div>
     </div>
   </header>
 
-  <nav class="breadcrumb" id="breadcrumb" aria-label="Fil d'ariane">
-    <button class="crumb crumb-root" data-view="__macro__">Vue d'ensemble</button>
-  </nav>
+  <main class="landing-main">
+    <div class="choice-grid">
+      <a class="choice-card" href="sankey.html" aria-label="Ouvrir le diagramme de flux (Sankey)">
+        <div class="choice-thumb choice-thumb-sankey">
+          <img src="assets/preview-sankey.svg" alt="Aperçu du diagramme de flux Sankey"
+               loading="lazy" onerror="this.style.display='none'">
+        </div>
+        <div class="choice-body">
+          <h2>Le flux <span class="choice-tag">Sankey</span></h2>
+          <p>D'où vient l'argent, où il va. Les recettes se ramifient vers l'État, la Sécu, les
+            collectivités et les retraites. Cliquez un flux pour <strong>plonger</strong> jusqu'au
+            programme et à l'action.</p>
+          <span class="choice-cta">Explorer le flux →</span>
+        </div>
+      </a>
 
-  <main>
-    <p class="cas-legend" id="cas-legend" hidden>
-      <span class="swatch"></span> <strong>Gris uni</strong>&nbsp;: subvention d'équilibre prélevée
-      sur le budget des ministères pour le <strong>système de retraites</strong> (versée au CAS
-      Pensions — <strong>source vérifiée</strong>, crédits votés).
-      <span id="legend-est" hidden><span class="swatch swatch-est"></span>
-      <strong>Hachures</strong>&nbsp;: <strong>estimation</strong> (détail au survol de chaque
-      flux).</span>
-      <span class="legend-more">Détail dans «&nbsp;Méthodologie&nbsp;».</span></p>
-    <aside id="histo-card" class="histo-card" hidden aria-live="polite"></aside>
-    <div id="chart-stage">
-      <div id="chart" role="img" aria-label="Diagramme de Sankey des finances publiques françaises"></div>
+      <a class="choice-card" href="treemap.html" aria-label="Ouvrir le Mondrian des dépenses">
+        <div class="choice-thumb choice-thumb-mondrian">
+          <img src="assets/preview-mondrian.svg" alt="Aperçu du Mondrian des dépenses"
+               loading="lazy" onerror="this.style.display='none'">
+        </div>
+        <div class="choice-body">
+          <h2>Le Mondrian <span class="choice-tag">Rectangles</span></h2>
+          <p>Chaque euro dépensé, en aires proportionnelles. Un <strong>comparateur</strong> intégré,
+            le <strong>déséquilibre des retraites</strong> (136 Md€) en évidence, et un bouton pour
+            révéler le <strong>maquillage comptable</strong>.</p>
+          <span class="choice-cta">Explorer le Mondrian →</span>
+        </div>
+      </a>
     </div>
-    <p class="hint" id="hint">Cliquez sur une famille de dépenses, une branche de la Sécu ou le nœud
-      <strong>« Pensions versées — 405 Md€ »</strong> — ou directement sur un flux — pour <strong>zoomer</strong>
-      dessus. <kbd>Échap</kbd> ou clic sur le fond pour dézoomer.
-      <a class="alt-view" href="treemap.html">➕ Voir aussi&nbsp;: la vue <strong>treemap des
-      dépenses</strong> (le «&nbsp;trou&nbsp;» des retraites en évidence)</a></p>
-    <aside id="panel-retraites" class="panel-retraites" aria-live="polite"></aside>
+
+    <p class="landing-note">Le diagramme est <strong>comptablement équilibré</strong>&nbsp;:
+      recettes + dette = dépenses. Méthodologie détaillée et sources sur chaque page.</p>
   </main>
 
   <footer class="metho">
-    <details>
-      <summary>Méthodologie, périmètre &amp; sources</summary>
-      <div id="metho-body"><!-- rempli par app.js depuis meta --></div>
-    </details>
     <p class="credits">
       <strong>Un projet conçu et réalisé par Michael Colla.</strong>
       Design inspiré du poster «&nbsp;Où va l'argent public&nbsp;?&nbsp;» (<em>Le&nbsp;1 hebdo</em> n°569,
       C.&nbsp;Alet &amp; C.&nbsp;Martha, avec F.&nbsp;Ecalle/Fipeco). Données&nbsp;: data.economie.gouv.fr,
-      data.gouv.fr, PLFSS (open data Assemblée nationale) — Licence Ouverte 2.0.
-      Code&nbsp;: MIT. Généré le <span id="generated-at">…</span>.
-      <button type="button" class="report-btn" id="report-btn">⚑ Signaler une erreur</button>
+      data.gouv.fr, PLFSS (open data Assemblée nationale), rapports Sénat PLF 2025 —
+      Licence Ouverte 2.0. Code&nbsp;: MIT.
     </p>
   </footer>
 
-  <dialog id="report-dlg" class="report-dlg" aria-label="Signaler une erreur">
-    <form id="report-form" method="dialog">
-      <h3>Signaler une erreur</h3>
-      <p class="report-hint">Un chiffre douteux, une source manquante, un bug&nbsp;? Merci&nbsp;!
-        La vue en cours est jointe automatiquement.</p>
-      <label>Votre signalement<br>
-        <textarea id="report-msg" required rows="5"
-          placeholder="Ex. : le flux X me semble faux car…"></textarea></label>
-      <label>Votre e-mail (facultatif, pour vous répondre)<br>
-        <input type="email" id="report-email" placeholder="vous@exemple.fr"></label>
-      <p class="report-status" id="report-status" hidden></p>
-      <div class="report-actions">
-        <button type="button" class="crumb" id="report-cancel">Annuler</button>
-        <button type="submit" class="crumb report-send" id="report-send">Envoyer</button>
-      </div>
-    </form>
-  </dialog>
-
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/echarts/5.5.0/echarts.min.js"></script>
-  <script src="app.js?v=20260709f"></script>
+  <script>
+    // Landing autonome : remplit le bandeau de totaux depuis les données.
+    fetch("data/unified_finances.json", { cache: "no-cache" })
+      .then((r) => r.json())
+      .then((d) => {
+        const c = (d.meta && d.meta.checks) || {};
+        const f0 = (v) => Number(v).toLocaleString("fr-FR", { maximumFractionDigits: 0 });
+        document.getElementById("exercice").textContent = (d.meta || {}).exercice || "2025";
+        document.getElementById("tot-dep").innerHTML =
+          f0(c.depenses_totales).replace(/\s/g, "&nbsp;") + "&nbsp;Md€";
+        document.getElementById("statband").innerHTML =
+          '<span class="stat"><b>Recettes</b> ' + f0(c.recettes_hors_dette) + " Md€</span>" +
+          '<span class="stat stat-dette"><b>+ Dette</b> ' + f0(c.dette) + " Md€</span>" +
+          '<span class="stat-eq">=</span>' +
+          '<span class="stat stat-dep"><b>Dépenses</b> ' + f0(c.depenses_totales) + " Md€</span>" +
+          '<span class="stat-year">' + ((d.meta || {}).exercice || "2025") + "</span>";
+      })
+      .catch(() => {});
+  </script>
 </body>
 </html>

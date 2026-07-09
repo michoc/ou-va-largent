@@ -1,0 +1,38 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 300" width="480" height="300" role="img" aria-label="Aperçu du diagramme de flux Sankey">
+  <rect width="480" height="300" fill="#FFFFFF"/>
+  <!-- recettes (haut) -->
+  <g>
+    <rect x="30"  y="24" width="52" height="14" rx="4" fill="#7E6BB8"/>
+    <rect x="96"  y="24" width="44" height="14" rx="4" fill="#7B68B5"/>
+    <rect x="154" y="24" width="60" height="14" rx="4" fill="#7B68B5"/>
+    <rect x="228" y="24" width="30" height="14" rx="4" fill="#6FA85C"/>
+    <rect x="300" y="24" width="70" height="14" rx="4" fill="#7B68B5"/>
+    <rect x="384" y="24" width="40" height="14" rx="4" fill="#7E6BB8"/>
+  </g>
+  <!-- flux courbes vers les blocs -->
+  <g fill="none" stroke-opacity="0.38" stroke-width="14">
+    <path d="M56 40 C56 120 120 130 120 150" stroke="#C2527A"/>
+    <path d="M118 40 C118 120 210 130 210 150" stroke="#EE8FB4"/>
+    <path d="M184 40 C184 120 210 132 260 150" stroke="#EE8FB4"/>
+    <path d="M335 40 C335 120 320 130 320 150" stroke="#F09D86"/>
+    <path d="M404 40 C404 120 330 132 330 150" stroke="#F09D86"/>
+  </g>
+  <!-- blocs (milieu) -->
+  <rect x="92"  y="150" width="70" height="16" rx="4" fill="#C2527A"/>
+  <rect x="188" y="150" width="90" height="16" rx="4" fill="#EE8FB4"/>
+  <rect x="300" y="150" width="80" height="16" rx="4" fill="#F09D86"/>
+  <!-- flux vers les dépenses (bas) -->
+  <g fill="none" stroke-opacity="0.34" stroke-width="11">
+    <path d="M110 166 C110 230 70 236 70 262" stroke="#C2527A"/>
+    <path d="M230 166 C230 230 180 236 180 262" stroke="#EE8FB4"/>
+    <path d="M330 166 C330 230 270 236 270 262" stroke="#5C7FB8"/>
+    <path d="M350 166 C350 230 360 236 360 262" stroke="#D94F26"/>
+    <path d="M360 166 C360 236 420 240 420 262" stroke="#E88A54"/>
+  </g>
+  <!-- pensions terminal + dépenses -->
+  <rect x="44"  y="262" width="70" height="16" rx="4" fill="#C13B55"/>
+  <rect x="150" y="262" width="60" height="16" rx="4" fill="#E56BA0"/>
+  <rect x="240" y="262" width="60" height="16" rx="4" fill="#5C7FB8"/>
+  <rect x="330" y="262" width="46" height="16" rx="4" fill="#D94F26"/>
+  <rect x="392" y="262" width="56" height="16" rx="4" fill="#E88A54"/>
+</svg>
