@@ -433,12 +433,14 @@
   function setMode(mode) {
     MODE = mode;
     document.body.dataset.mode = mode;
-    modeToggle.checked = (mode === "officiel");
+    // curseur À DROITE (= checked) sur le libellé de droite « …finance les
+    // retraites » = mode réalité ; à gauche « tel que présenté » = officiel.
+    modeToggle.checked = (mode === "realite");
     history.replaceState(null, "", mode === "officiel" ? "#officiel" : "#realite");
     // setOption en fusion (structure identique) → animation de morphing native
     if (DATA_G) chart.setOption({ series: [{ data: build(DATA_G, mode) }] });
   }
-  modeToggle.addEventListener("change", () => setMode(modeToggle.checked ? "officiel" : "realite", true));
+  modeToggle.addEventListener("change", () => setMode(modeToggle.checked ? "realite" : "officiel"));
 
   /* ============ boot ============ */
   function boot(DATA) {
