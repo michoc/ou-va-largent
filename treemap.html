@@ -7,7 +7,7 @@
   <meta name="description" content="Treemap interactif des dépenses publiques françaises 2025 : chaque euro dépensé, du bloc au programme — avec le trou de financement des retraites mis en évidence.">
   <meta name="author" content="Michael Colla">
   <link rel="preconnect" href="https://cdnjs.cloudflare.com">
-  <link rel="stylesheet" href="style.css?v=20260709c">
+  <link rel="stylesheet" href="style.css?v=20260709d">
 </head>
 <body>
   <header class="masthead">
@@ -26,13 +26,29 @@
   </header>
 
   <main>
+    <p class="cas-legend">
+      <button type="button" class="report-btn" id="compare-btn">⚖ Comparer ce que je regarde</button>
+      <span class="legend-more">Cliquez un bloc (à n'importe quelle profondeur), puis comparez-le
+      au déficit des retraites ou à d'autres ordres de grandeur.</span></p>
+    <aside id="compare-panel" class="histo-card compare-panel" hidden aria-live="polite">
+      <div class="histo-text">
+        <h3>⚖ Comparateur</h3>
+        <label class="cmp-label">Comparer avec&nbsp;:
+          <select id="compare-ref"></select></label>
+        <div id="compare-body"></div>
+        <p class="histo-note">Aires proportionnelles aux montants. Références externes&nbsp;:
+          ordres de grandeur indicatifs (compilation de l'auteur).</p>
+      </div>
+    </aside>
     <div id="chart-stage">
       <div id="treemap" role="img" aria-label="Treemap des dépenses publiques françaises 2025"></div>
     </div>
     <p class="hint">Les blocs des administrations sont présentés <strong>nets</strong> de ce
       qu'ils re-versent au système de retraites (ces montants vivent dans le bloc
-      «&nbsp;Pensions&nbsp;») : la somme des rectangles = les dépenses totales du bandeau,
-      sans double compte. <a href="index.html">← Retour au poster (flux)</a></p>
+      «&nbsp;Pensions&nbsp;», où le <strong style="color:#C13B55">déficit de financement
+      (hachures rouges)</strong> = pensions 405 − cotisations 269). La somme des rectangles =
+      les dépenses totales du bandeau, sans double compte.
+      <a class="alt-view" href="index.html">← Retour au poster (flux)</a></p>
   </main>
 
   <footer class="metho">
@@ -45,6 +61,6 @@
   </footer>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/echarts/5.5.0/echarts.min.js"></script>
-  <script src="treemap.js?v=20260709c"></script>
+  <script src="treemap.js?v=20260709d"></script>
 </body>
 </html>
