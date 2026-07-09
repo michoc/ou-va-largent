@@ -305,6 +305,11 @@ main { max-width: 1220px; margin: 0 auto; padding: 6px 12px 8px; }
 }
 .cmp-sentence { font-size: 14px; margin: 8px 0 0; }
 .cmp-note { color: var(--ink-soft); font-size: 12px; }
+.cmp-selects { display: flex; gap: 14px; flex-wrap: wrap; align-items: center; }
+.cmp-svg { display: block; margin: 10px 0 0; max-width: 100%; }
+.cmp-svg .cmp-ratio { font: 800 15px var(--sans); fill: var(--accent); }
+.cmp-svg .cmp-name { font: 600 11px var(--sans); fill: var(--ink-soft); }
+.cmp-svg .cmp-val { font: 700 12px var(--sans); fill: var(--ink); }
 .hint kbd {
   font: 600 11px/1 var(--sans);
   border: 1px solid var(--rule);

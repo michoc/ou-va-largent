@@ -199,47 +199,116 @@
     ];
   }
 
-  /* ---------------- comparateur (⚖) ---------------- */
+  /* ---------------- comparateur (⚖) ----------------
+   * DEUX emplacements interchangeables : à gauche, par défaut, le DÉFICIT des
+   * retraites ; à droite, par défaut, le bloc cliqué (qui suit la navigation).
+   * Chaque côté peut recevoir : le bloc cliqué, le déficit, ou un ordre de
+   * grandeur externe (les références UNITAIRES — SMIC, Dacia… — ne sont
+   * proposées qu'à droite : elles convertissent le montant de gauche).
+   * Rendu : carrés d'aires proportionnelles reliés par des traits, ratio
+   * affiché entre les deux. */
   let cur = null;                    // dernier bloc cliqué {name, value}
   const cmpPanel = document.getElementById("compare-panel");
   const cmpBtn = document.getElementById("compare-btn");
-  const cmpSel = document.getElementById("compare-ref");
-  REFS.forEach((r, i) => {
-    const o = document.createElement("option");
-    o.value = i;
-    o.textContent = r.nom + (r.md ? " — " + fmt(r.md) + " Md€" : "");
-    cmpSel.appendChild(o);
-  });
+  const selA = document.getElementById("compare-a");
+  const selB = document.getElementById("compare-b");
+
+  function fillSelect(sel, withUnits) {
+    const oc = document.createElement("option");
+    oc.value = "CLICK";
+    oc.textContent = "Le bloc cliqué (suit la navigation)";
+    sel.appendChild(oc);
+    REFS.forEach((r, i) => {
+      if (r.type === "unite" && !withUnits) return;
+      const o = document.createElement("option");
+      o.value = i;
+      o.textContent = r.nom + (r.md ? " — " + fmt(r.md) + " Md€" : "");
+      sel.appendChild(o);
+    });
+  }
+  fillSelect(selA, false);
+  fillSelect(selB, true);
+  selA.value = String(REFS.findIndex((r) => r.id === "deficit"));   // défaut : déficit
+  selB.value = "CLICK";                                             // défaut : bloc cliqué
+
+  function resolve(sel) {
+    if (sel.value === "CLICK") {
+      return cur ? { nom: cur.name, md: cur.value, click: true } : null;
+    }
+    return REFS[+sel.value];
+  }
+
+  // motif hachuré rouge pour le carré « déficit » (SVG)
+  const SVG_HATCH = '<defs><pattern id="cmpHatch" width="7" height="7" ' +
+    'patternTransform="rotate(45)" patternUnits="userSpaceOnUse">' +
+    '<rect width="7" height="7" fill="#E8ADBA"></rect>' +
+    '<line x1="0" y1="0" x2="0" y2="7" stroke="#C13B55" stroke-width="4"></line></pattern></defs>';
+
+  function fillFor(item) {
+    if (item.id === "deficit") return "url(#cmpHatch)";
+    if (item.click) return "#5C7FB8";
+    return "#E8C9B8";
+  }
 
   function renderCompare() {
-    if (cmpPanel.hidden || !cur) return;
-    const ref = REFS[+cmpSel.value];
+    if (cmpPanel.hidden) return;
+    const A = resolve(selA), B = resolve(selB);
     const out = document.getElementById("compare-body");
-    if (ref.type === "unite") {
-      const n = cur.value * 1e9 / ref.unite;
+    if (!A || !B) { out.innerHTML = ""; return; }
+
+    // référence unitaire à droite : conversion du montant de gauche
+    if (B.type === "unite") {
+      const n = A.md * 1e9 / B.unite;
       out.innerHTML =
-        '<p class="cmp-sentence"><b>' + esc(cur.name) + "</b> (" + fmt(cur.value) +
-        " Md€) ≈ <b>" + fmt(Math.round(n)) + "</b> " + ref.plur +
-        (ref.extra ? " " + esc(ref.extra(n)) : "") + ".</p>";
+        '<p class="cmp-sentence"><b>' + esc(A.nom) + "</b> (" + fmt(A.md) +
+        " Md€) ≈ <b>" + fmt(Math.round(n)) + "</b> " + B.plur +
+        (B.extra ? " " + esc(B.extra(n)) : "") + ".</p>";
       return;
     }
-    const k = 86 / Math.sqrt(Math.max(cur.value, ref.md));   // côté ∝ √aire
-    const s1 = Math.max(10, Math.sqrt(cur.value) * k);
-    const s2 = Math.max(10, Math.sqrt(ref.md) * k);
-    const ratio = cur.value / ref.md;
+
+    // — carrés proportionnels reliés, ratio au centre —
+    const k = 92 / Math.sqrt(Math.max(A.md, B.md));    // côté ∝ √aire
+    const sA = Math.max(9, Math.sqrt(A.md) * k);
+    const sB = Math.max(9, Math.sqrt(B.md) * k);
+    const GAP = 108, PAD = 6, LABEL_H = 46;
+    const H = Math.max(sA, sB) + 14;
+    const W = PAD + sA + GAP + sB + PAD;
+    const yA = H - sA, yB = H - sB;                    // posés sur la même ligne
+    const xB = PAD + sA + GAP;
+    const big = Math.max(A.md, B.md) / Math.min(A.md, B.md);
+    const ratioTxt = A.md >= B.md ? fmt2(big) + " : 1" : "1 : " + fmt2(big);
+
+    let svg = '<svg class="cmp-svg" width="' + W + '" height="' + (H + LABEL_H) +
+              '" viewBox="0 0 ' + W + " " + (H + LABEL_H) + '">' + SVG_HATCH;
+    svg += '<rect x="' + PAD + '" y="' + yA + '" width="' + sA + '" height="' + sA +
+           '" rx="3" fill="' + fillFor(A) + '"' +
+           (A.id === "deficit" ? ' stroke="#C13B55" stroke-width="2"' : "") + '></rect>';
+    svg += '<rect x="' + xB + '" y="' + yB + '" width="' + sB + '" height="' + sB +
+           '" rx="3" fill="' + fillFor(B) + '"' +
+           (B.id === "deficit" ? ' stroke="#C13B55" stroke-width="2"' : "") + '></rect>';
+    // traits de liaison haut & bas + ratio central
+    svg += '<line x1="' + (PAD + sA) + '" y1="' + yA + '" x2="' + xB + '" y2="' + yB +
+           '" stroke="#8B90A0" stroke-width="1" stroke-dasharray="4 3"></line>';
+    svg += '<line x1="' + (PAD + sA) + '" y1="' + H + '" x2="' + xB + '" y2="' + H +
+           '" stroke="#8B90A0" stroke-width="1" stroke-dasharray="4 3"></line>';
+    svg += '<text x="' + (PAD + sA + GAP / 2) + '" y="' + (H / 2 + 4) +
+           '" text-anchor="middle" class="cmp-ratio">' + ratioTxt + "</text>";
+    // libellés sous les carrés
+    const lbl = (x, w, item) =>
+      '<text x="' + (x + w / 2) + '" y="' + (H + 16) + '" text-anchor="middle" class="cmp-name">' +
+      esc(item.nom.length > 34 ? item.nom.slice(0, 33) + "…" : item.nom) + "</text>" +
+      '<text x="' + (x + w / 2) + '" y="' + (H + 32) + '" text-anchor="middle" class="cmp-val">' +
+      fmt(item.md) + " Md€</text>";
+    svg += lbl(PAD, sA, A) + lbl(xB, sB, B) + "</svg>";
+
+    const ratio = A.md / B.md;
     const phrase = ratio >= 1
-      ? "≈ <b>" + fmt2(ratio) + " ×</b> « " + esc(ref.nom) + " »"
-      : "« " + esc(ref.nom) + " » ≈ <b>" + fmt2(1 / ratio) + " ×</b> ce bloc";
-    out.innerHTML =
-      '<div class="cmp-squares">' +
-      '<div class="cmp-item"><div class="cmp-square" style="width:' + s1 + "px;height:" + s1 +
-      'px;background:#5C7FB8"></div><span>' + esc(cur.name) + "<br><b>" + fmt(cur.value) +
-      " Md€</b></span></div>" +
-      '<div class="cmp-item"><div class="cmp-square cmp-square-ref" style="width:' + s2 +
-      "px;height:" + s2 + 'px"></div><span>' + esc(ref.nom) + "<br><b>" + fmt(ref.md) +
-      " Md€</b></span></div></div>" +
-      '<p class="cmp-sentence"><b>' + esc(cur.name) + "</b> " + phrase +
-      (ref.note ? ' <span class="cmp-note">(' + esc(ref.note) + ")</span>" : "") + ".</p>";
+      ? "<b>" + esc(A.nom) + "</b> ≈ <b>" + fmt2(ratio) + " ×</b> « " + esc(B.nom) + " »"
+      : "« " + esc(B.nom) + " » ≈ <b>" + fmt2(1 / ratio) + " ×</b> « " + esc(A.nom) + " »";
+    out.innerHTML = '<div class="cmp-squares">' + svg + "</div>" +
+      '<p class="cmp-sentence">' + phrase +
+      ((A.note || B.note) ? ' <span class="cmp-note">(' + esc(A.note || B.note) + ")</span>" : "") +
+      ".</p>";
   }
   const esc = (s) => String(s || "").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
 
@@ -249,7 +318,8 @@
     cmpBtn.classList.toggle("active", !cmpPanel.hidden);
     renderCompare();
   });
-  cmpSel.addEventListener("change", renderCompare);
+  selA.addEventListener("change", renderCompare);
+  selB.addEventListener("change", renderCompare);
 
   /* ---------------- boot ---------------- */
   function boot(DATA) {
