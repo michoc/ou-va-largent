@@ -167,12 +167,12 @@
     const deficit = Math.round(defKids.reduce((s, k) => s + k.value, 0) * 10) / 10;
 
     const pensions = {
-      name: "Pensions versées (405 Md€)",
-      itemStyle: { color: "#C94A6E" },
+      name: "Retraites — pensions versées (405 Md€)",
+      itemStyle: { color: "#C94A6E", gapWidth: 1 },
       upperLabel: { show: true, color: "#FFFFFF" },
       children: [
         { name: "Payées par les cotisations", value: cot,
-          itemStyle: { color: "#7E6BB8" },
+          itemStyle: { color: "#C94A6E" },
           _tip: "269 Md€ de cotisations vieillesse tous régimes, au taux du privé (≈ 2/3 des ressources — COR)." },
         { name: "DÉFICIT de financement (" + fmt(deficit) + " Md€)",
           itemStyle: { color: HATCH_RED, borderColor: ACCENT, borderWidth: 3 },
@@ -243,6 +243,7 @@
   }
   const esc = (s) => String(s || "").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
 
+  cmpBtn.classList.add("active");               // ouvert par défaut
   cmpBtn.addEventListener("click", () => {
     cmpPanel.hidden = !cmpPanel.hidden;
     cmpBtn.classList.toggle("active", !cmpPanel.hidden);
@@ -257,6 +258,7 @@
       '<span class="stat stat-dep"><b>Dépenses</b> ' + fmt(c.depenses_totales) + " Md€</span>" +
       '<span class="stat-year">' + (DATA.meta || {}).exercice + "</span>";
     cur = { name: "Toutes les dépenses publiques", value: c.depenses_totales };
+    renderCompare();                             // comparaison affichée d'emblée
 
     chart.setOption({
       tooltip: {

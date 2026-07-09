@@ -272,6 +272,12 @@ main { max-width: 1220px; margin: 0 auto; padding: 6px 12px 8px; }
 
 /* ---------- comparateur du treemap ---------- */
 .compare-panel[hidden] { display: none; }
+.compare-panel {
+  background: #FFF5F7;
+  border: 1.5px solid var(--accent);
+  border-left-width: 6px;
+}
+.compare-panel h3 { color: var(--accent); font-size: 17px; }
 .report-btn.active { background: var(--accent); color: #fff; }
 .cmp-label { font-size: 13px; font-weight: 600; }
 .cmp-label select {
