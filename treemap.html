@@ -6,11 +6,13 @@
   <title>Le Mondrian des dépenses publiques — Où va l'argent public ? 2025</title>
   <meta name="description" content="Le Mondrian des dépenses publiques françaises 2025 : chaque euro en rectangles proportionnels, le déséquilibre des retraites en évidence, un comparateur d'ordres de grandeur et un switch qui révèle le maquillage comptable.">
   <meta name="author" content="Michael Colla">
-  <meta property="og:image" content="assets/preview-mondrian.svg">
+  <meta property="og:title" content="Le Mondrian des dépenses publiques — 2025">
+  <meta property="og:description" content="Chaque euro en rectangles proportionnels, le déséquilibre des retraites (136 Md€) en évidence, un switch qui révèle le maquillage comptable.">
+  <meta property="og:image" content="https://michoc.github.io/ou-va-largent/assets/og-card.png">
   <link rel="preconnect" href="https://cdnjs.cloudflare.com">
-  <link rel="stylesheet" href="style.css?v=20260710b">
+  <link rel="stylesheet" href="style.css?v=20260711">
 </head>
-<body data-mode="realite">
+<body class="mondrian" data-mode="realite">
   <header class="masthead">
     <div class="masthead-inner">
       <p class="kicker"><a class="home-link" href="index.html">← Accueil</a>
@@ -20,7 +22,8 @@
         Chaque euro dépensé, en <strong>rectangles proportionnels</strong> — une seule fois.
         Cliquez pour <strong>plonger</strong> (jusqu'au programme et à l'action), survolez pour
         isoler un bloc. Le <strong style="color:#C13B55">déséquilibre des retraites</strong>
-        (136&nbsp;Md€, hachures rouges) vit au sein du bloc «&nbsp;Retraites&nbsp;».
+        — 136&nbsp;Md€, hachures rouges — vit au sein du bloc «&nbsp;Retraites&nbsp;»,
+        et l'interrupteur ci-dessous révèle où l'État le camoufle.
       </p>
       <div class="statband" id="statband" aria-label="Total des dépenses"></div>
     </div>
@@ -41,11 +44,11 @@
     </div>
 
     <p class="cas-legend">
-      <button type="button" class="report-btn active" id="compare-btn">⚖ Comparateur</button>
+      <button type="button" class="report-btn" id="compare-btn">⚖ Comparateur</button>
       <span class="legend-more">Cliquez un bloc à n'importe quelle profondeur pour le comparer
       au déséquilibre des retraites ou à d'autres ordres de grandeur.</span></p>
 
-    <aside id="compare-panel" class="histo-card compare-panel" aria-live="polite">
+    <aside id="compare-panel" class="histo-card compare-panel" hidden aria-live="polite">
       <div class="histo-text">
         <h3>⚖ Comparateur</h3>
         <div class="cmp-selects">
@@ -102,14 +105,14 @@
   </dialog>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/echarts/5.5.0/echarts.min.js"></script>
-  <script src="treemap.js?v=20260710b"></script>
+  <script src="treemap.js?v=20260711"></script>
   <script>
     // légende dynamique du switch + dialogue d'explication
     (function () {
       const cap = document.getElementById("mode-caption");
       const texts = {
         realite: "Réalité : administrations nettes, et le bloc « Retraites » affiche ses vrais 405 Md€ (dont 136 de déséquilibre).",
-        officiel: "Présentation officielle : 74 Md€ de retraites sont cachés dans les budgets des ministères (hachures) — les retraites semblent ne coûter que 331 Md€.",
+        officiel: "Présentation officielle : 74 Md€ de retraites sont cachés dans les budgets des ministères (hachures) — les retraites semblent ne coûter que 331 Md€. Plongez dans une famille de ministères pour voir sa part hachurée.",
       };
       function refresh() { cap.textContent = texts[document.body.dataset.mode] || texts.realite; }
       new MutationObserver(refresh).observe(document.body, { attributes: true, attributeFilter: ["data-mode"] });

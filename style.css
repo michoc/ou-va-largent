@@ -359,11 +359,15 @@ main { max-width: 1220px; margin: 0 auto; padding: 6px 12px 8px; }
 }
 .compare-panel h3 { color: var(--accent); font-size: 17px; }
 .report-btn.active { background: var(--accent); color: #fff; }
-.cmp-label { font-size: 13px; font-weight: 600; }
+.cmp-label {
+  font-size: 13px; font-weight: 600;
+  display: flex; align-items: center; min-width: 0; flex: 1 1 240px;
+}
 .cmp-label select {
   font: 400 13px var(--sans);
   margin-left: 6px;
-  max-width: min(420px, 90vw);
+  flex: 1 1 auto; min-width: 0;
+  max-width: min(420px, 100%);
   padding: 5px 8px;
   border: 1px solid var(--rule);
   border-radius: 8px;
@@ -404,6 +408,9 @@ main { max-width: 1220px; margin: 0 auto; padding: 6px 12px 8px; }
 .mode-lbl strong { color: var(--ink); }
 body[data-mode="officiel"] .mode-lbl:first-of-type strong { color: var(--accent); }
 body[data-mode="realite"] .mode-switch .mode-lbl:nth-of-type(2) strong { color: var(--accent); }
+/* le libellé INACTIF s'estompe : lève l'ambiguïté quand le switch se replie */
+body[data-mode="officiel"] .mode-switch .mode-lbl:nth-of-type(2) { opacity: .5; }
+body[data-mode="realite"] .mode-lbl:first-of-type { opacity: .5; }
 .switch { position: relative; display: inline-block; width: 52px; height: 28px; flex: 0 0 auto; }
 .switch input { opacity: 0; width: 0; height: 0; }
 .switch .slider {
@@ -530,4 +537,19 @@ body[data-mode="realite"] .mode-switch .mode-lbl:nth-of-type(2) strong { color: 
 @media (max-width: 720px) {
   #chart { height: 560px; }
   .standfirst { font-size: 14px; }
+}
+
+/* ============ page Mondrian : en-tête compact (le chart doit se voir
+   sans scroller sur un écran de portable) ============ */
+.mondrian .masthead { padding: 22px 20px 14px; }
+.mondrian h1 { font-size: clamp(26px, 3.2vw, 38px); margin-bottom: 6px; }
+.mondrian .standfirst { font-size: 14px; max-width: 940px; }
+.mondrian .statband { margin-top: 10px; padding: 6px 14px; }
+.mondrian .statband .stat { font-size: 13px; }
+
+@media (max-width: 640px) {
+  /* le switch en pile : libellé / interrupteur / libellé, centrés */
+  .mode-switch { flex-direction: column; align-items: center; gap: 4px; text-align: center; }
+  .mode-switch .switch { order: 0; }
+  .mode-caption { text-align: center; }
 }

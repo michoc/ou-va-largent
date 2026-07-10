@@ -113,12 +113,12 @@
     "deficit|epr":
       "Chaque année, le déséquilibre des retraites pourrait financer {n} fois les 6 nouveaux EPR2.",
     "loyers|deficit":
-      "Tous les loyers versés en France représentent {ratio} le déséquilibre des retraites : de quoi " +
-      "en financer environ {mois}.",
+      "Tous les loyers versés en France ({n} fois le déséquilibre des retraites) ne le " +
+      "financeraient que pendant environ {mois}.",
     "deficit|cdg":
       "Une année du déséquilibre des retraites équivaut à {n} porte-avions Charles de Gaulle.",
     "deficit|arnault":
-      "Le déséquilibre annuel des retraites représente {ratio} la fortune de Bernard Arnault.",
+      "Le déséquilibre annuel des retraites représente {n} fois la fortune de Bernard Arnault.",
   };
 
   /* ============ formatage du temps ============ */
@@ -131,6 +131,23 @@
     const sem = mois * 4.345;
     if (sem >= 1.3) return Math.round(sem) + " semaines";
     return Math.round(mois * 30.4) + " jours";
+  }
+
+  /* ============ étiquettes : wrap au mot ============ */
+  // ECharts césure en plein mot (« Administr/ation ») : on replie NOUS-MÊMES
+  // aux espaces (lignes ≤ 13 caractères), l'ellipsis ne gère que le reliquat.
+  function wrapMot(name, max) {
+    max = max || 13;
+    const mots = String(name).split(" ");
+    const lignes = [];
+    let cur = "";
+    mots.forEach((m) => {
+      if (!cur) cur = m;
+      else if ((cur + " " + m).length <= max) cur += " " + m;
+      else { lignes.push(cur); cur = m; }
+    });
+    if (cur) lignes.push(cur);
+    return lignes.join("\n");
   }
 
   /* ============ générateur de phrase (déterministe) ============ */
@@ -151,17 +168,16 @@
       const n = A.md / B.md, invN = B.md / A.md;
       return CURATED[key]
         .replace("{n}", fmt2(n)).replace("{invN}", fmt2(invN))
-        .replace("{ratio}", "× " + fmt2(A.md >= B.md ? A.md / B.md : B.md / A.md))
         .replace("{mois}", fmtTemps(Math.min(A.md, B.md) / Math.max(A.md, B.md) * 12));
     }
     const parts = [];
-    // phrase 1 : le multiple
+    // phrase 1 : le multiple (« X représente N fois Y »)
     if (A.md >= B.md)
-      parts.push("<b>" + esc(cap(A.court || A.nom)) + "</b> " + rep(A.court || A.nom) + " <b>× " +
-                 fmt2(A.md / B.md) + "</b> " + esc(B.court || B.nom) + ".");
+      parts.push("<b>" + esc(cap(A.court || A.nom)) + "</b> " + rep(A.court || A.nom) + " <b>" +
+                 fmt2(A.md / B.md) + " fois</b> " + esc(B.court || B.nom) + ".");
     else
-      parts.push("<b>" + esc(cap(B.court || B.nom)) + "</b> " + rep(B.court || B.nom) + " <b>× " +
-                 fmt2(B.md / A.md) + "</b> " + esc(A.court || A.nom) + ".");
+      parts.push("<b>" + esc(cap(B.court || B.nom)) + "</b> " + rep(B.court || B.nom) + " <b>" +
+                 fmt2(B.md / A.md) + " fois</b> " + esc(A.court || A.nom) + ".");
     // phrase 2 : contexte flux / stock
     const flux = A.flux ? A : (B.flux ? B : null);
     const stock = !A.flux ? A : (!B.flux ? B : null);
@@ -178,7 +194,8 @@
       }
     } else if (A.flux && B.flux) {
       const big = A.md >= B.md ? A : B, small = A.md >= B.md ? B : A;
-      parts.push("Chaque année, " + esc(cap(small.court || small.nom)) + " " + rep(small.court || small.nom) +
+      // pas de cap() après la virgule — le nom reste en minuscule dans la phrase
+      parts.push("Chaque année, " + esc(small.court || small.nom) + " " + rep(small.court || small.nom) +
                  " environ <b>" + fmtTemps(small.md / big.md * 12) + "</b> " +
                  esc(deElide(big.court || big.nom)) + ".");
     }
@@ -201,7 +218,7 @@
       name: n, value: Math.round(grouped[n] * factor * 100) / 100,
       children: kidsOf(DATA, n, factor, color, depth + 1),
       itemStyle: { color: color, colorAlpha: alpha(depth + 1) },
-      upperLabel: { show: true, color: "#FFFFFF" },
+      upperLabel: { show: true, color: "#1E2430" },
       _tip: fmt(grouped[n]) + " Md€ de crédits votés" +
             (factor < 0.999 ? " (net des sommes re-versées aux retraites)." : "."),
     })).sort((a, b) => b.value - a.value);
@@ -229,14 +246,14 @@
         const kids = kidsOf(DATA, fam, factor, nodeColor[fam], 1) || [];
         if (official && vp > 0.01) {
           kids.push({ name: "→ Contributions retraites (CAS Pensions)", value: Math.round(vp * 100) / 100,
-            itemStyle: { color: HATCH_GREY }, _est: true,
+            itemStyle: { color: HATCH_GREY }, label: { color: "#2A2F3A" }, _est: true,
             _tip: "≈ " + fmt(vp) + " Md€ des crédits de cette famille financent en réalité les " +
                   "retraites (contributions employeur au CAS Pensions), présentés ici comme sa dépense propre." });
           kids.sort((a, b) => b.value - a.value);
         }
         familles.push({
           name: fam.replace("É · ", ""), children: kids,
-          itemStyle: { color: nodeColor[fam] }, upperLabel: { show: true, color: "#FFFFFF" },
+          itemStyle: { color: nodeColor[fam] }, upperLabel: { show: true, color: "#1E2430" },
           _tip: fmt(l.value) + " Md€ de crédits votés" +
                 (official ? " (bruts ; part hachurée = ce qui finance en réalité les retraites)."
                           : ", nets des " + fmt(vp) + " Md€ re-versés aux retraites."),
@@ -250,14 +267,14 @@
       .map((l) => ({
         name: l.target, children: kidsOf(DATA, l.target, 1, nodeColor[l.target], 1),
         value: DATA.drill[l.target] ? undefined : l.value,
-        itemStyle: { color: nodeColor[l.target] }, upperLabel: { show: true, color: "#FFFFFF" },
+        itemStyle: { color: nodeColor[l.target] }, upperLabel: { show: true, color: "#1E2430" },
       }));
     if (official && secuTr > 0.01)
       branches.push({ name: "→ Transferts aux retraites", value: Math.round(secuTr * 100) / 100,
-        itemStyle: { color: HATCH_GREY }, _est: true,
+        itemStyle: { color: HATCH_GREY }, label: { color: "#2A2F3A" }, _est: true,
         _tip: "≈ " + fmt(secuTr) + " Md€ de transferts des autres branches vers la vieillesse." });
     const secu = { name: "Sécurité sociale", children: branches,
-      itemStyle: { color: COL.secu }, upperLabel: { show: true, color: "#FFFFFF" },
+      itemStyle: { color: COL.secu }, upperLabel: { show: true, color: "#1E2430" },
       _tip: "Branches maladie, famille, autonomie, AT-MP (hors retraites, présentées à part)." };
 
     // — Collectivités / UE —
@@ -271,9 +288,9 @@
             { name: "Transferts (TVA, dotations)", value: Math.round((ctIn - cnracl) * 100) / 100,
               itemStyle: { color: COL.ct } },
             { name: "→ Retraites (CNRACL)", value: Math.round(cnracl * 100) / 100,
-              itemStyle: { color: HATCH_GREY }, _est: true,
+              itemStyle: { color: HATCH_GREY }, label: { color: "#2A2F3A" }, _est: true,
               _tip: "≈ " + fmt(cnracl) + " Md€ de surcotisations CNRACL des agents territoriaux/hospitaliers." },
-          ], upperLabel: { show: true, color: "#FFFFFF" } }
+          ], upperLabel: { show: true, color: "#1E2430" } }
       : { name: "Collectivités territoriales", value: Math.round((ctIn - cnracl) * 100) / 100,
           itemStyle: { color: COL.ct },
           _tip: "Fractions de TVA + prélèvements sur recettes, nets des surcotisations CNRACL (retraites)." };
@@ -284,7 +301,7 @@
     let retraites;
     if (official) {
       retraites = { name: "Retraites — financées directement (331 Md€)",
-        itemStyle: { color: COL.pens }, upperLabel: { show: true, color: "#FFFFFF" },
+        itemStyle: { color: COL.pens }, upperLabel: { show: true, color: "#1E2430" },
         _tip: "Les retraites coûtent 405 Md€. N'apparaissent ici que les 331 financés « en direct » " +
               "(cotisations, impôts affectés, dette). Les 74 Md€ restants sont logés dans les budgets " +
               "des ministères, de la Sécu et des collectivités (parts hachurées) : le maquillage comptable.",
@@ -295,19 +312,21 @@
             _tip: "CSG-FSV, fractions de TVA et impôts affectés à la vieillesse, déficit résiduel." },
         ] };
     } else {
+      const LBL_RED = { color: "#7E1D33" };      // lisible sur les hachures rose pâle
       const defKids = [];
       defKids.push({ name: "Impôts affectés & dette", value: Math.round(impots * 100) / 100,
-        itemStyle: { color: HATCH_RED }, _tip: "CSG-FSV, TVA et impôts affectés à la vieillesse, dette." });
+        itemStyle: { color: HATCH_RED }, label: LBL_RED,
+        _tip: "CSG-FSV, TVA et impôts affectés à la vieillesse, dette." });
       L.filter((l) => l.target === PENS && l.source.indexOf("É · ") === 0).forEach((l) =>
         defKids.push({ name: l.source.replace("É · ", "Ministères — "), value: l.value,
-          itemStyle: { color: HATCH_RED }, _tip: l.tooltip || "" }));
+          itemStyle: { color: HATCH_RED }, label: LBL_RED, _tip: l.tooltip || "" }));
       defKids.push({ name: "Collectivités (CNRACL)", value: Math.round(cnracl * 100) / 100,
-        itemStyle: { color: HATCH_RED } });
+        itemStyle: { color: HATCH_RED }, label: LBL_RED });
       defKids.push({ name: "Transferts Sécu", value: Math.round(secuTr * 100) / 100,
-        itemStyle: { color: HATCH_RED } });
+        itemStyle: { color: HATCH_RED }, label: LBL_RED });
       const deficit = Math.round(defKids.reduce((s, k) => s + k.value, 0) * 10) / 10;
       retraites = { name: "Retraites — pensions versées (405 Md€)",
-        itemStyle: { color: COL.pens }, upperLabel: { show: true, color: "#FFFFFF" },
+        itemStyle: { color: COL.pens }, upperLabel: { show: true, color: "#1E2430" },
         _tip: "405 Md€ de pensions. Les cotisations (269) n'en couvrent que les deux tiers.",
         children: [
           { name: "Couvert par les cotisations", value: Math.round(cot * 100) / 100,
@@ -315,7 +334,7 @@
             _tip: "269 Md€ de cotisations vieillesse tous régimes (≈ 2/3 des ressources — COR)." },
           { name: "Déséquilibre du système de retraites (" + fmt(deficit) + " Md€)",
             itemStyle: { color: HATCH_RED, borderColor: ACCENT, borderWidth: 3 },
-            upperLabel: { show: true, color: ACCENT },
+            label: { color: "#7E1D33" }, upperLabel: { show: true, color: ACCENT },
             children: defKids.sort((a, b) => b.value - a.value),
             _tip: "L'écart entre cotisations reçues (269) et pensions versées (405) : comblé par les " +
                   "impôts affectés, les subventions d'équilibre des ministères (CAS Pensions), la CNRACL, " +
@@ -325,7 +344,7 @@
 
     return [
       { name: "Ministères de l'État", children: familles, itemStyle: { color: COL.etat },
-        upperLabel: { show: true, color: "#FFFFFF" },
+        upperLabel: { show: true, color: "#1E2430" },
         _tip: "Budget général : familles → missions → programmes → actions (mêmes plongées que le poster)." +
               (official ? " Brut, avec les contributions retraites hachurées." : " Net des re-fléchages retraites.") },
       secu, retraites, ct,
@@ -356,8 +375,10 @@
 
   function resolve(sel) {
     if (sel.value === "CLICK")
-      return cur ? { id: "click", nom: cur.name, court: cur.name, md: cur.value, flux: true,
-                     color: cur.color } : null;
+      // « court » sert dans les phrases : article + guillemets pour la grammaire
+      return cur ? { id: "click", nom: cur.name,
+                     court: cur.court || "le bloc « " + cur.name + " »",
+                     md: cur.value, flux: true, color: cur.color } : null;
     return refById[sel.value];
   }
 
@@ -449,7 +470,8 @@
     document.getElementById("statband").innerHTML =
       '<span class="stat stat-dep"><b>Dépenses</b> ' + fmt(c.depenses_totales) + " Md€</span>" +
       '<span class="stat-year">' + (DATA.meta || {}).exercice + "</span>";
-    cur = { name: "Toutes les dépenses publiques", value: c.depenses_totales, color: "#5C7FB8" };
+    cur = { name: "Ensemble des dépenses publiques", court: "l'ensemble des dépenses publiques",
+            value: c.depenses_totales, color: "#5C7FB8" };
 
     chart.setOption({
       tooltip: {
@@ -464,18 +486,27 @@
         },
       },
       series: [{
-        type: "treemap", data: build(DATA, MODE), leafDepth: 2, roam: false,
+        type: "treemap", name: "Vue d'ensemble", data: build(DATA, MODE), leafDepth: 2, roam: false,
         width: "100%", height: "94%", top: 30,
         animationDurationUpdate: 800, animationEasingUpdate: "cubicInOut",
-        breadcrumb: { show: true, top: 2, left: "center",
-          itemStyle: { color: "#1E2430", textStyle: { color: "#FAF6EF" } } },
-        label: { show: true, formatter: (p) => p.name + "\n" + fmt(p.value) + " Md€",
-          fontSize: 12, fontWeight: 700, overflow: "break" },
-        upperLabel: { show: true, height: 22, fontSize: 12, fontWeight: 700 },
+        breadcrumb: { show: true, top: 2, left: "center", height: 20,
+          itemStyle: { color: "#1E2430", textStyle: { color: "#FAF6EF", fontWeight: 700 } } },
+        // wrap MANUEL au mot (l'overflow d'ECharts césure en plein mot) + « … »
+        label: { show: true, formatter: (p) => wrapMot(p.name) + "\n" + fmt(p.value) + " Md€",
+          fontSize: 12, fontWeight: 700, overflow: "truncate", ellipsis: "…" },
+        // ⚠ l'upperLabel HÉRITE du label : formatter une-ligne explicite sinon
+        // les noms de groupes n'affichent que la 1re ligne du wrap
+        upperLabel: { show: true, height: 22, fontSize: 12, fontWeight: 700, color: "#1E2430",
+          formatter: (p) => p.name, overflow: "truncate", ellipsis: "…" },
         itemStyle: { borderColor: "#FAF6EF", borderWidth: 2, gapWidth: 2 },
         emphasis: { focus: "ancestor" },
+        // ⚠ levels[0] = RACINE VIRTUELLE (pas le 1er niveau de données) :
+        // on y masque le label hérité du nom de série (breadcrumb seulement)
         levels: [
-          { itemStyle: { borderColor: "#FAF6EF", borderWidth: 5, gapWidth: 5 } },
+          { upperLabel: { show: false }, label: { show: false },
+            itemStyle: { borderWidth: 0, gapWidth: 0 } },
+          { itemStyle: { borderColor: "#FAF6EF", borderWidth: 5, gapWidth: 5 },
+            upperLabel: { show: true, color: "#1E2430", fontWeight: 800 } },
           { itemStyle: { borderColor: "#FAF6EF", borderWidth: 2, gapWidth: 2 } },
           { itemStyle: { gapWidth: 1 } },
         ],
@@ -487,6 +518,10 @@
         cur = { name: p.name, value: Array.isArray(p.value) ? p.value[0] : p.value,
                 color: (p.data.itemStyle && p.data.itemStyle.color) || p.color || "#5C7FB8" };
         if (typeof cur.color !== "string") cur.color = "#5C7FB8";   // motif hachuré → couleur neutre
+        if (cmpPanel.hidden) {                 // replié par défaut : le 1er clic l'ouvre
+          cmpPanel.hidden = false;
+          cmpBtn.classList.add("active");
+        }
         renderCompare();
       }
     });

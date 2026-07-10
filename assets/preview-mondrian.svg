@@ -1,4 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 300" width="480" height="300" role="img" aria-label="Aperçu du Mondrian des dépenses">
+  <!-- Composition « safe-zone » : la carte de l'accueil recadre en cover ancré
+       en haut (~ y 0-200 visible en desktop) ; le bloc hachuré 136 Md€ doit y rester. -->
   <defs>
     <pattern id="hred" width="8" height="8" patternTransform="rotate(45)" patternUnits="userSpaceOnUse">
       <rect width="8" height="8" fill="#E8ADBA"/>
@@ -7,27 +9,19 @@
   </defs>
   <rect width="480" height="300" fill="#FAF6EF"/>
   <g stroke="#FAF6EF" stroke-width="4">
-    <!-- Ministères de l'État -->
-    <rect x="6"   y="6"   width="180" height="180" fill="#F09D86"/>
-    <rect x="10"  y="10"  width="110" height="120" fill="#E88A54"/>
-    <rect x="124" y="10"  width="58"  height="70"  fill="#D94F26"/>
-    <rect x="124" y="84"  width="58"  height="46"  fill="#DB6A42"/>
-    <rect x="10"  y="134" width="172" height="48"  fill="#E5A07A"/>
-    <!-- Sécurité sociale -->
-    <rect x="190" y="6"   width="150" height="120" fill="#EE8FB4"/>
-    <rect x="194" y="10"  width="142" height="70"  fill="#E56BA0"/>
-    <rect x="194" y="84"  width="68"  height="38"  fill="#F2A9C4"/>
-    <rect x="266" y="84"  width="70"  height="38"  fill="#EE8FB4"/>
-    <!-- Retraites -->
-    <rect x="190" y="130" width="150" height="164" fill="#C94A6E"/>
-    <rect x="194" y="134" width="142" height="86"  fill="#C94A6E"/>
-    <rect x="194" y="224" width="142" height="66"  fill="url(#hred)" stroke="#C13B55" stroke-width="2"/>
-    <!-- Collectivités + UE -->
-    <rect x="344" y="6"   width="130" height="200" fill="#D9A441"/>
-    <rect x="344" y="210" width="130" height="84"  fill="#A79BC8"/>
-    <rect x="6"   y="190" width="180" height="104" fill="#F09D86"/>
-    <rect x="10"  y="194" width="88"  height="96"  fill="#E88A54"/>
-    <rect x="102" y="194" width="80"  height="96"  fill="#DB6A42"/>
+    <rect x="6"   y="6"   width="144" height="96"  fill="#5C7FB8"/>
+    <rect x="6"   y="106" width="144" height="66"  fill="#D94F26"/>
+    <rect x="6"   y="176" width="70"  height="60"  fill="#E88A54"/>
+    <rect x="80"  y="176" width="70"  height="60"  fill="#DB6A42"/>
+    <rect x="6"   y="240" width="144" height="54"  fill="#E5A07A"/>
+    <rect x="154" y="6"   width="176" height="102" fill="#C94A6E"/>
+    <rect x="154" y="112" width="176" height="80"  fill="url(#hred)" stroke="#C13B55" stroke-width="2.5"/>
+    <rect x="154" y="196" width="176" height="98"  fill="#C94A6E" opacity="0.82"/>
+    <rect x="334" y="6"   width="140" height="118" fill="#EE8FB4"/>
+    <rect x="334" y="128" width="86"  height="64"  fill="#E56BA0"/>
+    <rect x="424" y="128" width="50"  height="64"  fill="#F2A9C4"/>
+    <rect x="334" y="196" width="140" height="64"  fill="#D9A441"/>
+    <rect x="334" y="264" width="140" height="30"  fill="#A79BC8"/>
   </g>
-  <text x="269" y="262" text-anchor="middle" font-family="Helvetica,Arial" font-size="11" font-weight="700" fill="#7E1D33">136 Md€</text>
+  <text x="242" y="157" text-anchor="middle" font-family="Helvetica,Arial" font-size="15" font-weight="800" fill="#7E1D33">136 Md€</text>
 </svg>

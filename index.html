@@ -4,14 +4,14 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Où va l'argent public ? — Les dépenses publiques 2025, deux visions</title>
-  <meta name="description" content="Où va l'argent public français en 2025 ? Deux visualisations interactives des mêmes 1 286 Md€ de dépenses : le flux (Sankey) et le Mondrian. Données open data, sourcées et auditées.">
+  <meta name="description" content="Où va l'argent public français en 2025 ? Deux visualisations interactives des mêmes 1 287 Md€ de dépenses : le flux (Sankey) et le Mondrian. Données open data, sourcées et auditées.">
   <meta name="author" content="Michael Colla">
   <meta property="og:title" content="Où va l'argent public ? — 2025">
-  <meta property="og:description" content="Deux façons de regarder les mêmes 1 286 Md€ de dépenses publiques : le flux (Sankey) et le Mondrian.">
-  <meta property="og:image" content="assets/preview-mondrian.svg">
+  <meta property="og:description" content="Deux façons de regarder les mêmes 1 287 Md€ de dépenses publiques : le flux (Sankey) et le Mondrian.">
+  <meta property="og:image" content="https://michoc.github.io/ou-va-largent/assets/og-card.png">
   <link rel="preconnect" href="https://cdnjs.cloudflare.com">
   <!-- ?v= : cache-busting — incrémenter à chaque déploiement de style/app -->
-  <link rel="stylesheet" href="style.css?v=20260710b">
+  <link rel="stylesheet" href="style.css?v=20260711">
 </head>
 <body class="landing">
   <header class="masthead">
@@ -19,7 +19,7 @@
       <p class="kicker">Les finances publiques françaises · exercice <span id="exercice">2025</span></p>
       <h1><span class="hl">Où va l'argent public&nbsp;?</span></h1>
       <p class="standfirst">
-        <strong>Deux façons</strong> de regarder les mêmes <strong id="tot-dep">1&nbsp;286&nbsp;Md€</strong>
+        <strong>Deux façons</strong> de regarder les mêmes <strong id="tot-dep">1&nbsp;286,7&nbsp;Md€</strong>
         de dépenses publiques&nbsp;: en <strong>flux</strong>, pour suivre chaque euro de sa recette à
         sa destination&nbsp;; en <strong>rectangles</strong>, pour comparer les masses d'un coup d'œil.
         Données open data officielles, sourcées, auditées.
@@ -59,7 +59,7 @@
       </a>
     </div>
 
-    <p class="landing-note">Le diagramme est <strong>comptablement équilibré</strong>&nbsp;:
+    <p class="landing-note">Les deux vues sont <strong>comptablement équilibrées</strong>&nbsp;:
       recettes + dette = dépenses. Méthodologie détaillée et sources sur chaque page.</p>
   </main>
 
@@ -79,7 +79,7 @@
       .then((r) => r.json())
       .then((d) => {
         const c = (d.meta && d.meta.checks) || {};
-        const f0 = (v) => Number(v).toLocaleString("fr-FR", { maximumFractionDigits: 0 });
+        const f0 = (v) => Number(v).toLocaleString("fr-FR", { maximumFractionDigits: 1 });
         document.getElementById("exercice").textContent = (d.meta || {}).exercice || "2025";
         document.getElementById("tot-dep").innerHTML =
           f0(c.depenses_totales).replace(/\s/g, "&nbsp;") + "&nbsp;Md€";
