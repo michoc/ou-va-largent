@@ -5,21 +5,20 @@
  * Sankey (data/unified_finances.json : ministères → familles → missions →
  * programmes → actions, via DATA.drill).
  *
- * DEUX MODES (switch), tous deux additifs (somme ≈ 1 286,7 Md€). L'argent NON
- * CONTRIBUTIF des retraites (136) est un APLAT CRAMOISI #8E1B38 (jamais hachuré :
- * la hachure reste réservée aux « estimations ») :
- *   • « Réalité » (défaut) : administrations NETTES ; les 136 sont REGROUPÉS en
- *     un seul encart cramoisi (= exactement 136, borderWidth 0) dans le bloc
- *     « Retraites — 405 Md€ ».
- *   • « Tel que présenté » : CAMOUFLAGE TOTAL, fidèle aux documents budgétaires —
- *     les 136 sont fondus dans les budgets BRUTS (contribution CAS couleur famille,
- *     transferts Sécu roses, CNRACL ocre, impôts affectés rose pâle) ; le bloc
- *     retraites ne montre que 331 « financés directement ». AUCUN cramoisi statique.
- *   Au BASCULEMENT, une bascule SOBRE en DEUX ÉTAPES (fonction migrate()) :
- *   ① le cramoisi apparaît dans le COIN de chaque bloc hôte (fond immobile) ;
- *   ② les parts CAS quittent les blocs (rétrécissement au net) et le bloc
- *   « Déficit 136 » se crée — animation NATIVE d'ECharts, géographie stable
- *   (sort:false + ordre identique des deux modes).
+ * TROIS PHASES (sélecteur 3 positions), toutes additives (somme ≈ 1 286,7 Md€),
+ * chacune STABLE, lisible et capturable. L'argent NON CONTRIBUTIF des retraites
+ * (136) est un APLAT CRAMOISI #8E1B38 (jamais hachuré : la hachure = estimation) :
+ *   ① « officiel » (tel que présenté) : CAMOUFLAGE TOTAL fidèle aux documents
+ *     budgétaires — budgets BRUTS, les 136 fondus dedans (contribution CAS
+ *     couleur famille, transferts Sécu roses, CNRACL ocre, impôts rose pâle) ;
+ *     le bloc retraites ne montre que 331. AUCUN cramoisi.
+ *   ② « revele » : MÊME forme (mêmes valeurs que ①), mais les parts non
+ *     contributives sont CRAMOISIES à leur place — 3 nœuds recolorés + 7 patchs
+ *     de coin persistants sur les familles (leur CAS est en profondeur 3).
+ *   ③ « realite » (défaut) : budgets NETS ; les 136 REGROUPÉS en un encart
+ *     cramoisi (aire exacte, borderWidth 0) dans « Retraites — 405 Md€ ».
+ *   Passages de phase = animation NATIVE d'ECharts, géographie stable
+ *   (sort:false + ordre identique) ; ①↔② ne bouge pas d'un pixel.
  *
  * COMPARATEUR (⚖) : deux emplacements interchangeables (déficit à gauche par
  * défaut, bloc cliqué à droite) ; carrés d'aires proportionnelles reliés, ratio
@@ -258,20 +257,25 @@
     const nodeColor = {}; DATA.nodes.forEach((n) => (nodeColor[n.name] = n.color));
     const L = DATA.links;
     const sum = (p) => L.filter(p).reduce((s, l) => s + l.value, 0);
-    const official = mode === "officiel";
+    // TROIS PHASES : « officiel » (camouflé) et « revele » partagent la MÊME
+    // structure BRUTE (mêmes valeurs → même layout, la forme du Mondrian ne
+    // change pas entre ① et ②) ; seule la COULEUR des parts non contributives
+    // passe au cramoisi en ②. « realite » = budgets nets + bloc Déficit 136.
+    const official = mode !== "realite";
+    const revealed = mode === "revele";
+    const migColor = (host) => revealed ? DEFICIT : host;
+    const migInk = (host) => revealed ? "#FFFFFF" : inkFor(host);
 
     const versePens = {};
     L.filter((l) => l.target === PENS && l.source.indexOf("É · ") === 0)
       .forEach((l) => (versePens[l.source] = (versePens[l.source] || 0) + l.value));
 
     // — Ministères de l'État —
-    // « Tel que présenté » = CAMOUFLAGE fidèle aux documents budgétaires : chaque
-    // famille est affichée BRUTE, sa contribution CAS logée dedans en enfant de
-    // la MÊME couleur que le budget (indistinguable — c'est le maquillage ; le
-    // nom n'apparaît qu'en plongeant ou en infobulle). AUCUN bloc cramoisi en
-    // statique : le cramoisi n'existe que pendant la chorégraphie de bascule.
-    // « Réalité » = familles NETTES. MIG_SRC = où « vivent » les parts (pour la
-    // révélation/le vol) : bandes ∝ vp/brut dans les familles + 3 nœuds exacts.
+    // ① CAMOUFLAGE fidèle aux documents budgétaires : chaque famille est BRUTE,
+    // sa contribution CAS logée dedans en enfant de la MÊME couleur (le
+    // maquillage). Ses parts visibles en ② = patchs de coin (surcouche, la CAS
+    // des familles est en profondeur 3, invisible à la vue d'ensemble).
+    // ③ familles NETTES. MIG_SRC = où « vivent » les parts : bandes ∝ vp/brut.
     const familles = [];
     const migSrc = [];
     let totalVp = 0;
@@ -283,7 +287,7 @@
         const kids = kidsOf(DATA, fam, factor, nodeColor[fam], 1) || [];
         if (official && vp > 0.01)
           kids.push({ name: "Contribution retraites (CAS Pensions)", value: Math.round(vp * 100) / 100,
-            itemStyle: { color: nodeColor[fam] }, label: { color: inkFor(nodeColor[fam]) }, _est: true,
+            itemStyle: { color: migColor(nodeColor[fam]) }, label: { color: migInk(nodeColor[fam]) }, _est: true,
             _tip: "≈ " + fmt(vp) + " Md€ présentés comme une dépense de cette famille, mais versés " +
                   "au CAS Pensions : ils financent en réalité les retraites." });
         if (vp > 0.01) migSrc.push({ type: "strip", host: court, frac: vp / l.value, value: vp });
@@ -315,9 +319,10 @@
     // camouflé toujours EN DERNIER → sa position ne saute pas au basculement
     branches.sort((a, b) => (b.value || 999) - (a.value || 999));
     if (official && secuTr > 0.01)
-      // camouflé : même rose que la Sécu — comme dans la présentation officielle
+      // ① camouflé (même rose que la Sécu, comme la présentation officielle) ;
+      // ② révélé : cramoisi — même valeur → même place, la forme ne change pas
       branches.push({ name: "Transferts entre branches", value: Math.round(secuTr * 100) / 100,
-        itemStyle: { color: COL.secu }, label: { color: inkFor(COL.secu) }, _est: true,
+        itemStyle: { color: migColor(COL.secu) }, label: { color: migInk(COL.secu) }, _est: true,
         _tip: "≈ " + fmt(secuTr) + " Md€ de transferts des autres branches vers la vieillesse : " +
               "de l'argent Sécu qui finance en réalité les retraites." });
     const secu = { name: "Sécurité sociale", children: branches,
@@ -335,7 +340,8 @@
             { name: "Transferts (TVA, dotations)", value: Math.round((ctIn - cnracl) * 100) / 100,
               itemStyle: { color: COL.ct }, label: { color: inkFor(COL.ct) } },
             { name: "CNRACL", value: Math.round(cnracl * 100) / 100,
-              itemStyle: { color: COL.ct }, label: { color: inkFor(COL.ct), fontSize: 11 }, _est: true,
+              itemStyle: { color: migColor(COL.ct) },
+              label: { color: migInk(COL.ct), fontSize: 11 }, _est: true,
               _tip: "≈ " + fmt(cnracl) + " Md€ de surcotisations retraites (CNRACL) des agents " +
                     "territoriaux et hospitaliers, fondues dans le budget des collectivités." },
           ], upperLabel: { show: true, color: "#1E2430" } }
@@ -363,10 +369,11 @@
         children: [
           { name: "Cotisations", value: Math.round(cot * 100) / 100,
             itemStyle: { color: COL.pens }, label: { color: inkFor(COL.pens) } },
-          // camouflé (rose pâle, comme la présentation) — c'est pourtant de
-          // l'argent NON CONTRIBUTIF : il rejoindra le 136 au basculement.
+          // ① camouflé (rose pâle, comme la présentation) ; ② révélé : cramoisi —
+          // c'est de l'argent NON CONTRIBUTIF, il rejoindra le Déficit 136 en ③.
           { name: "Impôts affectés & dette", value: Math.round(impots * 100) / 100,
-            itemStyle: { color: COL.pens, colorAlpha: 0.7 }, label: { color: inkFor(COL.pens, 0.7) },
+            itemStyle: revealed ? { color: DEFICIT } : { color: COL.pens, colorAlpha: 0.7 },
+            label: { color: revealed ? "#FFFFFF" : inkFor(COL.pens, 0.7) },
             _tip: "CSG-FSV, fractions de TVA et impôts affectés à la vieillesse, dette : non contributif." },
         ] };
     } else {
@@ -510,132 +517,104 @@
     const a = selA.value; selA.value = selB.value; selB.value = a; renderCompare();
   });
 
-  /* ============ switch de mode — bascule sobre en DEUX ÉTAPES ============
-   * (les vols de rectangles et le universalTransition d'ECharts ont été essayés
-   * puis ABANDONNÉS : illisibles sur treemap. Décision commanditaire 2026-07-11.)
-   *   officiel → réalité : ① le cramoisi apparaît dans le COIN de chaque bloc
-   *   hôte (fond immobile) ; ② les parts CAS quittent les blocs — qui
-   *   rétrécissent au net — et le bloc « Déficit 136 » se crée (animation
-   *   native d'ECharts, géographie stable grâce à sort:false).
-   *   réalité → officiel : réabsorption native, puis les coins cramoisis
-   *   affleurent et se camouflent (« voilà où c'est caché »). */
-  const modeToggle = document.getElementById("mode-toggle");
+  /* ============ sélecteur de PHASE (3 positions) ============
+   * TROIS ÉTATS STABLES, chacun lisible et capturable (décision commanditaire
+   * 2026-07-11 ; les transitions animées — vols, chorégraphies — sont ABANDONNÉES) :
+   *   ① « officiel » : budget tel que présenté, camouflage total.
+   *   ② « revele »  : MÊME forme du Mondrian (mêmes valeurs), mais les parts
+   *      non contributives sont CRAMOISIES à leur place — 3 nœuds réels
+   *      recolorés + 7 patchs de coin persistants sur les familles (leur part
+   *      CAS est en profondeur 3, invisible à la vue d'ensemble).
+   *   ③ « realite » : budgets nets + bloc « Déficit des retraites — 136 ».
+   * Le passage d'une phase à l'autre = animation NATIVE d'ECharts (géographie
+   * stable grâce à sort:false ; ①↔② ne bouge même pas d'un pixel). */
   const stageEl = document.getElementById("chart-stage");
-  let migrating = false;
+  const stepBtns = [].slice.call(document.querySelectorAll(".mode-step"));
 
   function layoutsOf(names) {
     const map = {};
     chart.getModel().getSeriesByIndex(0).getData().tree.root.eachNode((n) => {
-      const l = names.indexOf(n.name) !== -1 && n.getLayout();
-      if (l && l.width > 0.5) map[n.name] = { x: l.x, y: l.y, w: l.width, h: l.height };
+      if (names.indexOf(n.name) === -1) return;
+      const l = n.getLayout();
+      if (!l || !(l.width > 0.5)) return;
+      // ⚠ getLayout() est RELATIF AU PARENT : on remonte les ancêtres pour
+      // obtenir la position absolue dans le canvas
+      let x = l.x, y = l.y, p = n.parentNode;
+      while (p) {
+        const pl = p.getLayout && p.getLayout();
+        if (pl) { x += pl.x || 0; y += pl.y || 0; }
+        p = p.parentNode;
+      }
+      map[n.name] = { x: x, y: y, w: l.width, h: l.height };
     });
     return map;
   }
-  // positions des parts non contributives dans le layout OFFICIEL courant :
-  // PATCH DE COIN (bas-droite, aire ∝ vp/brut) dans chaque famille + 3 nœuds rendus
-  function migRects(off) {
+  // PATCHS DE COIN persistants du mode « révélé » : bas-droite de chaque
+  // famille, aire ∝ vp/brut (les 3 nœuds dédiés sont, eux, recolorés en dur)
+  function clearPatches() {
+    [].slice.call(stageEl.querySelectorAll(".mig-ghost")).forEach((g) => g.remove());
+  }
+  function showPatches(fade) {
+    clearPatches();
+    if (MODE !== "revele") return;
+    const off = { x: el.offsetLeft, y: el.offsetTop };
     const strips = MIG_SRC.filter((s) => s.type === "strip");
-    const nodes = MIG_SRC.filter((s) => s.type === "node");
-    const lay = layoutsOf(strips.map((s) => s.host).concat(nodes.map((s) => s.host)));
-    const out = [];
-    strips.forEach((s) => {
+    const lay = layoutsOf(strips.map((s) => s.host));
+    strips.forEach((s, i) => {
       const r = lay[s.host];
       if (!r) return;
       const k = Math.sqrt(s.frac);               // aire du patch = frac × aire du bloc
       const w = r.w * k, h = r.h * k;
-      out.push({ value: s.value,
-        rect: { x: r.x + r.w - w + off.x, y: r.y + r.h - h + off.y, w: w, h: h } });
+      const d = document.createElement("div");
+      d.className = "mig-ghost";
+      d.style.cssText = "position:absolute;z-index:4;pointer-events:none;border-radius:2px;" +
+        "display:flex;align-items:center;justify-content:center;overflow:hidden;" +
+        "box-shadow:0 2px 10px rgba(74,10,26,.30);" +
+        "font:700 11px " + '"Helvetica Neue",Helvetica,Arial,sans-serif' + ";color:#fff;" +
+        "left:" + (r.x + r.w - w + off.x) + "px;top:" + (r.y + r.h - h + off.y) + "px;" +
+        "width:" + w + "px;height:" + h + "px;background:" + DEFICIT + ";";
+      if (w > 42 && h > 20) d.textContent = fmt(s.value);
+      stageEl.appendChild(d);
+      if (fade) {
+        d.style.opacity = "0";
+        d.animate([{ opacity: 0 }, { opacity: 1 }],
+          { duration: 450, delay: i * 50, easing: "ease-out", fill: "forwards" });
+      }
     });
-    nodes.forEach((s) => {
-      const r = lay[s.host];
-      if (r) out.push({ value: s.value, rect: { x: r.x + off.x, y: r.y + off.y, w: r.w, h: r.h } });
-    });
-    return out.sort((a, b) => b.value - a.value);
-  }
-  function mkGhost(r, color, label) {
-    const d = document.createElement("div");
-    d.className = "mig-ghost";
-    d.style.cssText = "position:absolute;z-index:4;pointer-events:none;border-radius:2px;" +
-      "display:flex;align-items:center;justify-content:center;overflow:hidden;" +
-      "box-shadow:0 3px 14px rgba(74,10,26,.35);" +
-      "font:700 11px " + '"Helvetica Neue",Helvetica,Arial,sans-serif' + ";color:#fff;" +
-      "left:" + r.x + "px;top:" + r.y + "px;width:" + r.w + "px;height:" + r.h + "px;" +
-      "background:" + color + ";";
-    if (label && r.w > 42 && r.h > 20) d.textContent = label;
-    stageEl.appendChild(d);
-    return d;
   }
 
-  function migrate(to) {
-    migrating = true;
-    const off = { x: el.offsetLeft, y: el.offsetTop };
-    const ghosts = [];
-    let finished = false;
-    const finish = () => {
-      if (finished) return;
-      finished = true;
-      ghosts.forEach((g) => g.remove());
-      migrating = false;
-    };
-    setTimeout(finish, 5000);                          // garde-fou (onglet en arrière-plan…)
-
-    /* Bascule SOBRE en DEUX ÉTAPES — plus aucun rectangle volant :
-       ① le cramoisi apparaît dans le COIN de chaque bloc hôte (fond immobile) ;
-       ② les parts CAS quittent les blocs (qui rétrécissent au net) et le bloc
-       « Déficit 136 » se crée — animation NATIVE d'ECharts, fiable, la
-       géographie étant stable (sort:false) seules les tailles respirent. */
-    const showCorners = (kf, dur) => migRects(off).map((s, i) => {
-      const f = mkGhost(s.rect, DEFICIT, fmt(s.value));
-      f.style.opacity = "0";
-      f.animate(kf, { duration: dur, delay: i * 60, easing: "ease-in-out", fill: "forwards" });
-      ghosts.push(f);
-      return f;
-    });
-
-    if (to === "realite") {
-      /* ① les sommes cachées se révèlent dans le coin de leurs blocs (0 → 1,6 s) */
-      showCorners([{ opacity: 0 }, { opacity: 1 }], 500);
-      /* ② elles quittent les budgets : blocs → nets, création du bloc 136 (1,6 → 2,6 s) */
-      setTimeout(() => {
-        ghosts.forEach((g) => g.remove());
-        ghosts.length = 0;
-        chart.setOption({ series: [{ data: build(DATA_G, to), animationDurationUpdate: 900 }] });
-        setTimeout(finish, 950);
-      }, 1600);
-    } else {
-      /* ① le bloc 136 disparaît, les budgets réabsorbent leurs parts (0 → 0,9 s) */
-      chart.setOption({ series: [{ data: build(DATA_G, to), animationDurationUpdate: 900 }] });
-      /* ② les coins cramoisis affleurent puis se camouflent : « voilà où c'est
-         caché » (1,0 → 2,9 s) */
-      setTimeout(() => {
-        showCorners([{ opacity: 0 }, { opacity: 1 }, { opacity: 1 }, { opacity: 0 }], 1800);
-        setTimeout(finish, 2400);
-      }, 1000);
-    }
-  }
+  const HASHES = { officiel: "#officiel", revele: "#revele", realite: "#realite" };
 
   function setMode(mode, animate) {
-    if (migrating) { modeToggle.checked = (MODE === "realite"); return; }
-    const changed = mode !== MODE;
     MODE = mode;
     document.body.dataset.mode = mode;
-    // curseur À DROITE (= checked) sur le libellé de droite « …finance les
-    // retraites » = mode réalité ; à gauche « tel que présenté » = officiel.
-    modeToggle.checked = (mode === "realite");
-    history.replaceState(null, "", mode === "officiel" ? "#officiel" : "#realite");
+    stepBtns.forEach((b) => {
+      const on = b.dataset.mode === mode;
+      b.classList.toggle("active", on);
+      b.setAttribute("aria-pressed", on ? "true" : "false");
+    });
+    history.replaceState(null, "", HASHES[mode] || "#realite");
     if (!DATA_G) return;
-    const reduced = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    if (!changed || animate === false || reduced) {
-      chart.setOption({ series: [{ data: build(DATA_G, mode) }] });
-      return;
+    clearPatches();
+    chart.setOption({ series: [{ data: build(DATA_G, mode),
+      animationDurationUpdate: animate === false ? 0 : 800 }] });
+    if (mode === "revele") {
+      // ①→② : mêmes valeurs, layout identique → patchs immédiats ;
+      // ③→② : le layout se réajuste (net → brut) → attendre la fin (800 ms)
+      const wait = (animate === false) ? 30 : 850;
+      setTimeout(() => showPatches(animate !== false), wait);
     }
-    migrate(mode);
   }
-  modeToggle.addEventListener("change", () => setMode(modeToggle.checked ? "realite" : "officiel"));
+  stepBtns.forEach((b) => b.addEventListener("click", () => {
+    if (b.dataset.mode !== MODE) setMode(b.dataset.mode);
+  }));
 
   /* ============ boot ============ */
   function boot(DATA) {
     DATA_G = DATA;
+    // le mode du hash est fixé AVANT le premier rendu (un double setOption au
+    // boot laissait les tuiles à taille zéro) ; setMode ne fera que synchroniser
+    MODE = { "#officiel": "officiel", "#revele": "revele" }[location.hash] || "realite";
     const c = (DATA.meta && DATA.meta.checks) || {};
     document.getElementById("statband").innerHTML =
       '<span class="stat stat-dep"><b>Dépenses</b> ' + fmt(c.depenses_totales) + " Md€</span>" +
@@ -707,7 +686,8 @@
 
     // défaut = « budget tel qu'il finance les retraites » (réalité), sauf hash
     // explicite — sans chorégraphie au chargement (animate: false)
-    setMode(location.hash === "#officiel" ? "officiel" : "realite", false);
+    // synchronise l'UI (boutons, légende, patchs) — MODE déjà fixé avant le rendu
+    setMode(MODE, false);
     renderCompare();
   }
 
@@ -724,5 +704,7 @@
     // le seuil de tuiles visibles dépend du format → on reconstruit au besoin
     if (DATA_G) chart.setOption({ series: [{ visibleMin: isPhone() ? 24 : 8 }] });
     chart.resize();
+    // les patchs du mode « révélé » suivent le nouveau layout
+    if (MODE === "revele") setTimeout(() => showPatches(false), 60);
   });
 })();

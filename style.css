@@ -566,3 +566,32 @@ body[data-mode="realite"] .mode-lbl:first-of-type { opacity: .5; }
   .mode-switch .switch { order: 0; }
   .mode-caption { text-align: center; }
 }
+
+/* ---------- sélecteur de phase à 3 positions (Mondrian) ---------- */
+.mode-steps {
+  display: flex; align-items: stretch; gap: 0; flex-wrap: wrap;
+  border: 1.5px solid var(--ink); border-radius: 999px; overflow: hidden;
+  width: fit-content; background: var(--paper);
+}
+.mode-step {
+  font: 600 13px/1.2 var(--sans); color: var(--ink-soft);
+  background: transparent; border: 0; cursor: pointer;
+  padding: 9px 16px; display: flex; align-items: center; gap: 7px;
+  border-right: 1px solid var(--rule); transition: background .15s, color .15s;
+}
+.mode-step:last-of-type { border-right: 0; }
+.mode-step:hover { background: #F5EFE2; color: var(--ink); }
+.mode-step.active { background: var(--ink); color: #FAF6EF; }
+.mode-step.active .step-n { background: #F5E663; color: var(--ink); }
+.step-n {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 18px; height: 18px; border-radius: 999px; flex: 0 0 auto;
+  background: var(--rule); color: var(--ink); font-weight: 800; font-size: 11px;
+}
+.mode-steps .mode-info { margin: 4px 8px 4px 4px; align-self: center; }
+@media (max-width: 640px) {
+  .mode-steps { width: 100%; border-radius: 14px; }
+  .mode-step { flex: 1 1 100%; border-right: 0; border-bottom: 1px solid var(--rule); justify-content: flex-start; }
+  .mode-steps .mode-info { position: absolute; right: 22px; margin-top: 6px; }
+  .mode-bar { position: relative; }
+}

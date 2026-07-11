@@ -10,7 +10,7 @@
   <meta property="og:description" content="Chaque euro en rectangles proportionnels, le déséquilibre des retraites (136 Md€) en évidence, un switch qui révèle le maquillage comptable.">
   <meta property="og:image" content="https://michoc.github.io/ou-va-largent/assets/og-card.png">
   <link rel="preconnect" href="https://cdnjs.cloudflare.com">
-  <link rel="stylesheet" href="style.css?v=20260711m">
+  <link rel="stylesheet" href="style.css?v=20260711p">
 </head>
 <body class="mondrian" data-mode="realite">
   <header class="masthead">
@@ -20,10 +20,10 @@
       <h1><span class="hl">Le Mondrian des dépenses publiques</span></h1>
       <p class="standfirst">
         Chaque euro dépensé, en <strong>rectangles proportionnels</strong> — une seule fois.
-        Cliquez pour <strong>plonger</strong> (jusqu'au programme et à l'action), survolez pour
-        isoler un bloc. Le <strong style="color:#8E1B38">déséquilibre des retraites</strong>
-        — 136&nbsp;Md€ — forme l'<strong>encart cramoisi</strong> encastré dans le bloc
-        «&nbsp;Retraites&nbsp;», et l'interrupteur ci-dessous révèle où l'État le camoufle.
+        Cliquez pour <strong>plonger</strong> (jusqu'au programme et à l'action). Les
+        <strong>trois lectures</strong> ci-dessous racontent le
+        <strong style="color:#8E1B38">déséquilibre des retraites</strong> (136&nbsp;Md€)&nbsp;:
+        d'abord camouflé dans les budgets, puis révélé en cramoisi, enfin regroupé en un bloc.
       </p>
       <div class="statband" id="statband" aria-label="Total des dépenses"></div>
     </div>
@@ -48,14 +48,14 @@
     </aside>
 
     <div class="mode-bar">
-      <div class="mode-switch">
-        <span class="mode-lbl">Budget <strong>tel que présenté</strong></span>
-        <label class="switch" title="Basculer entre présentation officielle et réalité">
-          <input type="checkbox" id="mode-toggle" checked>
-          <span class="slider"></span>
-        </label>
-        <span class="mode-lbl">Budget <strong>tel qu'il finance les retraites</strong></span>
-        <button type="button" class="mode-info" id="mode-info-btn" aria-label="Comprendre ce réglage">?</button>
+      <div class="mode-steps" role="group" aria-label="Trois lectures du même budget">
+        <button type="button" class="mode-step" data-mode="officiel" aria-pressed="false">
+          <span class="step-n">1</span> Tel que présenté</button>
+        <button type="button" class="mode-step" data-mode="revele" aria-pressed="false">
+          <span class="step-n">2</span> Retraites révélées</button>
+        <button type="button" class="mode-step" data-mode="realite" aria-pressed="false">
+          <span class="step-n">3</span> Le vrai coût</button>
+        <button type="button" class="mode-info" id="mode-info-btn" aria-label="Comprendre ces trois lectures">?</button>
       </div>
       <p class="mode-caption" id="mode-caption"></p>
     </div>
@@ -89,14 +89,15 @@
       supplémentaire (ligne 411050 sur les bulletins de paie des fonctionnaires).
       Le reste du trou est pris dans les impôts, taxes affectées et la dette.</p>
     <ul>
-      <li><strong>Budget tel que présenté</strong> — les 74&nbsp;Md€ sont <strong>invisibles</strong>,
-        fondus dans les budgets bruts des ministères, de la Sécu et des collectivités, exactement
-        comme dans les documents budgétaires : les retraites ne «&nbsp;semblent&nbsp;» coûter que
-        331&nbsp;Md€ en direct.</li>
-      <li><strong>Budget tel qu'il finance les retraites</strong> — on neutralise le maquillage :
-        en basculant, ces sommes <strong style="color:#8E1B38">se révèlent en cramoisi</strong> au
-        sein de chaque budget, puis <strong>le quittent et se regroupent</strong> dans le bloc
-        «&nbsp;Retraites&nbsp;», qui affiche alors ses vrais 405&nbsp;Md€, dont 136 de déséquilibre.</li>
+      <li><strong>① Tel que présenté</strong> — les 136&nbsp;Md€ non contributifs sont
+        <strong>invisibles</strong>, fondus dans les budgets bruts, exactement comme dans les
+        documents budgétaires : les retraites ne «&nbsp;semblent&nbsp;» coûter que 331&nbsp;Md€.</li>
+      <li><strong>② Retraites révélées</strong> — le même budget, la même forme, mais chaque somme
+        qui finance en réalité les retraites <strong style="color:#8E1B38">apparaît en
+        cramoisi</strong>, à sa place, dans son budget d'origine.</li>
+      <li><strong>③ Le vrai coût</strong> — ces sommes quittent les budgets (affichés nets) et
+        forment le bloc <strong style="color:#8E1B38">«&nbsp;Déficit des retraites —
+        136&nbsp;Md€&nbsp;»</strong> ; le bloc Retraites affiche ses vrais 405&nbsp;Md€.</li>
     </ul>
     <div class="report-actions">
       <button type="button" class="crumb report-send" id="mode-dlg-close">Compris</button>
@@ -104,14 +105,15 @@
   </dialog>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/echarts/5.5.0/echarts.min.js"></script>
-  <script src="treemap.js?v=20260711m"></script>
+  <script src="treemap.js?v=20260711p"></script>
   <script>
     // légende dynamique du switch + dialogue d'explication
     (function () {
       const cap = document.getElementById("mode-caption");
       const texts = {
-        realite: "Réalité : les parts cachées ont quitté les budgets (affichés nets) et forment le bloc « Déficit des retraites » — le bloc Retraites montre ses vrais 405 Md€, dont 136 de déséquilibre en cramoisi. Basculez pour les voir retourner se cacher.",
-        officiel: "Présentation officielle : les 136 Md€ non contributifs sont invisibles — fondus dans les budgets bruts, comme dans les documents budgétaires. Les retraites semblent ne coûter que 331 Md€. Basculez : le cramoisi apparaît au coin de chaque bloc, puis s'en extrait pour former le déficit.",
+        officiel: "① Le budget tel que l'État le présente : les 136 Md€ non contributifs des retraites sont fondus dans les budgets bruts — invisibles, comme dans les documents budgétaires. Les retraites semblent ne coûter que 331 Md€.",
+        revele: "② Le même budget, révélé : chaque part cramoisie est une somme qui finance en réalité les retraites, à sa place dans son budget — ministères 51,9 · Sécu 12,9 · collectivités 8,8 · impôts affectés & dette 62,4, soit 136 Md€. La forme du Mondrian n'a pas changé.",
+        realite: "③ Le vrai coût : ces sommes ont quitté les budgets (affichés nets) et forment le bloc « Déficit des retraites — 136 Md€ » ; le bloc Retraites montre ses vrais 405 Md€.",
       };
       function refresh() { cap.textContent = texts[document.body.dataset.mode] || texts.realite; }
       new MutationObserver(refresh).observe(document.body, { attributes: true, attributeFilter: ["data-mode"] });
