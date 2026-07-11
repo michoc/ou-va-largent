@@ -585,6 +585,8 @@
     const off = { x: el.offsetLeft, y: el.offsetTop };
     const strips = MIG_SRC.filter((s) => s.type === "strip");
     const lay = layoutsOf(strips.map((s) => s.host));
+    const phone = isPhone();
+    const fs = phone ? 9.5 : 11, pad = phone ? "0 4px" : "1px 6px", dot = phone ? 8 : 9;
     strips.forEach((s, i) => {
       const r = lay[s.host];
       if (!r) return;
@@ -594,31 +596,35 @@
       const base = "position:absolute;z-index:4;pointer-events:none;background:" + DEFICIT + ";" +
         "color:#fff;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;";
       const pill = base + "border-radius:3px;border:1px solid rgba(250,246,239,.5);" +
-        "box-shadow:0 1px 3px rgba(74,10,26,.22);padding:1px 6px;white-space:nowrap;" +
-        "font:800 11px/1.35 inherit;";
-      // badge DISCRET sur UNE ligne « 24,3 Md€ · 20 % », avec repli progressif
-      // (montant seul → pastille) selon la place réellement disponible dans le coin
-      const contents = [
-        "<b>" + fmt(s.value) + "&nbsp;Md€</b> · " + pct + "&nbsp;%",
-        "<b>" + fmt(s.value) + "&nbsp;Md€</b>",
-      ];
+        "box-shadow:0 1px 3px rgba(74,10,26,.22);padding:" + pad + ";white-space:nowrap;" +
+        "font:800 " + fs + "px/1.3 inherit;";
+      // badge DISCRET en coin bas-droite, avec repli progressif selon la place :
+      // « 24,3 Md€ · 20 % » → « 24,3 Md€ » → pastille. Sur mobile on saute
+      // directement au montant seul (le « % » n'y tient jamais).
+      const contents = phone
+        ? ["<b>" + fmt(s.value) + "</b>"]
+        : ["<b>" + fmt(s.value) + "&nbsp;Md€</b> · " + pct + "&nbsp;%", "<b>" + fmt(s.value) + "&nbsp;Md€</b>"];
       let placed = false;
-      // montants négligeables (< 0,6 Md€) → pastille seule, pour ne pas
-      // encombrer les petits blocs (le détail complet est dans l'infobulle « ? »)
-      if (s.value >= 0.6 && r.w >= 40 && r.h >= 22) {
+      // hauteur estimée de l'étiquette (ancrée en haut) = lignes du nom + ligne
+      // du montant → on ne pose le badge QUE s'il reste de l'espace libre dessous
+      const labelH = (wrapMot(s.host).split("\n").length + 1) * (phone ? 15 : 16) + 8;
+      const room = r.h - labelH - 6;             // espace vertical libre sous l'étiquette
+      // montants négligeables (< 0,6 Md€) → pastille ; sinon badge s'il tient
+      if (s.value >= 0.6 && r.w >= 34) {
         for (let ci = 0; ci < contents.length && !placed; ci++) {
           d.style.cssText = pill; d.innerHTML = contents[ci];
           stageEl.appendChild(d);
-          if (d.offsetWidth <= r.w - 8 && d.offsetHeight <= r.h - 6) placed = true;
+          if (d.offsetWidth <= r.w - 6 && d.offsetHeight <= room) placed = true;
           else stageEl.removeChild(d);
         }
       }
       if (!placed) {                              // pastille : le détail reste en infobulle
-        d.style.cssText = base + "width:9px;height:9px;border-radius:2px;box-shadow:0 1px 3px rgba(74,10,26,.32);";
+        d.style.cssText = base + "width:" + dot + "px;height:" + dot + "px;border-radius:2px;" +
+          "box-shadow:0 1px 3px rgba(74,10,26,.32);";
         d.innerHTML = "";
         stageEl.appendChild(d);
       }
-      const m = 5, bw = d.offsetWidth, bh = d.offsetHeight;
+      const m = phone ? 3 : 5, bw = d.offsetWidth, bh = d.offsetHeight;
       d.style.left = (r.x + r.w - bw - m + off.x) + "px";
       d.style.top = (r.y + r.h - bh - m + off.y) + "px";
       if (fade) {
@@ -700,7 +706,10 @@
           emphasis: { itemStyle: { color: "#F5E663",
             textStyle: { color: "#1E2430" } } } },
         // wrap MANUEL au mot (l'overflow d'ECharts césure en plein mot) + « … »
-        label: { show: true, formatter: (p) => wrapMot(p.name) + "\n" + fmt(p.value) + " Md€",
+        // position 'insideTop' : l'étiquette est ANCRÉE EN HAUT → le coin bas-droite
+        // reste libre pour le badge « part retraites » du mode ② (plus de collision)
+        label: { show: true, position: "insideTop", padding: [4, 0, 0, 0],
+          formatter: (p) => wrapMot(p.name) + "\n" + fmt(p.value) + " Md€",
           fontSize: 12, fontWeight: 700, overflow: "truncate", ellipsis: "…" },
         // ⚠ l'upperLabel HÉRITE du label : formatter une-ligne explicite sinon
         // les noms de groupes n'affichent que la 1re ligne du wrap
