@@ -344,20 +344,25 @@
         "cotisation par : impôts affectés & dette " + fmt(impots) + " · subventions d'équilibre " +
         "des ministères (CAS Pensions) " + fmt(minCAS) + " · CNRACL " + fmt(cnracl) +
         " · transferts Sécu " + fmt(secuTr) + ". Part non contributive.";
-      // gapWidth:0 → les enfants sont FLUSH (pas de liseré crème) : le bloc se lit
-      // comme UN SEUL rectangle de 405 dont la zone rouge (136) est encastrée.
+      // Le déséquilibre = APLAT plein cramoisi (pas de hachure : elle est réservée
+      // aux estimations), ENCASTRÉ comme un encart flottant dans le bloc grâce à
+      // une « douve » de la couleur du bloc (bordure épaisse rose) → il se détache
+      // en carte, tout en restant proportionnel (34 % de 405).
+      const DEFICIT = "#8E1B38";                 // cramoisi profond = « le trou »
+      const moat = isPhone() ? 9 : 22;           // marge qui fait flotter l'encart
       retraites = { name: "Retraites — 405 Md€",
         itemStyle: { color: COL.pens, gapWidth: 0 }, upperLabel: { show: true, color: "#1E2430" },
         _tip: "405 Md€ de pensions versées (tous régimes). Les cotisations n'en couvrent que 269 : " +
-              "il manque 136 Md€ (la zone rouge).",
+              "il manque 136 Md€ (l'encart cramoisi).",
         children: [
           { name: "Financé par les cotisations", value: Math.round(cot * 100) / 100,
             itemStyle: { color: COL.pens, borderColor: COL.pens, borderWidth: 0, gapWidth: 0 },
             label: { color: inkFor(COL.pens) },
             _tip: "269 Md€ de cotisations vieillesse tous régimes (≈ 2/3 des ressources — COR)." },
           { name: "Déséquilibre des retraites", value: deficit,
-            itemStyle: { color: HATCH_RED, borderColor: ACCENT, borderWidth: 3, gapWidth: 0 },
-            label: { color: "#7E1D33", fontWeight: 800 }, _tip: brk },
+            itemStyle: { color: DEFICIT, borderColor: COL.pens, borderWidth: moat, gapWidth: 0,
+              shadowBlur: 10, shadowColor: "rgba(74,10,26,.35)" },
+            label: { color: "#FFFFFF", fontWeight: 800 }, _tip: brk },
         ] };
     }
 
@@ -405,7 +410,8 @@
   const SVG_HATCH = '<defs><pattern id="cmpHatch" width="7" height="7" patternTransform="rotate(45)" ' +
     'patternUnits="userSpaceOnUse"><rect width="7" height="7" fill="#E8ADBA"></rect>' +
     '<line x1="0" y1="0" x2="0" y2="7" stroke="#C13B55" stroke-width="4"></line></pattern></defs>';
-  const fillFor = (it) => it.id === "deficit" ? "url(#cmpHatch)" : (it.color || (it.type === "unite" ? "#E8C9B8" : "#E8C9B8"));
+  // le déficit = aplat cramoisi partout (cohérent avec l'encart du Mondrian)
+  const fillFor = (it) => it.id === "deficit" ? "#8E1B38" : (it.color || "#E8C9B8");
 
   function renderCompare() {
     let A = resolve(selA), B = resolve(selB);
