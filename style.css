@@ -390,6 +390,10 @@ main { max-width: 1220px; margin: 0 auto; padding: 6px 12px 8px; }
 .cmp-sentence { font-size: 15px; line-height: 1.5; margin: 10px 0 0; }
 .cmp-note { color: var(--ink-soft); font-size: 12px; margin: 4px 0 0; }
 .cmp-selects { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+/* comparateur permanent en tête : SVG + phrase côte à côte (compact) sur desktop */
+#compare-body { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 26px; }
+#compare-body .cmp-squares { flex: 0 0 auto; margin: 8px 0 0; }
+#compare-body .cmp-sentence { flex: 1 1 320px; margin: 0; }
 .cmp-swap {
   border: 1px solid var(--accent); background: var(--paper); color: var(--accent);
   border-radius: 999px; width: 30px; height: 30px; cursor: pointer; font-size: 15px;
@@ -492,6 +496,15 @@ body[data-mode="realite"] .mode-lbl:first-of-type { opacity: .5; }
 }
 .metho ul { margin: 10px 0 4px; padding-left: 20px; }
 .metho li { margin-bottom: 6px; }
+.metho h4 {
+  font-family: var(--serif);
+  font-size: 15px;
+  margin: 18px 0 4px;
+  padding-top: 12px;
+  border-top: 1px solid var(--rule);
+  color: var(--accent);
+}
+.metho h4:first-of-type { border-top: 0; padding-top: 4px; margin-top: 8px; }
 .metho .src { font-size: 12px; }
 .credits { margin-top: 14px; font-size: 12px; }
 

@@ -10,7 +10,7 @@
   <meta property="og:description" content="Chaque euro en rectangles proportionnels, le déséquilibre des retraites (136 Md€) en évidence, un switch qui révèle le maquillage comptable.">
   <meta property="og:image" content="https://michoc.github.io/ou-va-largent/assets/og-card.png">
   <link rel="preconnect" href="https://cdnjs.cloudflare.com">
-  <link rel="stylesheet" href="style.css?v=20260711">
+  <link rel="stylesheet" href="style.css?v=20260711b">
 </head>
 <body class="mondrian" data-mode="realite">
   <header class="masthead">
@@ -30,6 +30,23 @@
   </header>
 
   <main>
+    <aside id="compare-panel" class="histo-card compare-panel" aria-live="polite">
+      <div class="histo-text">
+        <h3>⚖ Comparateur d'ordres de grandeur</h3>
+        <div class="cmp-selects">
+          <label class="cmp-label">Comparer&nbsp;:
+            <select id="compare-a"></select></label>
+          <button type="button" class="cmp-swap" id="compare-swap" title="Inverser">⇄</button>
+          <label class="cmp-label">avec&nbsp;:
+            <select id="compare-b"></select></label>
+        </div>
+        <div id="compare-body"></div>
+        <p class="histo-note"><strong>Cliquez un bloc</strong> du Mondrian (à n'importe quelle
+          profondeur) pour le placer dans le comparateur. Aires proportionnelles&nbsp;; ordres de
+          grandeur externes indicatifs (compilation de l'auteur).</p>
+      </div>
+    </aside>
+
     <div class="mode-bar">
       <div class="mode-switch">
         <span class="mode-lbl">Budget <strong>tel que présenté</strong></span>
@@ -42,27 +59,6 @@
       </div>
       <p class="mode-caption" id="mode-caption"></p>
     </div>
-
-    <p class="cas-legend">
-      <button type="button" class="report-btn" id="compare-btn">⚖ Comparateur</button>
-      <span class="legend-more">Cliquez un bloc à n'importe quelle profondeur pour le comparer
-      au déséquilibre des retraites ou à d'autres ordres de grandeur.</span></p>
-
-    <aside id="compare-panel" class="histo-card compare-panel" hidden aria-live="polite">
-      <div class="histo-text">
-        <h3>⚖ Comparateur</h3>
-        <div class="cmp-selects">
-          <label class="cmp-label">Comparer&nbsp;:
-            <select id="compare-a"></select></label>
-          <button type="button" class="cmp-swap" id="compare-swap" title="Inverser">⇄</button>
-          <label class="cmp-label">avec&nbsp;:
-            <select id="compare-b"></select></label>
-        </div>
-        <div id="compare-body"></div>
-        <p class="histo-note">Aires proportionnelles aux montants. Ordres de grandeur externes&nbsp;:
-          indicatifs (compilation de l'auteur).</p>
-      </div>
-    </aside>
 
     <div id="chart-stage">
       <div id="treemap" role="img" aria-label="Mondrian des dépenses publiques françaises 2025"></div>
@@ -105,7 +101,7 @@
   </dialog>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/echarts/5.5.0/echarts.min.js"></script>
-  <script src="treemap.js?v=20260711"></script>
+  <script src="treemap.js?v=20260711b"></script>
   <script>
     // légende dynamique du switch + dialogue d'explication
     (function () {

@@ -24,7 +24,12 @@
   "use strict";
 
   const el = document.getElementById("treemap");
-  el.style.height = Math.max(560, Math.min(880, window.innerHeight * 0.80)) + "px";
+  const isPhone = () => window.innerWidth < 640;
+  // sur mobile : bloc plus haut (aires plus lisibles, moins d'étiquettes tronquées)
+  const stageH = () => isPhone()
+    ? Math.round(Math.min(760, Math.max(560, window.innerHeight * 0.92)))
+    : Math.max(560, Math.min(880, window.innerHeight * 0.80));
+  el.style.height = stageH() + "px";
   const chart = echarts.init(el, null, { renderer: "canvas" });
 
   const fmt = (v) => Number(v).toLocaleString("fr-FR", { maximumFractionDigits: 1 });
@@ -53,6 +58,19 @@
   }
   const HATCH_RED = hatch("#E8ADBA", ACCENT);
   const HATCH_GREY = hatch("#D2D6DE", "#7E8494");
+
+  // couleur d'étiquette LISIBLE sur n'importe quel bloc : on mélange la couleur
+  // (avec son alpha de profondeur) sur le fond crème et on choisit encre sombre
+  // ou blanc selon la luminance perçue. Corrige les blancs illisibles sur les
+  // blocs pâles (profondeurs élevées) et les rouges-sur-rouges.
+  function inkFor(hex, a) {
+    a = a == null ? 1 : a;
+    const bg = [250, 246, 239];
+    const c = [1, 3, 5].map((i) => parseInt(hex.slice(i, i + 2), 16));
+    const L = [0.299, 0.587, 0.114].reduce((s, w, i) =>
+      s + w * (c[i] * a + bg[i] * (1 - a)), 0);
+    return L > 150 ? "#25292F" : "#FFFFFF";
+  }
 
   /* ============ références du comparateur (métadonnées pour les phrases) ====
    * flux:true  = montant ANNUEL (déficit, loyers, budgets…) ; false = STOCK.
@@ -218,6 +236,7 @@
       name: n, value: Math.round(grouped[n] * factor * 100) / 100,
       children: kidsOf(DATA, n, factor, color, depth + 1),
       itemStyle: { color: color, colorAlpha: alpha(depth + 1) },
+      label: { color: inkFor(color, alpha(depth + 1)) },
       upperLabel: { show: true, color: "#1E2430" },
       _tip: fmt(grouped[n]) + " Md€ de crédits votés" +
             (factor < 0.999 ? " (net des sommes re-versées aux retraites)." : "."),
@@ -267,7 +286,8 @@
       .map((l) => ({
         name: l.target, children: kidsOf(DATA, l.target, 1, nodeColor[l.target], 1),
         value: DATA.drill[l.target] ? undefined : l.value,
-        itemStyle: { color: nodeColor[l.target] }, upperLabel: { show: true, color: "#1E2430" },
+        itemStyle: { color: nodeColor[l.target] }, label: { color: inkFor(nodeColor[l.target]) },
+        upperLabel: { show: true, color: "#1E2430" },
       }));
     if (official && secuTr > 0.01)
       branches.push({ name: "→ Transferts aux retraites", value: Math.round(secuTr * 100) / 100,
@@ -286,13 +306,13 @@
           itemStyle: { color: COL.ct },
           children: [
             { name: "Transferts (TVA, dotations)", value: Math.round((ctIn - cnracl) * 100) / 100,
-              itemStyle: { color: COL.ct } },
+              itemStyle: { color: COL.ct }, label: { color: inkFor(COL.ct) } },
             { name: "→ Retraites (CNRACL)", value: Math.round(cnracl * 100) / 100,
               itemStyle: { color: HATCH_GREY }, label: { color: "#2A2F3A" }, _est: true,
               _tip: "≈ " + fmt(cnracl) + " Md€ de surcotisations CNRACL des agents territoriaux/hospitaliers." },
           ], upperLabel: { show: true, color: "#1E2430" } }
       : { name: "Collectivités territoriales", value: Math.round((ctIn - cnracl) * 100) / 100,
-          itemStyle: { color: COL.ct },
+          itemStyle: { color: COL.ct }, label: { color: inkFor(COL.ct) },
           _tip: "Fractions de TVA + prélèvements sur recettes, nets des surcotisations CNRACL (retraites)." };
 
     // — Retraites —
@@ -306,39 +326,35 @@
               "(cotisations, impôts affectés, dette). Les 74 Md€ restants sont logés dans les budgets " +
               "des ministères, de la Sécu et des collectivités (parts hachurées) : le maquillage comptable.",
         children: [
-          { name: "Cotisations", value: Math.round(cot * 100) / 100, itemStyle: { color: COL.pens } },
+          { name: "Cotisations", value: Math.round(cot * 100) / 100,
+            itemStyle: { color: COL.pens }, label: { color: inkFor(COL.pens) } },
           { name: "Impôts affectés & dette", value: Math.round(impots * 100) / 100,
-            itemStyle: { color: COL.pens, colorAlpha: 0.7 },
+            itemStyle: { color: COL.pens, colorAlpha: 0.7 }, label: { color: inkFor(COL.pens, 0.7) },
             _tip: "CSG-FSV, fractions de TVA et impôts affectés à la vieillesse, déficit résiduel." },
         ] };
     } else {
-      const LBL_RED = { color: "#7E1D33" };      // lisible sur les hachures rose pâle
-      const defKids = [];
-      defKids.push({ name: "Impôts affectés & dette", value: Math.round(impots * 100) / 100,
-        itemStyle: { color: HATCH_RED }, label: LBL_RED,
-        _tip: "CSG-FSV, TVA et impôts affectés à la vieillesse, dette." });
-      L.filter((l) => l.target === PENS && l.source.indexOf("É · ") === 0).forEach((l) =>
-        defKids.push({ name: l.source.replace("É · ", "Ministères — "), value: l.value,
-          itemStyle: { color: HATCH_RED }, label: LBL_RED, _tip: l.tooltip || "" }));
-      defKids.push({ name: "Collectivités (CNRACL)", value: Math.round(cnracl * 100) / 100,
-        itemStyle: { color: HATCH_RED }, label: LBL_RED });
-      defKids.push({ name: "Transferts Sécu", value: Math.round(secuTr * 100) / 100,
-        itemStyle: { color: HATCH_RED }, label: LBL_RED });
-      const deficit = Math.round(defKids.reduce((s, k) => s + k.value, 0) * 10) / 10;
-      retraites = { name: "Retraites — pensions versées (405 Md€)",
+      // — bloc RETRAITES : UN SEUL bloc de 405 Md€, dans lequel le DÉSÉQUILIBRE
+      //   (136) est une zone rouge INTÉGRÉE, identifiable et cliquable. Les
+      //   cotisations (269) prennent la couleur du bloc → on lit « 405, dont 136
+      //   en rouge » plutôt que deux rectangles concurrents. Le détail du 136
+      //   passe en infobulle (plus de sous-tuiles rouge-sur-rouge illisibles).
+      const minCAS = sum((l) => l.target === PENS && l.source.indexOf("É · ") === 0);
+      const deficit = Math.round((impots + minCAS + cnracl + secuTr) * 10) / 10;
+      const brk = "Écart entre 269 Md€ de cotisations et 405 Md€ de pensions, comblé sans " +
+        "cotisation par : impôts affectés & dette " + fmt(impots) + " · subventions d'équilibre " +
+        "des ministères (CAS Pensions) " + fmt(minCAS) + " · CNRACL " + fmt(cnracl) +
+        " · transferts Sécu " + fmt(secuTr) + ". Part non contributive.";
+      retraites = { name: "Retraites — 405 Md€",
         itemStyle: { color: COL.pens }, upperLabel: { show: true, color: "#1E2430" },
-        _tip: "405 Md€ de pensions. Les cotisations (269) n'en couvrent que les deux tiers.",
+        _tip: "405 Md€ de pensions versées (tous régimes). Les cotisations n'en couvrent que 269 : " +
+              "il manque 136 Md€ (la zone rouge).",
         children: [
-          { name: "Couvert par les cotisations", value: Math.round(cot * 100) / 100,
-            itemStyle: { color: COL.pens },
+          { name: "Financé par les cotisations", value: Math.round(cot * 100) / 100,
+            itemStyle: { color: COL.pens, borderColor: COL.pens }, label: { color: inkFor(COL.pens) },
             _tip: "269 Md€ de cotisations vieillesse tous régimes (≈ 2/3 des ressources — COR)." },
-          { name: "Déséquilibre du système de retraites (" + fmt(deficit) + " Md€)",
+          { name: "Déséquilibre des retraites", value: deficit,
             itemStyle: { color: HATCH_RED, borderColor: ACCENT, borderWidth: 3 },
-            label: { color: "#7E1D33" }, upperLabel: { show: true, color: ACCENT },
-            children: defKids.sort((a, b) => b.value - a.value),
-            _tip: "L'écart entre cotisations reçues (269) et pensions versées (405) : comblé par les " +
-                  "impôts affectés, les subventions d'équilibre des ministères (CAS Pensions), la CNRACL, " +
-                  "des transferts et la dette. Non contributif." },
+            label: { color: "#7E1D33", fontWeight: 800 }, _tip: brk },
         ] };
     }
 
@@ -348,14 +364,15 @@
         _tip: "Budget général : familles → missions → programmes → actions (mêmes plongées que le poster)." +
               (official ? " Brut, avec les contributions retraites hachurées." : " Net des re-fléchages retraites.") },
       secu, retraites, ct,
-      { name: "Union européenne", value: Math.round(ue * 100) / 100, itemStyle: { color: COL.ue } },
+      { name: "Union européenne", value: Math.round(ue * 100) / 100,
+        itemStyle: { color: COL.ue }, label: { color: inkFor(COL.ue) },
+        _tip: "Prélèvement sur recettes au profit de l'Union européenne." },
     ];
   }
 
-  /* ============ comparateur ============ */
+  /* ============ comparateur (affiché en permanence, en tête de page) ============ */
   let cur = null, DATA_G = null, MODE = "realite";
   const cmpPanel = document.getElementById("compare-panel");
-  const cmpBtn = document.getElementById("compare-btn");
   const selA = document.getElementById("compare-a");
   const selB = document.getElementById("compare-b");
 
@@ -388,7 +405,6 @@
   const fillFor = (it) => it.id === "deficit" ? "url(#cmpHatch)" : (it.color || (it.type === "unite" ? "#E8C9B8" : "#E8C9B8"));
 
   function renderCompare() {
-    if (cmpPanel.hidden) return;
     let A = resolve(selA), B = resolve(selB);
     const out = document.getElementById("compare-body");
     if (!A || !B) { out.innerHTML = '<p class="cmp-sentence">Cliquez un bloc du Mondrian pour le comparer.</p>'; return; }
@@ -438,11 +454,6 @@
       ((A.note || B.note) ? '<p class="cmp-note">' + esc(A.note || B.note) + "</p>" : "");
   }
 
-  cmpBtn.addEventListener("click", () => {
-    cmpPanel.hidden = !cmpPanel.hidden;
-    cmpBtn.classList.toggle("active", !cmpPanel.hidden);
-    renderCompare();
-  });
   selA.addEventListener("change", renderCompare);
   selB.addEventListener("change", renderCompare);
   document.getElementById("compare-swap").addEventListener("click", () => {
@@ -488,6 +499,8 @@
       series: [{
         type: "treemap", name: "Vue d'ensemble", data: build(DATA, MODE), leafDepth: 2, roam: false,
         width: "100%", height: "94%", top: 30,
+        // sur mobile, on masque les tuiles trop petites (étiquettes illisibles)
+        visibleMin: isPhone() ? 24 : 8,
         animationDurationUpdate: 800, animationEasingUpdate: "cubicInOut",
         breadcrumb: { show: true, top: 2, left: "center", height: 20,
           itemStyle: { color: "#1E2430", textStyle: { color: "#FAF6EF", fontWeight: 700 } } },
@@ -518,15 +531,12 @@
         cur = { name: p.name, value: Array.isArray(p.value) ? p.value[0] : p.value,
                 color: (p.data.itemStyle && p.data.itemStyle.color) || p.color || "#5C7FB8" };
         if (typeof cur.color !== "string") cur.color = "#5C7FB8";   // motif hachuré → couleur neutre
-        if (cmpPanel.hidden) {                 // replié par défaut : le 1er clic l'ouvre
-          cmpPanel.hidden = false;
-          cmpBtn.classList.add("active");
-        }
         renderCompare();
       }
     });
 
-    setMode(location.hash === "#officiel" ? "officiel" : "realite", false);
+    // défaut = « budget tel qu'il finance les retraites » (réalité), sauf hash explicite
+    setMode(location.hash === "#officiel" ? "officiel" : "realite");
     renderCompare();
   }
 
@@ -538,5 +548,10 @@
         "Impossible de charger les données (" + err.message + ").</p>";
     });
 
-  window.addEventListener("resize", () => chart.resize());
+  window.addEventListener("resize", () => {
+    el.style.height = stageH() + "px";
+    // le seuil de tuiles visibles dépend du format → on reconstruit au besoin
+    if (DATA_G) chart.setOption({ series: [{ visibleMin: isPhone() ? 24 : 8 }] });
+    chart.resize();
+  });
 })();

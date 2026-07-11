@@ -690,8 +690,13 @@
       new Date(meta.generated_at).toLocaleDateString("fr-FR");
     const c = meta.checks || {};
     const src = meta.sources || {};
-    const caveats = (meta.caveats || []).map((x) => "<li>" + esc(x) + "</li>").join("");
+    // le caveat « parts retraites des flux (gris/hachures) » fait doublon avec la
+    // section CAS Pensions ci-dessous → on l'écarte de la liste Périmètre.
+    const caveats = (meta.caveats || [])
+      .filter((x) => !/parts retraites des flux/i.test(x))
+      .map((x) => "<li>" + esc(x) + "</li>").join("");
     document.getElementById("metho-body").innerHTML =
+      "<h4>Périmètre &amp; choix de méthode</h4>" +
       "<ul>" + caveats + "</ul>" +
       "<h4>Le CAS Pensions — la « subvention d'équilibre » cachée dans le budget des ministères</h4>" +
       "<p>Le <strong>compte d'affectation spéciale « Pensions »</strong> (créé par la LOLF, en " +
@@ -708,18 +713,22 @@
       "ministère</strong>&nbsp;: ce n'est <strong>ni une augmentation du salaire des " +
       "fonctionnaires, ni une ouverture de droits supplémentaires</strong> — la retenue payée " +
       "par l'agent (11,10&nbsp;%) est, elle, alignée sur le privé depuis la réforme de 2010.</p>" +
-      "<p>Dans le diagramme&nbsp;: <strong>gris uni</strong> = contribution directe versée au " +
-      "CAS Pensions (catégorie 22 des crédits votés, calibrée sur les recettes réelles du " +
-      "CAS — donnée sourcée)&nbsp;; <strong>hachures</strong> = contribution des " +
-      "<strong>opérateurs</strong> financés par la mission (universités, CNRS, musées… — leurs " +
-      "établissements versent ≈ 5,9&nbsp;Md€/an au CAS, ligne réelle de recettes, répartie ici " +
-      "au prorata des subventions pour charges de service public&nbsp;: une estimation). La " +
-      "<strong>voie retraites</strong> de la vue d'ensemble ne re-flèche vers les pensions que " +
-      "la part <strong>au-delà du taux du privé</strong> (39,5&nbsp;Md€ + opérateurs 4,6 en " +
-      "2025), pour ne compter chaque euro qu'une fois.</p>" +
-      "<p><strong>Contrôle d'équilibre</strong> (axiome n°2)&nbsp;: recettes hors dette " +
-      fmt(c.recettes_hors_dette) + " + émission de dette " + fmt(c.dette) +
-      " = dépenses totales " + fmt(c.depenses_totales) + ".</p>" +
+      "<h4>Comment lire les parts « retraites » des flux</h4>" +
+      "<p><strong>Gris uni</strong> = contribution directe versée au CAS Pensions (catégorie 22 " +
+      "des crédits votés, calibrée sur les recettes réelles du CAS — <strong>donnée sourcée</strong>). " +
+      "<strong>Hachures</strong> = contribution des <strong>opérateurs</strong> financés par la " +
+      "mission (universités, CNRS, musées… — leurs établissements versent ≈ 5,9&nbsp;Md€/an au CAS, " +
+      "ligne réelle de recettes, répartie au prorata des subventions pour charges de service " +
+      "public&nbsp;: une <strong>estimation</strong>).</p>" +
+      "<p>Pour ne compter chaque euro qu'une fois, la <strong>voie retraites</strong> de la vue " +
+      "d'ensemble ne re-flèche vers les pensions que la part <strong>au-delà du taux du privé</strong> " +
+      "(39,5&nbsp;Md€ pour l'État + 4,6 pour les opérateurs en 2025)&nbsp;: les contributions déjà " +
+      "comptées dans les crédits des ministères, la CNRACL (collectivités) et les transferts de " +
+      "branches (Sécu) ne sont pas ajoutées au total du bandeau.</p>" +
+      "<h4>Contrôle d'équilibre</h4>" +
+      "<p>Axiome fondateur&nbsp;: recettes hors dette <strong>" + fmt(c.recettes_hors_dette) +
+      "&nbsp;Md€</strong> + émission de dette <strong>" + fmt(c.dette) +
+      "&nbsp;Md€</strong> = dépenses totales <strong>" + fmt(c.depenses_totales) + "&nbsp;Md€</strong>.</p>" +
       '<p class="src"><strong>Sources</strong> — État&nbsp;: ' + esc(src.etat_depenses || "") +
       "&nbsp;· Recettes&nbsp;: " + esc(src.etat_recettes || "") +
       "&nbsp;· Sécu&nbsp;: " + esc(src.secu || "") +
