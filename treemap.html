@@ -10,7 +10,7 @@
   <meta property="og:description" content="Chaque euro en rectangles proportionnels, le déséquilibre des retraites (136 Md€) en évidence, un switch qui révèle le maquillage comptable.">
   <meta property="og:image" content="https://michoc.github.io/ou-va-largent/assets/og-card.png">
   <link rel="preconnect" href="https://cdnjs.cloudflare.com">
-  <link rel="stylesheet" href="style.css?v=20260711k">
+  <link rel="stylesheet" href="style.css?v=20260711m">
 </head>
 <body class="mondrian" data-mode="realite">
   <header class="masthead">
@@ -104,14 +104,14 @@
   </dialog>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/echarts/5.5.0/echarts.min.js"></script>
-  <script src="treemap.js?v=20260711k"></script>
+  <script src="treemap.js?v=20260711m"></script>
   <script>
     // légende dynamique du switch + dialogue d'explication
     (function () {
       const cap = document.getElementById("mode-caption");
       const texts = {
-        realite: "Réalité : administrations nettes ; l'argent non contributif s'est révélé puis regroupé dans le bloc « Retraites », qui affiche ses vrais 405 Md€ (dont 136 de déséquilibre en cramoisi). Basculez pour le voir retourner se cacher.",
-        officiel: "Présentation officielle : les 136 Md€ non contributifs sont invisibles — fondus dans les budgets bruts des ministères, de la Sécu, des collectivités et dans les impôts affectés, comme dans les documents budgétaires. Les retraites semblent ne coûter que 331 Md€. Basculez : ils se révèlent et migrent former le déficit.",
+        realite: "Réalité : les parts cachées ont quitté les budgets (affichés nets) et forment le bloc « Déficit des retraites » — le bloc Retraites montre ses vrais 405 Md€, dont 136 de déséquilibre en cramoisi. Basculez pour les voir retourner se cacher.",
+        officiel: "Présentation officielle : les 136 Md€ non contributifs sont invisibles — fondus dans les budgets bruts, comme dans les documents budgétaires. Les retraites semblent ne coûter que 331 Md€. Basculez : le cramoisi apparaît au coin de chaque bloc, puis s'en extrait pour former le déficit.",
       };
       function refresh() { cap.textContent = texts[document.body.dataset.mode] || texts.realite; }
       new MutationObserver(refresh).observe(document.body, { attributes: true, attributeFilter: ["data-mode"] });

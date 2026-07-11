@@ -11,16 +11,15 @@
  *   • « Réalité » (défaut) : administrations NETTES ; les 136 sont REGROUPÉS en
  *     un seul encart cramoisi (= exactement 136, borderWidth 0) dans le bloc
  *     « Retraites — 405 Md€ ».
- *   • « Tel que présenté » : les 136 sont DISPERSÉS en 4 blocs cramoisis logés
- *     dans les administrations (Ministères 51,9 = CAS Pensions agrégé · Sécu 12,9
- *     · Collectivités 8,8 = CNRACL · Impôts & dette 62,4) ; le bloc retraites ne
- *     montre alors que 331 « financés directement ».
- *   Au BASCULEMENT, une CHORÉGRAPHIE en 2 temps (fonction migrate(), surcouche de
- *   divs animées via Web Animations API — le `universalTransition` d'ECharts a été
- *   essayé puis retiré : il faisait dérailler les petits blocs sur treemap) :
- *   ① révélation : chaque part « devient cramoisie » DANS son bloc (voile couleur
- *   du budget hôte qui s'estompe) ; ② vol : les 4 rectangles quittent leurs blocs
- *   et se fondent dans l'encart 136 (et inversement : scission puis dispersion).
+ *   • « Tel que présenté » : CAMOUFLAGE TOTAL, fidèle aux documents budgétaires —
+ *     les 136 sont fondus dans les budgets BRUTS (contribution CAS couleur famille,
+ *     transferts Sécu roses, CNRACL ocre, impôts affectés rose pâle) ; le bloc
+ *     retraites ne montre que 331 « financés directement ». AUCUN cramoisi statique.
+ *   Au BASCULEMENT, une bascule SOBRE en DEUX ÉTAPES (fonction migrate()) :
+ *   ① le cramoisi apparaît dans le COIN de chaque bloc hôte (fond immobile) ;
+ *   ② les parts CAS quittent les blocs (rétrécissement au net) et le bloc
+ *   « Déficit 136 » se crée — animation NATIVE d'ECharts, géographie stable
+ *   (sort:false + ordre identique des deux modes).
  *
  * COMPARATEUR (⚖) : deux emplacements interchangeables (déficit à gauche par
  * défaut, bloc cliqué à droite) ; carrés d'aires proportionnelles reliés, ratio
@@ -251,22 +250,15 @@
     })).sort((a, b) => b.value - a.value);
   }
 
-  // valeurs des 4 parts migrantes (remplies par build, servent à découper
-  // l'encart lors de la dispersion) + teinte « fantôme » pendant le vol
+  // où « vivent » les parts non contributives dans le layout officiel
+  // (remplies par build : 7 bandes ∝ vp/brut + 3 nœuds, somme = 136)
   let MIG_SRC = [];
-  const PALE = "#DCB4BF";
 
-  function build(DATA, mode, opts) {
-    opts = opts || {};
-    const ghost = !!opts.ghost;                 // cible(s) estompée(s) pendant le vol
+  function build(DATA, mode) {
     const nodeColor = {}; DATA.nodes.forEach((n) => (nodeColor[n.name] = n.color));
     const L = DATA.links;
     const sum = (p) => L.filter(p).reduce((s, l) => s + l.value, 0);
     const official = mode === "officiel";
-    // pendant le vol de regroupement, l'ENCART cible du nouveau layout est
-    // estompé (couleur pâle, sans étiquette) puis révélé à l'arrivée des flyers
-    const migColor = ghost ? PALE : DEFICIT;
-    const migLabel = (extra) => ghost ? { show: false } : Object.assign({ color: "#FFFFFF" }, extra || {});
 
     const versePens = {};
     L.filter((l) => l.target === PENS && l.source.indexOf("É · ") === 0)
@@ -402,9 +394,9 @@
             label: { color: inkFor(COL.pens) },
             _tip: "269 Md€ de cotisations vieillesse tous régimes (≈ 2/3 des ressources — COR)." },
           { name: "Déséquilibre des retraites", value: deficit,
-            itemStyle: { color: migColor, borderColor: migColor, borderWidth: 0, gapWidth: 0,
-              shadowBlur: ghost ? 0 : 12, shadowColor: "rgba(74,10,26,.40)" },
-            label: migLabel({ fontWeight: 800 }), _tip: brk },
+            itemStyle: { color: DEFICIT, borderColor: DEFICIT, borderWidth: 0, gapWidth: 0,
+              shadowBlur: 12, shadowColor: "rgba(74,10,26,.40)" },
+            label: { color: "#FFFFFF", fontWeight: 800 }, _tip: brk },
         ] };
     }
 
@@ -518,18 +510,18 @@
     const a = selA.value; selA.value = selB.value; selB.value = a; renderCompare();
   });
 
-  /* ============ switch de mode + chorégraphie de migration ============
-   * Bascule en DEUX TEMPS (surcouche de divs animées — le morphing auto
-   * d'ECharts déraille sur treemap) :
-   *   officiel → réalité : ① chaque part « devient cramoisie » DANS son bloc
-   *   (un voile couleur du budget hôte s'estompe) ; ② les 4 rectangles QUITTENT
-   *   leurs blocs et volent se fondre dans l'encart 136.
-   *   réalité → officiel : l'encart se scinde en 4 et vole vers les budgets. */
+  /* ============ switch de mode — bascule sobre en DEUX ÉTAPES ============
+   * (les vols de rectangles et le universalTransition d'ECharts ont été essayés
+   * puis ABANDONNÉS : illisibles sur treemap. Décision commanditaire 2026-07-11.)
+   *   officiel → réalité : ① le cramoisi apparaît dans le COIN de chaque bloc
+   *   hôte (fond immobile) ; ② les parts CAS quittent les blocs — qui
+   *   rétrécissent au net — et le bloc « Déficit 136 » se crée (animation
+   *   native d'ECharts, géographie stable grâce à sort:false).
+   *   réalité → officiel : réabsorption native, puis les coins cramoisis
+   *   affleurent et se camouflent (« voilà où c'est caché »). */
   const modeToggle = document.getElementById("mode-toggle");
   const stageEl = document.getElementById("chart-stage");
   let migrating = false;
-
-  const MIG_TARGET = "Déséquilibre des retraites";
 
   function layoutsOf(names) {
     const map = {};
@@ -540,7 +532,7 @@
     return map;
   }
   // positions des parts non contributives dans le layout OFFICIEL courant :
-  // bandes verticales à droite des familles (∝ vp/brut) + 3 nœuds rendus
+  // PATCH DE COIN (bas-droite, aire ∝ vp/brut) dans chaque famille + 3 nœuds rendus
   function migRects(off) {
     const strips = MIG_SRC.filter((s) => s.type === "strip");
     const nodes = MIG_SRC.filter((s) => s.type === "node");
@@ -548,8 +540,11 @@
     const out = [];
     strips.forEach((s) => {
       const r = lay[s.host];
-      if (r) out.push({ value: s.value,
-        rect: { x: r.x + r.w * (1 - s.frac) + off.x, y: r.y + off.y, w: r.w * s.frac, h: r.h } });
+      if (!r) return;
+      const k = Math.sqrt(s.frac);               // aire du patch = frac × aire du bloc
+      const w = r.w * k, h = r.h * k;
+      out.push({ value: s.value,
+        rect: { x: r.x + r.w - w + off.x, y: r.y + r.h - h + off.y, w: w, h: h } });
     });
     nodes.forEach((s) => {
       const r = lay[s.host];
@@ -570,7 +565,6 @@
     stageEl.appendChild(d);
     return d;
   }
-  const rectOf = (l, off) => ({ x: l.x + off.x, y: l.y + off.y, w: l.w, h: l.h });
 
   function migrate(to) {
     migrating = true;
@@ -581,90 +575,42 @@
       if (finished) return;
       finished = true;
       ghosts.forEach((g) => g.remove());
-      chart.setOption({ series: [{ data: build(DATA_G, to), animationDurationUpdate: 350 }] });
       migrating = false;
     };
-    setTimeout(finish, 7000);                          // garde-fou (onglet en arrière-plan…)
-    const css = (r) => ({ left: r.x + "px", top: r.y + "px", width: r.w + "px", height: r.h + "px" });
-    const curRect = (f) => ({ x: f.offsetLeft, y: f.offsetTop, w: f.offsetWidth, h: f.offsetHeight });
-    const FLY = { duration: 1100, easing: "cubic-bezier(.5,.05,.25,1)", fill: "forwards" };
+    setTimeout(finish, 5000);                          // garde-fou (onglet en arrière-plan…)
 
-    /* Chorégraphie STRICTEMENT SÉQUENTIELLE (~4,5-5 s, budget accordé) : à tout
-       instant, SOIT le fond bouge, SOIT les rectangles volent — jamais les deux.
-       La géographie étant stabilisée (sort:false), l'ajustement du fond n'est
-       plus qu'une respiration de tailles. */
+    /* Bascule SOBRE en DEUX ÉTAPES — plus aucun rectangle volant :
+       ① le cramoisi apparaît dans le COIN de chaque bloc hôte (fond immobile) ;
+       ② les parts CAS quittent les blocs (qui rétrécissent au net) et le bloc
+       « Déficit 136 » se crée — animation NATIVE d'ECharts, fiable, la
+       géographie étant stable (sort:false) seules les tailles respirent. */
+    const showCorners = (kf, dur) => migRects(off).map((s, i) => {
+      const f = mkGhost(s.rect, DEFICIT, fmt(s.value));
+      f.style.opacity = "0";
+      f.animate(kf, { duration: dur, delay: i * 60, easing: "ease-in-out", fill: "forwards" });
+      ghosts.push(f);
+      return f;
+    });
 
     if (to === "realite") {
-      /* ① RÉVÉLATION (0→1,5 s) : fond officiel IMMOBILE, les sommes cachées
-         apparaissent en cramoisi dans leurs budgets, l'une après l'autre */
-      const flyers = migRects(off).map((s, i) => {
-        const f = mkGhost(s.rect, DEFICIT, fmt(s.value));
-        f.style.opacity = "0";
-        f.animate([{ opacity: 0 }, { opacity: 1 }],
-          { duration: 700, delay: i * 90, easing: "ease-out", fill: "forwards" });
-        ghosts.push(f);
-        return f;
-      });
-      /* ② PAUSE de lecture (1,5→2,0 s), puis le FOND s'ajuste SEUL (2,0→2,7 s) :
-         budgets bruts → nets, l'encart cible apparaît en pâle. Les rectangles
-         cramoisis restent immobiles, détachés, au-dessus. */
+      /* ① les sommes cachées se révèlent dans le coin de leurs blocs (0 → 1,6 s) */
+      showCorners([{ opacity: 0 }, { opacity: 1 }], 500);
+      /* ② elles quittent les budgets : blocs → nets, création du bloc 136 (1,6 → 2,6 s) */
       setTimeout(() => {
-        chart.setOption({ series: [{ data: build(DATA_G, to, { ghost: true }), animationDurationUpdate: 650 }] });
-      }, 2000);
-      /* ③ VOL (2,8→4,6 s) : fond désormais STABLE, les rectangles convergent
-         un à un vers l'encart et s'y fondent */
-      setTimeout(() => {
-        const t = layoutsOf([MIG_TARGET])[MIG_TARGET];
-        if (!t) { finish(); return; }
-        const dst = css(rectOf(t, off));
-        let done = 0;
-        flyers.forEach((f, i) => {
-          const a = f.animate([css(curRect(f)), dst], Object.assign({ delay: i * 80 }, FLY));
-          a.onfinish = () => { if (++done === flyers.length) finish(); };
-        });
-      }, 2800);
+        ghosts.forEach((g) => g.remove());
+        ghosts.length = 0;
+        chart.setOption({ series: [{ data: build(DATA_G, to), animationDurationUpdate: 900 }] });
+        setTimeout(finish, 950);
+      }, 1600);
     } else {
-      /* ---- sens inverse : SCISSION, ajustement du fond, DISPERSION, CAMOUFLAGE ---- */
-      const t = layoutsOf([MIG_TARGET])[MIG_TARGET];
-      if (!t) { finish(); return; }
-      // détail des parts (build(officiel) remplit MIG_SRC) — data réutilisée en ②
-      const officialData = build(DATA_G, to);
-      const parts = MIG_SRC.slice().sort((a, b) => b.value - a.value);
-      const total = parts.reduce((s, p) => s + p.value, 0) || 1;
-      /* ① SCISSION (0→0,6 s) : l'encart se découpe en bandes ∝ (liserés qui
-         apparaissent), fond immobile */
-      const flyers = [];
-      let cx = t.x + off.x;
-      parts.forEach((p) => {
-        const w = Math.max(2, (t.w * p.value) / total);
-        const f = mkGhost({ x: cx, y: t.y + off.y, w: w, h: t.h }, DEFICIT, fmt(p.value));
-        f.style.boxShadow = "inset 1px 0 0 rgba(250,246,239,.55)";   // liseré de découpe
-        ghosts.push(f); flyers.push(f);
-        cx += w;
-      });
-      /* ② le FOND s'ajuste SEUL (0,6→1,3 s) : budgets nets → bruts (camouflés),
-         les bandes restent immobiles au-dessus */
+      /* ① le bloc 136 disparaît, les budgets réabsorbent leurs parts (0 → 0,9 s) */
+      chart.setOption({ series: [{ data: build(DATA_G, to), animationDurationUpdate: 900 }] });
+      /* ② les coins cramoisis affleurent puis se camouflent : « voilà où c'est
+         caché » (1,0 → 2,9 s) */
       setTimeout(() => {
-        chart.setOption({ series: [{ data: officialData, animationDurationUpdate: 650 }] });
-      }, 600);
-      /* ③ DISPERSION (1,4→3,3 s) : fond STABLE, chaque bande vole vers son
-         budget puis s'y CAMOUFLE (fondu de disparition) */
-      setTimeout(() => {
-        const dsts = migRects(off);                    // triées par valeur, comme parts
-        let done = 0, count = 0;
-        dsts.forEach((d, i) => {
-          const f = flyers[i];
-          if (!f) return;
-          count++;
-          const a = f.animate([css(curRect(f)), css(d.rect)], Object.assign({ delay: i * 80 }, FLY));
-          a.onfinish = () => {
-            const fade = f.animate([{ opacity: 1 }, { opacity: 0 }],
-              { duration: 500, easing: "ease-in", fill: "forwards" });
-            fade.onfinish = () => { if (++done === count) finish(); };
-          };
-        });
-        if (!count) finish();
-      }, 1400);
+        showCorners([{ opacity: 0 }, { opacity: 1 }, { opacity: 1 }, { opacity: 0 }], 1800);
+        setTimeout(finish, 2400);
+      }, 1000);
     }
   }
 
