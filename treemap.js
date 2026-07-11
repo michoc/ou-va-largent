@@ -5,15 +5,19 @@
  * Sankey (data/unified_finances.json : ministères → familles → missions →
  * programmes → actions, via DATA.drill).
  *
- * DEUX MODES (switch), tous deux additifs (somme = 1 286,7 Md€) :
- *   • « Réalité » (défaut) : administrations NETTES de ce qu'elles re-versent
- *     aux retraites ; bloc « Retraites — 405 Md€ » avec, à l'intérieur, le
- *     « Déséquilibre du système de retraites (136 Md€) » en HACHURES ROUGES.
- *   • « Tel que présenté » : administrations BRUTES (les contributions
- *     retraites — CAS Pensions, CNRACL, transferts — apparaissent HACHURÉES à
- *     l'intérieur de leurs budgets) ; le bloc retraites ne montre alors que
- *     331,4 Md€ « financés directement ». Le basculement fait migrer 73,6 Md€
- *     des administrations vers les retraites → révèle le maquillage comptable.
+ * DEUX MODES (switch), tous deux additifs (somme ≈ 1 286,7 Md€). L'argent NON
+ * CONTRIBUTIF des retraites (136) est un APLAT CRAMOISI #8E1B38 (jamais hachuré :
+ * la hachure reste réservée aux « estimations ») :
+ *   • « Réalité » (défaut) : administrations NETTES ; les 136 sont REGROUPÉS en
+ *     un seul encart cramoisi (= exactement 136, borderWidth 0) dans le bloc
+ *     « Retraites — 405 Md€ ».
+ *   • « Tel que présenté » : les 136 sont DISPERSÉS en 4 blocs cramoisis logés
+ *     dans les administrations (Ministères 51,9 = CAS Pensions agrégé · Sécu 12,9
+ *     · Collectivités 8,8 = CNRACL · Impôts & dette 62,4) ; le bloc retraites ne
+ *     montre alors que 331 « financés directement ».
+ *   Au BASCULEMENT, ces 4 blocs cramoisis (groupId « deficit-origin ») FUSIONNENT
+ *   dans l'encart 136 via `universalTransition` → on VOIT le trou quitter les
+ *   budgets et se regrouper (réponse au « où ça ampute les budgets »).
  *
  * COMPARATEUR (⚖) : deux emplacements interchangeables (déficit à gauche par
  * défaut, bloc cliqué à droite) ; carrés d'aires proportionnelles reliés, ratio
@@ -42,6 +46,8 @@
   const PENS = "Pensions versées — 405 Md€";
   const SECU_N = "Sécurité sociale (hors retraites)";
   const ACCENT = "#C13B55";
+  const DEFICIT = "#8E1B38";                    // cramoisi = argent NON CONTRIBUTIF des retraites
+  const GID = "deficit-origin";                 // groupId de fusion (universalTransition)
   const COL = { etat: "#F09D86", secu: "#EE8FB4", pens: "#C94A6E", ct: "#D9A441", ue: "#A79BC8",
                 cot: "#8C79C0" };
 
@@ -254,30 +260,34 @@
       .forEach((l) => (versePens[l.source] = (versePens[l.source] || 0) + l.value));
 
     // — Ministères de l'État —
+    // Familles TOUJOURS nettes (missions nettes des re-fléchages retraites). En
+    // mode officiel, la part CAS de TOUS les ministères est agrégée en UN bloc
+    // cramoisi au niveau de l'État (visible à la vue d'ensemble → il fusionnera
+    // avec le déficit au basculement). vpBreak = détail par ministère pour l'infobulle.
     const familles = [];
+    let totalVp = 0; const vpBreak = [];
     L.filter((l) => l.source === "État (budget général)" && l.target.indexOf("É · ") === 0)
       .forEach((l) => {
         const fam = l.target, vp = versePens[fam] || 0;
-        // missions NETTES dans les deux modes ; en mode officiel, la part CAS
-        // re-devient un enfant hachuré distinct (net + CAS = brut) → pas de
-        // double compte, la famille retrouve sa valeur brute.
+        totalVp += vp;
+        if (vp > 0.05) vpBreak.push([fam.replace("É · ", ""), vp]);
         const factor = (l.value - vp) / l.value;
-        const kids = kidsOf(DATA, fam, factor, nodeColor[fam], 1) || [];
-        if (official && vp > 0.01) {
-          kids.push({ name: "→ Contributions retraites (CAS Pensions)", value: Math.round(vp * 100) / 100,
-            itemStyle: { color: HATCH_GREY }, label: { color: "#2A2F3A" }, _est: true,
-            _tip: "≈ " + fmt(vp) + " Md€ des crédits de cette famille financent en réalité les " +
-                  "retraites (contributions employeur au CAS Pensions), présentés ici comme sa dépense propre." });
-          kids.sort((a, b) => b.value - a.value);
-        }
         familles.push({
-          name: fam.replace("É · ", ""), children: kids,
+          name: fam.replace("É · ", ""), children: kidsOf(DATA, fam, factor, nodeColor[fam], 1) || [],
           itemStyle: { color: nodeColor[fam] }, upperLabel: { show: true, color: "#1E2430" },
-          _tip: fmt(l.value) + " Md€ de crédits votés" +
-                (official ? " (bruts ; part hachurée = ce qui finance en réalité les retraites)."
-                          : ", nets des " + fmt(vp) + " Md€ re-versés aux retraites."),
+          _tip: fmt(l.value - vp) + " Md€ de crédits votés, nets des " + fmt(vp) +
+                " Md€ de contributions employeur re-versées aux retraites (CAS Pensions).",
         });
       });
+    if (official && totalVp > 0.01) {
+      vpBreak.sort((a, b) => b[1] - a[1]);
+      familles.push({ name: "→ Retraites (CAS Pensions)", value: Math.round(totalVp * 100) / 100,
+        itemStyle: { color: DEFICIT }, label: { color: "#FFFFFF" }, _est: true,
+        groupId: GID, universalTransition: true,
+        _tip: "≈ " + fmt(totalVp) + " Md€ prélevés sur les budgets des ministères comme " +
+              "« contribution employeur au CAS Pensions », mais qui financent en réalité les retraites " +
+              "(dont " + vpBreak.slice(0, 4).map((x) => x[0] + " " + fmt(x[1])).join(", ") + "…)." });
+    }
 
     // — Sécurité sociale (branches ± transfert retraites) —
     const secuTr = sum((l) => l.source === SECU_N && l.target.indexOf("Régimes") === 0);
@@ -291,7 +301,8 @@
       }));
     if (official && secuTr > 0.01)
       branches.push({ name: "→ Transferts aux retraites", value: Math.round(secuTr * 100) / 100,
-        itemStyle: { color: HATCH_GREY }, label: { color: "#2A2F3A" }, _est: true,
+        itemStyle: { color: DEFICIT }, label: { color: "#FFFFFF" }, _est: true,
+        groupId: GID, universalTransition: true,
         _tip: "≈ " + fmt(secuTr) + " Md€ de transferts des autres branches vers la vieillesse." });
     const secu = { name: "Sécurité sociale", children: branches,
       itemStyle: { color: COL.secu }, upperLabel: { show: true, color: "#1E2430" },
@@ -308,7 +319,8 @@
             { name: "Transferts (TVA, dotations)", value: Math.round((ctIn - cnracl) * 100) / 100,
               itemStyle: { color: COL.ct }, label: { color: inkFor(COL.ct) } },
             { name: "→ Retraites (CNRACL)", value: Math.round(cnracl * 100) / 100,
-              itemStyle: { color: HATCH_GREY }, label: { color: "#2A2F3A" }, _est: true,
+              itemStyle: { color: DEFICIT }, label: { color: "#FFFFFF" }, _est: true,
+              groupId: GID, universalTransition: true,
               _tip: "≈ " + fmt(cnracl) + " Md€ de surcotisations CNRACL des agents territoriaux/hospitaliers." },
           ], upperLabel: { show: true, color: "#1E2430" } }
       : { name: "Collectivités territoriales", value: Math.round((ctIn - cnracl) * 100) / 100,
@@ -327,10 +339,14 @@
               "des ministères, de la Sécu et des collectivités (parts hachurées) : le maquillage comptable.",
         children: [
           { name: "Cotisations", value: Math.round(cot * 100) / 100,
-            itemStyle: { color: COL.pens }, label: { color: inkFor(COL.pens) } },
+            itemStyle: { color: COL.pens }, label: { color: inkFor(COL.pens) },
+            groupId: "cotis", universalTransition: true },
+          // même dans la présentation « directe », les impôts affectés & la dette
+          // sont de l'argent NON CONTRIBUTIF → cramoisi, et ils rejoindront le 136.
           { name: "Impôts affectés & dette", value: Math.round(impots * 100) / 100,
-            itemStyle: { color: COL.pens, colorAlpha: 0.7 }, label: { color: inkFor(COL.pens, 0.7) },
-            _tip: "CSG-FSV, fractions de TVA et impôts affectés à la vieillesse, déficit résiduel." },
+            itemStyle: { color: DEFICIT }, label: { color: "#FFFFFF" },
+            groupId: GID, universalTransition: true,
+            _tip: "CSG-FSV, fractions de TVA et impôts affectés à la vieillesse, dette : non contributif." },
         ] };
     } else {
       // — bloc RETRAITES : UN SEUL bloc de 405 Md€, dans lequel le DÉSÉQUILIBRE
@@ -347,7 +363,8 @@
       // Le déséquilibre = APLAT plein cramoisi (pas de hachure : réservée aux
       // estimations). borderWidth 0 → le CRAMOISI SEUL = exactement 136 (aire
       // proportionnelle honnête) ; une légère ombre le décolle du bloc « pensions ».
-      const DEFICIT = "#8E1B38";                 // cramoisi profond = « le trou »
+      // groupId GID + universalTransition : au basculement, les morceaux cramoisis
+      // dispersés dans les budgets (mode officiel) FUSIONNENT dans cet encart.
       retraites = { name: "Retraites — 405 Md€",
         itemStyle: { color: COL.pens, gapWidth: 0 }, upperLabel: { show: true, color: "#1E2430" },
         _tip: "405 Md€ de pensions versées (tous régimes). Les cotisations n'en couvrent que 269 : " +
@@ -355,12 +372,13 @@
         children: [
           { name: "Financé par les cotisations", value: Math.round(cot * 100) / 100,
             itemStyle: { color: COL.pens, borderColor: COL.pens, borderWidth: 0, gapWidth: 0 },
-            label: { color: inkFor(COL.pens) },
+            label: { color: inkFor(COL.pens) }, groupId: "cotis", universalTransition: true,
             _tip: "269 Md€ de cotisations vieillesse tous régimes (≈ 2/3 des ressources — COR)." },
           { name: "Déséquilibre des retraites", value: deficit,
             itemStyle: { color: DEFICIT, borderColor: DEFICIT, borderWidth: 0, gapWidth: 0,
               shadowBlur: 12, shadowColor: "rgba(74,10,26,.40)" },
-            label: { color: "#FFFFFF", fontWeight: 800 }, _tip: brk },
+            label: { color: "#FFFFFF", fontWeight: 800 },
+            groupId: GID, universalTransition: true, _tip: brk },
         ] };
     }
 
@@ -368,7 +386,7 @@
       { name: "Ministères de l'État", children: familles, itemStyle: { color: COL.etat },
         upperLabel: { show: true, color: "#1E2430" },
         _tip: "Budget général : familles → missions → programmes → actions (mêmes plongées que le poster)." +
-              (official ? " Brut, avec les contributions retraites hachurées." : " Net des re-fléchages retraites.") },
+              (official ? " Sa part « retraites » (CAS Pensions) est isolée en cramoisi." : " Net des re-fléchages retraites.") },
       secu, retraites, ct,
       { name: "Union européenne", value: Math.round(ue * 100) / 100,
         itemStyle: { color: COL.ue }, label: { color: inkFor(COL.ue) },
@@ -508,7 +526,10 @@
         width: "100%", height: "94%", top: 30,
         // sur mobile, on masque les tuiles trop petites (étiquettes illisibles)
         visibleMin: isPhone() ? 24 : 8,
-        animationDurationUpdate: 800, animationEasingUpdate: "cubicInOut",
+        // fusion animée entre les 2 modes : les morceaux cramoisis (groupId GID)
+        // dispersés dans les budgets se regroupent dans l'encart 136 (et inversement)
+        universalTransition: { enabled: true, seriesKey: "mondrian", divideShape: "clone" },
+        animationDurationUpdate: 900, animationEasingUpdate: "cubicInOut",
         // fil d'ariane discret, intégré au fond crème (pastille papier, survol jaune)
         breadcrumb: { show: true, top: 6, left: "center", height: 24, itemGap: 6, emptyItemWidth: 4,
           itemStyle: { color: "#FBF7EE", borderColor: "#E4DCCB", borderWidth: 1, borderRadius: 999,

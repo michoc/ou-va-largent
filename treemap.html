@@ -10,7 +10,7 @@
   <meta property="og:description" content="Chaque euro en rectangles proportionnels, le déséquilibre des retraites (136 Md€) en évidence, un switch qui révèle le maquillage comptable.">
   <meta property="og:image" content="https://michoc.github.io/ou-va-largent/assets/og-card.png">
   <link rel="preconnect" href="https://cdnjs.cloudflare.com">
-  <link rel="stylesheet" href="style.css?v=20260711e">
+  <link rel="stylesheet" href="style.css?v=20260711f">
 </head>
 <body class="mondrian" data-mode="realite">
   <header class="masthead">
@@ -89,11 +89,12 @@
       supplémentaire. Le reste du trou est pris dans les impôts, taxes affectées et la dette.</p>
     <ul>
       <li><strong>Budget tel que présenté</strong> — les 74&nbsp;Md€ restent logés dans les budgets
-        des ministères, de la Sécu et des collectivités (parts hachurées) : les retraites ne
-        «&nbsp;semblent&nbsp;» coûter que 331&nbsp;Md€ en direct.</li>
+        des ministères, de la Sécu et des collectivités (<strong style="color:#8E1B38">parts
+        cramoisies</strong>) : les retraites ne «&nbsp;semblent&nbsp;» coûter que 331&nbsp;Md€ en direct.</li>
       <li><strong>Budget tel qu'il finance les retraites</strong> — on neutralise le maquillage :
-        ces 74&nbsp;Md€ rejoignent le bloc «&nbsp;Retraites&nbsp;», qui affiche ses vrais
-        405&nbsp;Md€, dont 136 de déséquilibre dans l'encart cramoisi.</li>
+        en basculant, ces <strong style="color:#8E1B38">parts cramoisies</strong> se
+        <strong>détachent des budgets et se regroupent</strong> dans le bloc «&nbsp;Retraites&nbsp;»,
+        qui affiche alors ses vrais 405&nbsp;Md€, dont 136 de déséquilibre.</li>
     </ul>
     <div class="report-actions">
       <button type="button" class="crumb report-send" id="mode-dlg-close">Compris</button>
@@ -101,14 +102,14 @@
   </dialog>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/echarts/5.5.0/echarts.min.js"></script>
-  <script src="treemap.js?v=20260711e"></script>
+  <script src="treemap.js?v=20260711f"></script>
   <script>
     // légende dynamique du switch + dialogue d'explication
     (function () {
       const cap = document.getElementById("mode-caption");
       const texts = {
-        realite: "Réalité : administrations nettes, et le bloc « Retraites » affiche ses vrais 405 Md€ (dont 136 de déséquilibre).",
-        officiel: "Présentation officielle : 74 Md€ de retraites sont cachés dans les budgets des ministères (hachures) — les retraites semblent ne coûter que 331 Md€. Plongez dans une famille de ministères pour voir sa part hachurée.",
+        realite: "Réalité : administrations nettes ; les parts cramoisies des budgets se sont regroupées dans le bloc « Retraites », qui affiche ses vrais 405 Md€ (dont 136 de déséquilibre). Basculez pour voir d'où vient le trou.",
+        officiel: "Présentation officielle : les parts cramoisies (74 Md€) sont logées dans les budgets des ministères, de la Sécu et des collectivités — les retraites semblent ne coûter que 331 Md€. Basculez : ces parts migrent et forment le déficit.",
       };
       function refresh() { cap.textContent = texts[document.body.dataset.mode] || texts.realite; }
       new MutationObserver(refresh).observe(document.body, { attributes: true, attributeFilter: ["data-mode"] });
