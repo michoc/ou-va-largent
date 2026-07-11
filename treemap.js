@@ -15,9 +15,12 @@
  *     dans les administrations (Ministères 51,9 = CAS Pensions agrégé · Sécu 12,9
  *     · Collectivités 8,8 = CNRACL · Impôts & dette 62,4) ; le bloc retraites ne
  *     montre alors que 331 « financés directement ».
- *   Au BASCULEMENT, ces 4 blocs cramoisis (groupId « deficit-origin ») FUSIONNENT
- *   dans l'encart 136 via `universalTransition` → on VOIT le trou quitter les
- *   budgets et se regrouper (réponse au « où ça ampute les budgets »).
+ *   Au BASCULEMENT, la continuité de COULEUR (le cramoisi reste cramoisi) + la
+ *   transition par défaut + la légende racontent la migration (le trou quitte les
+ *   budgets et se regroupe). NB : `universalTransition` (morphing auto) a été
+ *   ESSAYÉ puis retiré — il faisait dérailler les petits blocs (CNRACL) sur
+ *   treemap. Pour un vrai « vol » propre, il faudrait une surcouche `graphic`.
+ *   (Les props `groupId`/`universalTransition` restées sur les nœuds sont inertes.)
  *
  * COMPARATEUR (⚖) : deux emplacements interchangeables (déficit à gauche par
  * défaut, bloc cliqué à droite) ; carrés d'aires proportionnelles reliés, ratio
@@ -318,10 +321,10 @@
           children: [
             { name: "Transferts (TVA, dotations)", value: Math.round((ctIn - cnracl) * 100) / 100,
               itemStyle: { color: COL.ct }, label: { color: inkFor(COL.ct) } },
-            { name: "→ Retraites (CNRACL)", value: Math.round(cnracl * 100) / 100,
-              itemStyle: { color: DEFICIT }, label: { color: "#FFFFFF" }, _est: true,
-              groupId: GID, universalTransition: true,
-              _tip: "≈ " + fmt(cnracl) + " Md€ de surcotisations CNRACL des agents territoriaux/hospitaliers." },
+            { name: "→ CNRACL", value: Math.round(cnracl * 100) / 100,
+              itemStyle: { color: DEFICIT }, label: { color: "#FFFFFF", fontSize: 11 }, _est: true,
+              _tip: "≈ " + fmt(cnracl) + " Md€ de surcotisations retraites (CNRACL) des agents " +
+                    "territoriaux et hospitaliers, logées dans le budget des collectivités." },
           ], upperLabel: { show: true, color: "#1E2430" } }
       : { name: "Collectivités territoriales", value: Math.round((ctIn - cnracl) * 100) / 100,
           itemStyle: { color: COL.ct }, label: { color: inkFor(COL.ct) },
@@ -526,10 +529,10 @@
         width: "100%", height: "94%", top: 30,
         // sur mobile, on masque les tuiles trop petites (étiquettes illisibles)
         visibleMin: isPhone() ? 24 : 8,
-        // fusion animée entre les 2 modes : les morceaux cramoisis (groupId GID)
-        // dispersés dans les budgets se regroupent dans l'encart 136 (et inversement)
-        universalTransition: { enabled: true, seriesKey: "mondrian", divideShape: "clone" },
-        animationDurationUpdate: 900, animationEasingUpdate: "cubicInOut",
+        // NB : universalTransition (morphing auto) fait dérailler les petits blocs
+        // sur treemap (CNRACL 8,8 partait en vol aberrant) → transition par défaut,
+        // propre ; la continuité de couleur (cramoisi) + la légende racontent la migration.
+        animationDurationUpdate: 750, animationEasingUpdate: "cubicOut",
         // fil d'ariane discret, intégré au fond crème (pastille papier, survol jaune)
         breadcrumb: { show: true, top: 6, left: "center", height: 24, itemGap: 6, emptyItemWidth: 4,
           itemStyle: { color: "#FBF7EE", borderColor: "#E4DCCB", borderWidth: 1, borderRadius: 999,
