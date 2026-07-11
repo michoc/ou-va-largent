@@ -344,24 +344,22 @@
         "cotisation par : impôts affectés & dette " + fmt(impots) + " · subventions d'équilibre " +
         "des ministères (CAS Pensions) " + fmt(minCAS) + " · CNRACL " + fmt(cnracl) +
         " · transferts Sécu " + fmt(secuTr) + ". Part non contributive.";
-      // Le déséquilibre = APLAT plein cramoisi (pas de hachure : elle est réservée
-      // aux estimations), ENCASTRÉ comme un encart flottant dans le bloc grâce à
-      // une « douve » de la couleur du bloc (bordure épaisse rose) → il se détache
-      // en carte, tout en restant proportionnel (34 % de 405).
+      // Le déséquilibre = APLAT plein cramoisi (pas de hachure : réservée aux
+      // estimations). borderWidth 0 → le CRAMOISI SEUL = exactement 136 (aire
+      // proportionnelle honnête) ; une légère ombre le décolle du bloc « pensions ».
       const DEFICIT = "#8E1B38";                 // cramoisi profond = « le trou »
-      const moat = isPhone() ? 9 : 22;           // marge qui fait flotter l'encart
       retraites = { name: "Retraites — 405 Md€",
         itemStyle: { color: COL.pens, gapWidth: 0 }, upperLabel: { show: true, color: "#1E2430" },
         _tip: "405 Md€ de pensions versées (tous régimes). Les cotisations n'en couvrent que 269 : " +
-              "il manque 136 Md€ (l'encart cramoisi).",
+              "il manque 136 Md€ (la zone cramoisie).",
         children: [
           { name: "Financé par les cotisations", value: Math.round(cot * 100) / 100,
             itemStyle: { color: COL.pens, borderColor: COL.pens, borderWidth: 0, gapWidth: 0 },
             label: { color: inkFor(COL.pens) },
             _tip: "269 Md€ de cotisations vieillesse tous régimes (≈ 2/3 des ressources — COR)." },
           { name: "Déséquilibre des retraites", value: deficit,
-            itemStyle: { color: DEFICIT, borderColor: COL.pens, borderWidth: moat, gapWidth: 0,
-              shadowBlur: 10, shadowColor: "rgba(74,10,26,.35)" },
+            itemStyle: { color: DEFICIT, borderColor: DEFICIT, borderWidth: 0, gapWidth: 0,
+              shadowBlur: 12, shadowColor: "rgba(74,10,26,.40)" },
             label: { color: "#FFFFFF", fontWeight: 800 }, _tip: brk },
         ] };
     }
@@ -511,8 +509,13 @@
         // sur mobile, on masque les tuiles trop petites (étiquettes illisibles)
         visibleMin: isPhone() ? 24 : 8,
         animationDurationUpdate: 800, animationEasingUpdate: "cubicInOut",
-        breadcrumb: { show: true, top: 2, left: "center", height: 20,
-          itemStyle: { color: "#1E2430", textStyle: { color: "#FAF6EF", fontWeight: 700 } } },
+        // fil d'ariane discret, intégré au fond crème (pastille papier, survol jaune)
+        breadcrumb: { show: true, top: 6, left: "center", height: 24, itemGap: 6, emptyItemWidth: 4,
+          itemStyle: { color: "#FBF7EE", borderColor: "#E4DCCB", borderWidth: 1, borderRadius: 999,
+            shadowBlur: 4, shadowColor: "rgba(30,36,48,.08)",
+            textStyle: { color: "#4A5265", fontSize: 12, fontWeight: 700 } },
+          emphasis: { itemStyle: { color: "#F5E663",
+            textStyle: { color: "#1E2430" } } } },
         // wrap MANUEL au mot (l'overflow d'ECharts césure en plein mot) + « … »
         label: { show: true, formatter: (p) => wrapMot(p.name) + "\n" + fmt(p.value) + " Md€",
           fontSize: 12, fontWeight: 700, overflow: "truncate", ellipsis: "…" },
