@@ -37,9 +37,12 @@
   el.style.height = stageH() + "px";
   const chart = echarts.init(el, null, { renderer: "canvas" });
 
-  const fmt = (v) => Number(v).toLocaleString("fr-FR", { maximumFractionDigits: 1 });
-  const fmt2 = (v) => Number(v).toLocaleString("fr-FR", { maximumFractionDigits: 2 });
-  const fmt0 = (v) => Number(v).toLocaleString("fr-FR", { maximumFractionDigits: 0 });
+  // séparateur de milliers = ESPACE FINE INSÉCABLE (U+202F), forcé nous-mêmes
+  // (certains moteurs ne groupent pas via toLocaleString) → « 7 597 765 »
+  const group = (s) => s.replace(/\B(?=(\d{3})+(?!\d))/g, " ");
+  const fmt = (v) => group(Number(v).toLocaleString("fr-FR", { maximumFractionDigits: 1 }).replace(/\s/g, ""));
+  const fmt2 = (v) => group(Number(v).toLocaleString("fr-FR", { maximumFractionDigits: 2 }).replace(/\s/g, ""));
+  const fmt0 = (v) => group(Math.round(Number(v)).toString());
   const esc = (s) => String(s || "").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
   const cap = (s) => s ? s.charAt(0).toUpperCase() + s.slice(1) : s;
 
@@ -399,10 +402,29 @@
       //   passe en infobulle (plus de sous-tuiles rouge-sur-rouge illisibles).
       const minCAS = sum((l) => l.target === PENS && l.source.indexOf("É · ") === 0);
       const deficit = Math.round((impots + minCAS + cnracl + secuTr) * 10) / 10;
-      const brk = "Écart entre 269 Md€ de cotisations et 405 Md€ de pensions, comblé sans " +
-        "cotisation par : impôts affectés & dette " + fmt(impots) + " · subventions d'équilibre " +
-        "des ministères (CAS Pensions) " + fmt(minCAS) + " · CNRACL " + fmt(cnracl) +
-        " · transferts Sécu " + fmt(secuTr) + ". Part non contributive.";
+      const brk = "Cliquez pour décomposer : d'où viennent les 136 Md€ qui comblent l'écart " +
+        "entre 269 de cotisations et 405 de pensions (subventions des ministères, impôts " +
+        "affectés & dette, transferts de la Sécu, CNRACL). Part non contributive.";
+      // DÉCOMPOSITION (visible au clic) : chaque provenance dans SA couleur
+      // → on voit sur quel budget chaque euro du trou est prélevé.
+      const defKids = [];
+      L.filter((l) => l.target === PENS && l.source.indexOf("É · ") === 0).forEach((l) => {
+        const short = l.source.replace("É · ", ""), col = nodeColor[l.source] || COL.etat;
+        defKids.push({ name: "Subvention — " + short, value: Math.round(l.value * 100) / 100,
+          itemStyle: { color: col }, label: { color: inkFor(col) },
+          _tip: fmt(l.value) + " Md€ prélevés sur le budget « " + short + " » pour financer les " +
+                "retraites (contribution employeur, présentée comme dépense du ministère)." });
+      });
+      defKids.push({ name: "Impôts affectés & dette", value: Math.round(impots * 100) / 100,
+        itemStyle: { color: "#7A6A86" }, label: { color: "#FFFFFF" },
+        _tip: fmt(impots) + " Md€ : CSG-FSV, fractions de TVA, impôts affectés à la vieillesse et dette." });
+      defKids.push({ name: "Transferts de la Sécu (entre branches)", value: Math.round(secuTr * 100) / 100,
+        itemStyle: { color: COL.secu }, label: { color: inkFor(COL.secu) },
+        _tip: fmt(secuTr) + " Md€ de transferts des autres branches de la Sécu vers la vieillesse." });
+      defKids.push({ name: "Surcotisations CNRACL (collectivités)", value: Math.round(cnracl * 100) / 100,
+        itemStyle: { color: COL.ct }, label: { color: inkFor(COL.ct) },
+        _tip: fmt(cnracl) + " Md€ de surcotisations retraites des agents territoriaux et hospitaliers." });
+      defKids.sort((a, b) => b.value - a.value);
       // Le déséquilibre = APLAT plein cramoisi (pas de hachure : réservée aux
       // estimations). borderWidth 0 → le CRAMOISI SEUL = exactement 136 (aire
       // proportionnelle honnête) ; une légère ombre le décolle du bloc « pensions ».
@@ -415,7 +437,7 @@
             itemStyle: { color: COL.pens, borderColor: COL.pens, borderWidth: 0, gapWidth: 0 },
             label: { color: inkFor(COL.pens) },
             _tip: "269 Md€ de cotisations vieillesse tous régimes (≈ 2/3 des ressources — COR)." },
-          { name: "Déséquilibre des retraites", value: deficit,
+          { name: "Déséquilibre des retraites", value: deficit, children: defKids,
             itemStyle: { color: DEFICIT, borderColor: DEFICIT, borderWidth: 0, gapWidth: 0,
               shadowBlur: 12, shadowColor: "rgba(74,10,26,.40)" },
             label: { color: "#FFFFFF", fontWeight: 800 }, _tip: brk },
@@ -574,8 +596,10 @@
     });
     return map;
   }
-  // PATCHS DE COIN persistants du mode « révélé » : bas-droite de chaque
-  // famille, aire ∝ vp/brut (les 3 nœuds dédiés sont, eux, recolorés en dur)
+  // BANDE cramoisie proportionnelle du mode « révélé » : au BAS de chaque
+  // famille, HAUTEUR = part CAS × hauteur du bloc → l'AIRE cramoisie = la part
+  // exacte du budget (bloc scindé « net / subvention retraites »). Le montant
+  // et le % sont posés dessus. Les 3 nœuds dédiés sont, eux, recolorés en plein.
   function clearPatches() {
     [].slice.call(stageEl.querySelectorAll(".mig-ghost")).forEach((g) => g.remove());
   }
@@ -586,47 +610,38 @@
     const strips = MIG_SRC.filter((s) => s.type === "strip");
     const lay = layoutsOf(strips.map((s) => s.host));
     const phone = isPhone();
-    const fs = phone ? 9.5 : 11, pad = phone ? "0 4px" : "1px 6px", dot = phone ? 8 : 9;
     strips.forEach((s, i) => {
       const r = lay[s.host];
       if (!r) return;
       const pct = Math.round(s.frac * 100);
+      const bh = Math.max(phone ? 5 : 7, r.h * s.frac);   // hauteur = part × hauteur du bloc
       const d = document.createElement("div");
       d.className = "mig-ghost";
-      const base = "position:absolute;z-index:4;pointer-events:none;background:" + DEFICIT + ";" +
-        "color:#fff;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;";
-      const pill = base + "border-radius:3px;border:1px solid rgba(250,246,239,.5);" +
-        "box-shadow:0 1px 3px rgba(74,10,26,.22);padding:" + pad + ";white-space:nowrap;" +
-        "font:800 " + fs + "px/1.3 inherit;";
-      // badge DISCRET en coin bas-droite, avec repli progressif selon la place :
-      // « 24,3 Md€ · 20 % » → « 24,3 Md€ » → pastille. Sur mobile on saute
-      // directement au montant seul (le « % » n'y tient jamais).
-      const contents = phone
-        ? ["<b>" + fmt(s.value) + "</b>"]
-        : ["<b>" + fmt(s.value) + "&nbsp;Md€</b> · " + pct + "&nbsp;%", "<b>" + fmt(s.value) + "&nbsp;Md€</b>"];
-      let placed = false;
-      // hauteur estimée de l'étiquette (ancrée en haut) = lignes du nom + ligne
-      // du montant → on ne pose le badge QUE s'il reste de l'espace libre dessous
-      const labelH = (wrapMot(s.host).split("\n").length + 1) * (phone ? 15 : 16) + 8;
-      const room = r.h - labelH - 6;             // espace vertical libre sous l'étiquette
-      // montants négligeables (< 0,6 Md€) → pastille ; sinon badge s'il tient
-      if (s.value >= 0.6 && r.w >= 34) {
-        for (let ci = 0; ci < contents.length && !placed; ci++) {
-          d.style.cssText = pill; d.innerHTML = contents[ci];
-          stageEl.appendChild(d);
-          if (d.offsetWidth <= r.w - 6 && d.offsetHeight <= room) placed = true;
-          else stageEl.removeChild(d);
-        }
+      d.style.cssText = "position:absolute;z-index:4;pointer-events:none;overflow:hidden;" +
+        "background:" + DEFICIT + ";color:#fff;border-top:1.5px solid rgba(250,246,239,.85);" +
+        "border-bottom-left-radius:3px;border-bottom-right-radius:3px;" +
+        "display:flex;align-items:center;justify-content:center;text-align:center;" +
+        "font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;white-space:nowrap;" +
+        "left:" + (r.x + off.x) + "px;top:" + (r.y + r.h - bh + off.y) + "px;" +
+        "width:" + r.w + "px;height:" + bh + "px;";
+      // « X Md€ · Y % » si la bande est assez épaisse ET large, sinon montant
+      // seul, sinon rien (la bande proportionnelle parle d'elle-même ;
+      // « % du budget » est explicité dans la légende / l'infobulle)
+      const full = "<b style='font:800 " + (phone ? 11 : 12.5) + "px/1 inherit'>" + fmt(s.value) +
+        "&nbsp;Md€</b><span style='font:600 " + (phone ? 9.5 : 10.5) +
+        "px/1 inherit;opacity:.92;margin-left:5px'>· " + pct + "&nbsp;%</span>";
+      const money = "<b style='font:800 " + (phone ? 10 : 11) + "px/1 inherit'>" +
+        fmt(s.value) + (phone ? "" : "&nbsp;Md€") + "</b>";
+      if (bh >= 18 && r.w >= 90) d.innerHTML = full;
+      else if (bh >= 13 && r.w >= 40) d.innerHTML = money;
+      stageEl.appendChild(d);
+      // garde-fou anti-troncature : un nombre coupé induit en erreur (« 24,3 »
+      // tronqué en « 4,3 »). Si le texte déborde de la bande, on rétrograde
+      // full → montant seul → rien (jamais de chiffre à moitié).
+      if (d.innerHTML && d.scrollWidth > d.clientWidth + 1) {
+        d.innerHTML = money;
+        if (d.scrollWidth > d.clientWidth + 1) d.innerHTML = "";
       }
-      if (!placed) {                              // pastille : le détail reste en infobulle
-        d.style.cssText = base + "width:" + dot + "px;height:" + dot + "px;border-radius:2px;" +
-          "box-shadow:0 1px 3px rgba(74,10,26,.32);";
-        d.innerHTML = "";
-        stageEl.appendChild(d);
-      }
-      const m = phone ? 3 : 5, bw = d.offsetWidth, bh = d.offsetHeight;
-      d.style.left = (r.x + r.w - bw - m + off.x) + "px";
-      d.style.top = (r.y + r.h - bh - m + off.y) + "px";
       if (fade) {
         d.style.opacity = "0";
         d.animate([{ opacity: 0 }, { opacity: 1 }],
@@ -636,6 +651,51 @@
   }
 
   const HASHES = { officiel: "#officiel", revele: "#revele", realite: "#realite" };
+
+  /* ============ plongée PILOTÉE + fil d'Ariane HTML ============
+   * Le zoom natif d'ECharts (nodeClick) plongeait aussi dans les FEUILLES →
+   * grand espace blanc en haut. Ici on ne déroule QUE les blocs ayant des
+   * enfants : on re-enracine en remplaçant la donnée par le sous-arbre du nœud
+   * (fiable à toute profondeur, y compris « Déséquilibre des retraites » → ses
+   * subventions d'équilibre). navPath = chemin de noms depuis la vue d'ensemble. */
+  const crumbEl = document.getElementById("tm-crumb");
+  let navPath = [];
+
+  function topData() { return DATA_G ? build(DATA_G, MODE) : []; }
+  // enfants du nœud courant ; RE-RÉSOLU depuis un build frais → la plongée
+  // survit aux changements de phase (et se replie si le nœud n'existe plus)
+  function viewData() {
+    let arr = topData();
+    for (let i = 0; i < navPath.length; i++) {
+      const node = arr.find((n) => n.name === navPath[i]);
+      if (!node || !node.children || !node.children.length) { navPath = navPath.slice(0, i); break; }
+      arr = node.children;
+    }
+    return arr;
+  }
+  function renderCrumb() {
+    if (!crumbEl) return;
+    if (!navPath.length) { crumbEl.hidden = true; crumbEl.innerHTML = ""; return; }
+    const parts = ["Vue d'ensemble"].concat(navPath);
+    crumbEl.hidden = false;
+    crumbEl.innerHTML = parts.map((nm, i) => {
+      const last = i === parts.length - 1;
+      return '<button type="button" class="tm-crumb-item' + (last ? " cur" : "") +
+        '" data-i="' + i + '"' + (last ? ' aria-current="page"' : "") + ">" + esc(nm) + "</button>";
+    }).join('<span class="tm-crumb-sep" aria-hidden="true">›</span>');
+  }
+  function renderView() {
+    clearPatches();
+    chart.setOption({ series: [{ data: viewData() }] });
+    renderCrumb();
+    // les bandes cramoisies du mode ② n'ont de sens qu'à la vue d'ensemble
+    if (MODE === "revele" && !navPath.length) setTimeout(() => showPatches(false), 30);
+  }
+  if (crumbEl) crumbEl.addEventListener("click", (e) => {
+    const b = e.target.closest(".tm-crumb-item"); if (!b) return;
+    navPath = navPath.slice(0, +b.dataset.i);   // i=0 → « Vue d'ensemble » → racine
+    renderView();
+  });
 
   function setMode(mode, animate) {
     MODE = mode;
@@ -647,9 +707,11 @@
     });
     history.replaceState(null, "", HASHES[mode] || "#realite");
     if (!DATA_G) return;
+    navPath = [];   // un changement de phase repart de la vue d'ensemble
     clearPatches();
     chart.setOption({ series: [{ data: build(DATA_G, mode),
       animationDurationUpdate: animate === false ? 0 : 800 }] });
+    renderCrumb();
     if (mode === "revele") {
       // ①→② : mêmes valeurs, layout identique → patchs immédiats ;
       // ③→② : le layout se réajuste (net → brut) → attendre la fin (800 ms)
@@ -688,23 +750,24 @@
       },
       series: [{
         type: "treemap", name: "Vue d'ensemble", data: build(DATA, MODE), leafDepth: 2, roam: false,
+        // ⚠ on PILOTE nous-mêmes le drill (nodeClick:false) : le zoom natif
+        // plongeait dans les FEUILLES (nœuds sans enfant) → grand espace blanc
+        // en haut. Ici, seuls les blocs AVEC enfants se déroulent (voir chart.on
+        // "click"), et le fil d'Ariane est en HTML (#tm-crumb) → plus de réserve
+        // de 30 px pour le fil natif, le Mondrian démarre tout en haut.
+        nodeClick: false,
         // ⚠ sort:false = on garde l'ORDRE DES DONNÉES (identique dans les deux
         // modes, tris manuels stables dans build) → géographie stable au basculement
         sort: false,
-        width: "100%", height: "94%", top: 30,
+        width: "100%", height: "99%", top: 4,
         // sur mobile, on masque les tuiles trop petites (étiquettes illisibles)
         visibleMin: isPhone() ? 24 : 8,
         // NB : universalTransition (morphing auto) fait dérailler les petits blocs
         // sur treemap (CNRACL 8,8 partait en vol aberrant) → transition par défaut,
         // propre ; la continuité de couleur (cramoisi) + la légende racontent la migration.
         animationDurationUpdate: 750, animationEasingUpdate: "cubicOut",
-        // fil d'ariane discret, intégré au fond crème (pastille papier, survol jaune)
-        breadcrumb: { show: true, top: 6, left: "center", height: 24, itemGap: 6, emptyItemWidth: 4,
-          itemStyle: { color: "#FBF7EE", borderColor: "#E4DCCB", borderWidth: 1, borderRadius: 999,
-            shadowBlur: 4, shadowColor: "rgba(30,36,48,.08)",
-            textStyle: { color: "#4A5265", fontSize: 12, fontWeight: 700 } },
-          emphasis: { itemStyle: { color: "#F5E663",
-            textStyle: { color: "#1E2430" } } } },
+        // fil d'Ariane : on utilise le nôtre en HTML (#tm-crumb) — pilotage manuel
+        breadcrumb: { show: false },
         // wrap MANUEL au mot (l'overflow d'ECharts césure en plein mot) + « … »
         // position 'insideTop' : l'étiquette est ANCRÉE EN HAUT → le coin bas-droite
         // reste libre pour le badge « part retraites » du mode ② (plus de collision)
@@ -731,11 +794,21 @@
     });
 
     chart.on("click", (p) => {
-      if (p.data && p.value != null && !p.data._est) {
+      if (!p.data) return;
+      // 1) comparateur : tout bloc chiffré (hors estimations) va dans le ⚖
+      if (p.value != null && !p.data._est) {
         cur = { name: p.name, value: Array.isArray(p.value) ? p.value[0] : p.value,
                 color: (p.data.itemStyle && p.data.itemStyle.color) || p.color || "#5C7FB8" };
         if (typeof cur.color !== "string") cur.color = "#5C7FB8";   // motif hachuré → couleur neutre
         renderCompare();
+      }
+      // 2) plongée : SEULEMENT les blocs ayant des enfants (jamais une feuille →
+      // plus d'espace blanc). treePathInfo est RELATIF à la racine visible, on
+      // l'ajoute donc au chemin courant. Le bloc « Déséquilibre des retraites »
+      // ayant des enfants (les subventions d'équilibre), il se décompose ici.
+      if (p.data.children && p.data.children.length && p.treePathInfo) {
+        navPath = navPath.concat(p.treePathInfo.slice(1).map((t) => t.name));
+        renderView();
       }
     });
 
@@ -759,7 +832,7 @@
     // le seuil de tuiles visibles dépend du format → on reconstruit au besoin
     if (DATA_G) chart.setOption({ series: [{ visibleMin: isPhone() ? 24 : 8 }] });
     chart.resize();
-    // les patchs du mode « révélé » suivent le nouveau layout
-    if (MODE === "revele") setTimeout(() => showPatches(false), 60);
+    // les bandes du mode « révélé » suivent le nouveau layout (vue d'ensemble seule)
+    if (MODE === "revele" && !navPath.length) setTimeout(() => showPatches(false), 60);
   });
 })();

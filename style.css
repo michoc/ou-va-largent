@@ -350,6 +350,38 @@ main { max-width: 1220px; margin: 0 auto; padding: 6px 12px 8px; }
   box-shadow: 0 2px 14px rgba(30, 36, 48, .06);
 }
 
+/* ---------- fil d'Ariane du Mondrian (plongée pilotée, pastilles papier) ---------- */
+.tm-crumb {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 4px 6px;
+  padding: 8px 6px 10px;
+}
+.tm-crumb[hidden] { display: none; }
+.tm-crumb-item {
+  font: 700 12px/1 inherit;
+  color: #4A5265;
+  background: #FBF7EE;
+  border: 1px solid #E4DCCB;
+  border-radius: 999px;
+  padding: 5px 11px;
+  cursor: pointer;
+  box-shadow: 0 1px 3px rgba(30, 36, 48, .08);
+  transition: background .15s, color .15s, border-color .15s;
+}
+.tm-crumb-item:hover,
+.tm-crumb-item:focus-visible { background: #F5E663; color: #1E2430; border-color: #E2D24A; outline: none; }
+.tm-crumb-item.cur {
+  color: #1E2430;
+  background: #fff;
+  border-color: var(--accent);
+  cursor: default;
+  box-shadow: none;
+}
+.tm-crumb-sep { color: #B9AE97; font-weight: 700; }
+
 /* ---------- comparateur du treemap ---------- */
 .compare-panel[hidden] { display: none; }
 .compare-panel {
