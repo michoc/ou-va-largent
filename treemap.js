@@ -84,7 +84,22 @@
    * Ordres de grandeur INDICATIFS (compilation de l'auteur).                  */
   const REFS = [
     { id: "deficit", nom: "Déséquilibre du système de retraites", court: "le déséquilibre des retraites",
-      md: 136, flux: true, note: "pensions 405 − cotisations 269 (COR)" },
+      md: 136, flux: true, note: "pensions 405 − cotisations 269 (COR)", grp: "budget" },
+    // — BUDGETS PUBLICS (à l'échelle du Mondrian) —
+    { id: "pensions", nom: "Ensemble des pensions (toutes retraites)", court: "les pensions versées",
+      md: 405, flux: true, grp: "budget", note: "405 Md€/an, tous régimes (COR juin 2025)" },
+    { id: "sante", nom: "Assurance maladie (Santé)", court: "l'assurance maladie",
+      md: 255.3, flux: true, grp: "budget" },
+    { id: "totdep", nom: "Dépenses publiques totales", court: "l'ensemble des dépenses publiques",
+      md: 1286.7, flux: true, grp: "budget" },
+    { id: "cotis", nom: "Cotisations retraite reçues", court: "les cotisations retraite",
+      md: 269, flux: true, grp: "budget", note: "≈ 2/3 des ressources des retraites" },
+    { id: "dette_ch", nom: "Charge de la dette (intérêts, 1 an)", court: "la charge de la dette",
+      md: 61.3, flux: true, grp: "budget" },
+    { id: "defense", nom: "Budget de la Défense (mission)", court: "le budget de la Défense",
+      md: 50.5, flux: true, grp: "budget" },
+    { id: "educ", nom: "Éducation nationale (1er + 2nd degré)", court: "l'Éducation nationale",
+      md: 70.9, flux: true, grp: "budget" },
     { id: "loyers", nom: "Loyers versés en France (1 an)", court: "les loyers versés en France",
       md: 95, flux: true },
     { id: "benef_cac", nom: "Bénéfices mondiaux du CAC 40 (2025)", court: "les bénéfices du CAC 40",
@@ -436,11 +451,21 @@
     const oc = document.createElement("option");
     oc.value = "CLICK"; oc.textContent = "Le bloc que je regarde (suit la navigation)";
     sel.appendChild(oc);
-    REFS.forEach((r) => {
-      const o = document.createElement("option");
-      o.value = r.id;
-      o.textContent = r.nom + (r.md ? " — " + fmt(r.md) + " Md€" : "");
-      sel.appendChild(o);
+    const groups = [
+      ["Budgets publics", (r) => r.grp === "budget"],
+      ["Ordres de grandeur", (r) => !r.grp && r.type !== "unite"],
+      ["Combien on pourrait payer", (r) => r.type === "unite"],
+    ];
+    groups.forEach(([label, keep]) => {
+      const og = document.createElement("optgroup");
+      og.label = label;
+      REFS.filter(keep).forEach((r) => {
+        const o = document.createElement("option");
+        o.value = r.id;
+        o.textContent = r.nom + (r.md ? " — " + fmt(r.md) + " Md€" : "");
+        og.appendChild(o);
+      });
+      if (og.children.length) sel.appendChild(og);
     });
   }
   fillSelect(selA); fillSelect(selB);
@@ -563,34 +588,43 @@
     strips.forEach((s, i) => {
       const r = lay[s.host];
       if (!r) return;
-      const k = Math.sqrt(s.frac);               // aire du patch = frac × aire du bloc
-      const w = r.w * k, h = r.h * k;
+      const pct = Math.round(s.frac * 100);
       const d = document.createElement("div");
       d.className = "mig-ghost";
-      // « part à détacher » : liseré pointillé crème (elle quittera ce budget en ③),
-      // même grammaire que les tuiles (coins 3px, gap crème), ombre discrète
-      d.style.cssText = "position:absolute;z-index:4;pointer-events:none;border-radius:3px;" +
-        "display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;" +
-        "overflow:hidden;text-align:center;padding:2px;" +
-        "outline:2px solid #FAF6EF;border:1.5px dashed rgba(250,246,239,.75);" +
-        "box-shadow:0 2px 8px rgba(74,10,26,.28);" +
-        "font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;color:#fff;" +
-        "left:" + (r.x + r.w - w + off.x) + "px;top:" + (r.y + r.h - h + off.y) + "px;" +
-        "width:" + w + "px;height:" + h + "px;background:" + DEFICIT + ";";
-      // contenu selon la place : libellé + montant → montant → nombre seul
-      if (w >= 108 && h >= 50) {
-        d.innerHTML = '<span style="font:600 10px/1.2 inherit;opacity:.85;letter-spacing:.02em">' +
-          "CAS Pensions</span><b style='font:800 12.5px/1.2 inherit'>" + fmt(s.value) + "&nbsp;Md€</b>";
-      } else if (w >= 62 && h >= 26) {
-        d.innerHTML = "<b style='font:800 11px/1.2 inherit'>" + fmt(s.value) + "&nbsp;Md€</b>";
-      } else if (w >= 30 && h >= 16) {
-        d.innerHTML = "<b style='font:800 10px/1.1 inherit'>" + fmt(s.value) + "</b>";
+      const base = "position:absolute;z-index:4;pointer-events:none;background:" + DEFICIT + ";" +
+        "color:#fff;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;";
+      const pill = base + "border-radius:3px;border:1px solid rgba(250,246,239,.5);" +
+        "box-shadow:0 1px 3px rgba(74,10,26,.22);padding:1px 6px;white-space:nowrap;" +
+        "font:800 11px/1.35 inherit;";
+      // badge DISCRET sur UNE ligne « 24,3 Md€ · 20 % », avec repli progressif
+      // (montant seul → pastille) selon la place réellement disponible dans le coin
+      const contents = [
+        "<b>" + fmt(s.value) + "&nbsp;Md€</b> · " + pct + "&nbsp;%",
+        "<b>" + fmt(s.value) + "&nbsp;Md€</b>",
+      ];
+      let placed = false;
+      // montants négligeables (< 0,6 Md€) → pastille seule, pour ne pas
+      // encombrer les petits blocs (le détail complet est dans l'infobulle « ? »)
+      if (s.value >= 0.6 && r.w >= 40 && r.h >= 22) {
+        for (let ci = 0; ci < contents.length && !placed; ci++) {
+          d.style.cssText = pill; d.innerHTML = contents[ci];
+          stageEl.appendChild(d);
+          if (d.offsetWidth <= r.w - 8 && d.offsetHeight <= r.h - 6) placed = true;
+          else stageEl.removeChild(d);
+        }
       }
-      stageEl.appendChild(d);
+      if (!placed) {                              // pastille : le détail reste en infobulle
+        d.style.cssText = base + "width:9px;height:9px;border-radius:2px;box-shadow:0 1px 3px rgba(74,10,26,.32);";
+        d.innerHTML = "";
+        stageEl.appendChild(d);
+      }
+      const m = 5, bw = d.offsetWidth, bh = d.offsetHeight;
+      d.style.left = (r.x + r.w - bw - m + off.x) + "px";
+      d.style.top = (r.y + r.h - bh - m + off.y) + "px";
       if (fade) {
         d.style.opacity = "0";
         d.animate([{ opacity: 0 }, { opacity: 1 }],
-          { duration: 450, delay: i * 50, easing: "ease-out", fill: "forwards" });
+          { duration: 400, delay: i * 45, easing: "ease-out", fill: "forwards" });
       }
     });
   }

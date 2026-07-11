@@ -595,3 +595,24 @@ body[data-mode="realite"] .mode-lbl:first-of-type { opacity: .5; }
   .mode-steps .mode-info { position: absolute; right: 22px; margin-top: 6px; }
   .mode-bar { position: relative; }
 }
+
+/* ---------- incitation + liens des trois lectures ---------- */
+.steps-lead { margin: 0 0 7px; font-size: 13px; color: var(--ink-soft); }
+.steps-lead strong { color: var(--ink); }
+.mode-caption .phase-link {
+  color: var(--accent); font-weight: 700; cursor: pointer;
+  border-bottom: 1.5px solid rgba(193, 59, 85, .35); white-space: nowrap;
+}
+.mode-caption .phase-link:hover { border-bottom-color: var(--accent); }
+/* pastille de rappel « il y a trois vues » sur le sélecteur */
+@keyframes stepPulse { 0%,100% { box-shadow: 0 0 0 0 rgba(193,59,85,.0); }
+  50% { box-shadow: 0 0 0 4px rgba(193,59,85,.16); } }
+.mode-steps { animation: stepPulse 2.4s ease-in-out 1.2s 3; }
+
+/* ---------- table du calcul (dialogue « ? ») ---------- */
+.dlg-calc-title { font-weight: 700; margin: 14px 0 4px; color: var(--accent); }
+.dlg-calc { border-collapse: collapse; width: 100%; font-size: 13.5px; }
+.dlg-calc td { padding: 4px 0; border-bottom: 1px dashed var(--rule); vertical-align: top; }
+.dlg-calc td:last-child { text-align: right; font-weight: 700; white-space: nowrap; padding-left: 14px; }
+.dlg-calc .dlg-calc-tot td { border-bottom: 0; border-top: 2px solid var(--ink); padding-top: 7px; }
+.dlg-calc .dlg-calc-tot td:last-child { color: #8E1B38; font-size: 15px; }

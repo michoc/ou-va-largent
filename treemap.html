@@ -10,7 +10,7 @@
   <meta property="og:description" content="Chaque euro en rectangles proportionnels, le déséquilibre des retraites (136 Md€) en évidence, un switch qui révèle le maquillage comptable.">
   <meta property="og:image" content="https://michoc.github.io/ou-va-largent/assets/og-card.png">
   <link rel="preconnect" href="https://cdnjs.cloudflare.com">
-  <link rel="stylesheet" href="style.css?v=20260711q">
+  <link rel="stylesheet" href="style.css?v=20260711s">
 </head>
 <body class="mondrian" data-mode="realite">
   <header class="masthead">
@@ -48,13 +48,14 @@
     </aside>
 
     <div class="mode-bar">
+      <p class="steps-lead">Le même budget, <strong>trois lectures</strong> — cliquez pour dérouler&nbsp;:</p>
       <div class="mode-steps" role="group" aria-label="Trois lectures du même budget">
         <button type="button" class="mode-step" data-mode="officiel" aria-pressed="false">
-          <span class="step-n">1</span> Tel que présenté</button>
+          <span class="step-n">1</span> Le budget présenté à la nation</button>
         <button type="button" class="mode-step" data-mode="revele" aria-pressed="false">
-          <span class="step-n">2</span> Retraites révélées</button>
+          <span class="step-n">2</span> Les subventions d'équilibre cachées</button>
         <button type="button" class="mode-step" data-mode="realite" aria-pressed="false">
-          <span class="step-n">3</span> Le vrai coût</button>
+          <span class="step-n">3</span> Le budget réel</button>
         <button type="button" class="mode-info" id="mode-info-btn" aria-label="Comprendre ces trois lectures">?</button>
       </div>
       <p class="mode-caption" id="mode-caption"></p>
@@ -89,33 +90,43 @@
       supplémentaire (ligne 411050 sur les bulletins de paie des fonctionnaires).
       Le reste du trou est pris dans les impôts, taxes affectées et la dette.</p>
     <ul>
-      <li><strong>① Tel que présenté</strong> — les 136&nbsp;Md€ non contributifs sont
+      <li><strong>① Le budget présenté à la nation</strong> — les 136&nbsp;Md€ non contributifs sont
         <strong>invisibles</strong>, fondus dans les budgets bruts, exactement comme dans les
         documents budgétaires : les retraites ne «&nbsp;semblent&nbsp;» coûter que 331&nbsp;Md€.</li>
-      <li><strong>② Retraites révélées</strong> — le même budget, la même forme, mais chaque somme
-        qui finance en réalité les retraites <strong style="color:#8E1B38">apparaît en
-        cramoisi</strong>, à sa place, dans son budget d'origine.</li>
-      <li><strong>③ Le vrai coût</strong> — ces sommes quittent les budgets (affichés nets) et
+      <li><strong>② Les subventions d'équilibre cachées</strong> — le même budget, la même forme,
+        mais chaque somme qui finance en réalité les retraites <strong style="color:#8E1B38">apparaît
+        en cramoisi</strong> (montant + part du budget), à sa place, dans son budget d'origine.</li>
+      <li><strong>③ Le budget réel</strong> — ces sommes quittent les budgets (affichés nets) et
         forment le bloc <strong style="color:#8E1B38">«&nbsp;Déficit des retraites —
         136&nbsp;Md€&nbsp;»</strong> ; le bloc Retraites affiche ses vrais 405&nbsp;Md€.</li>
     </ul>
+    <p class="dlg-calc-title">Le calcul des 136&nbsp;Md€ non contributifs</p>
+    <table class="dlg-calc">
+      <tr><td>Contributions « employeur » des ministères au CAS Pensions</td><td>51,9</td></tr>
+      <tr><td>Impôts affectés &amp; dette (CSG-FSV, fractions de TVA…)</td><td>62,4</td></tr>
+      <tr><td>Transferts des autres branches de la Sécu vers la vieillesse</td><td>12,9</td></tr>
+      <tr><td>Surcotisations CNRACL des collectivités (agents territoriaux/hospitaliers)</td><td>8,8</td></tr>
+      <tr class="dlg-calc-tot"><td>Déséquilibre du système de retraites</td><td>136&nbsp;Md€</td></tr>
+    </table>
     <div class="report-actions">
       <button type="button" class="crumb report-send" id="mode-dlg-close">Compris</button>
     </div>
   </dialog>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/echarts/5.5.0/echarts.min.js"></script>
-  <script src="treemap.js?v=20260711q"></script>
+  <script src="treemap.js?v=20260711s"></script>
   <script>
     // légende dynamique du switch + dialogue d'explication
     (function () {
       const cap = document.getElementById("mode-caption");
-      const SW = '<span style="display:inline-block;width:13px;height:13px;border-radius:3px;' +
+      const SW = '<span style="display:inline-block;width:12px;height:12px;border-radius:3px;' +
         'background:#8E1B38;vertical-align:-2px;margin-right:5px"></span>';
+      const go = (m, t) => '<a class="phase-link" data-goto="' + m + '" role="button" tabindex="0">' + t + '</a>';
+      const info = '<a class="phase-link" data-info="1" role="button" tabindex="0">le calcul détaillé</a>';
       const texts = {
-        officiel: "① Le budget tel que l'État le présente : les 136 Md€ non contributifs des retraites sont fondus dans les budgets bruts — invisibles, comme dans les documents budgétaires. Les retraites semblent ne coûter que 331 Md€.",
-        revele: SW + "② Le même budget, révélé : en cramoisi, les <strong>subventions d'équilibre des retraites</strong>, prélevées sur les budgets sans le dire — contributions « employeur » des ministères au CAS Pensions (<strong>51,9 Md€</strong>), transferts des branches Sécu (12,9), surcotisations CNRACL des collectivités (8,8), impôts affectés &amp; dette (62,4). <strong>Total : 136 Md€.</strong> La forme du Mondrian n'a pas changé.",
-        realite: "③ Le vrai coût : ces sommes ont quitté les budgets (affichés nets) et forment le bloc « Déficit des retraites — 136 Md€ » ; le bloc Retraites montre ses vrais 405 Md€.",
+        officiel: "① Le budget tel qu'il est présenté à la nation : les 136 Md€ qui financent les retraites sans cotisation sont <strong>fondus dans les budgets bruts</strong>, invisibles. Les retraites semblent ne coûter que 331 Md€. &nbsp;" + go("revele", "→ Révéler ces sommes"),
+        revele: SW + "② En cramoisi, les <strong>subventions d'équilibre des retraites</strong> — prélevées sur les budgets sans le dire, à leur place. <strong>136 Md€</strong> au total (" + info + "). &nbsp;" + go("realite", "→ Voir le budget réel"),
+        realite: "③ Le budget réel : ces sommes ont quitté les budgets (affichés <strong>nets</strong>) et forment le bloc « Déficit des retraites — 136 Md€ ». Le bloc Retraites affiche ses vrais 405 Md€. &nbsp;" + go("officiel", "◀ D'où sort ce chiffre&nbsp;?"),
       };
       function refresh() { cap.innerHTML = texts[document.body.dataset.mode] || texts.realite; }
       new MutationObserver(refresh).observe(document.body, { attributes: true, attributeFilter: ["data-mode"] });
@@ -123,6 +134,13 @@
       const dlg = document.getElementById("mode-dlg");
       document.getElementById("mode-info-btn").addEventListener("click", () => dlg.showModal());
       document.getElementById("mode-dlg-close").addEventListener("click", () => dlg.close());
+      // liens incitatifs dans la légende : changent de phase (via le bouton) ou ouvrent le calcul
+      cap.addEventListener("click", (e) => {
+        const a = e.target.closest(".phase-link"); if (!a) return;
+        if (a.dataset.info) { dlg.showModal(); return; }
+        const b = document.querySelector('.mode-step[data-mode="' + a.dataset.goto + '"]');
+        if (b) b.click();
+      });
     })();
   </script>
 </body>
