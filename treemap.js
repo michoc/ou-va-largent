@@ -15,12 +15,12 @@
  *     dans les administrations (Ministères 51,9 = CAS Pensions agrégé · Sécu 12,9
  *     · Collectivités 8,8 = CNRACL · Impôts & dette 62,4) ; le bloc retraites ne
  *     montre alors que 331 « financés directement ».
- *   Au BASCULEMENT, la continuité de COULEUR (le cramoisi reste cramoisi) + la
- *   transition par défaut + la légende racontent la migration (le trou quitte les
- *   budgets et se regroupe). NB : `universalTransition` (morphing auto) a été
- *   ESSAYÉ puis retiré — il faisait dérailler les petits blocs (CNRACL) sur
- *   treemap. Pour un vrai « vol » propre, il faudrait une surcouche `graphic`.
- *   (Les props `groupId`/`universalTransition` restées sur les nœuds sont inertes.)
+ *   Au BASCULEMENT, une CHORÉGRAPHIE en 2 temps (fonction migrate(), surcouche de
+ *   divs animées via Web Animations API — le `universalTransition` d'ECharts a été
+ *   essayé puis retiré : il faisait dérailler les petits blocs sur treemap) :
+ *   ① révélation : chaque part « devient cramoisie » DANS son bloc (voile couleur
+ *   du budget hôte qui s'estompe) ; ② vol : les 4 rectangles quittent leurs blocs
+ *   et se fondent dans l'encart 136 (et inversement : scission puis dispersion).
  *
  * COMPARATEUR (⚖) : deux emplacements interchangeables (déficit à gauche par
  * défaut, bloc cliqué à droite) ; carrés d'aires proportionnelles reliés, ratio
@@ -50,7 +50,6 @@
   const SECU_N = "Sécurité sociale (hors retraites)";
   const ACCENT = "#C13B55";
   const DEFICIT = "#8E1B38";                    // cramoisi = argent NON CONTRIBUTIF des retraites
-  const GID = "deficit-origin";                 // groupId de fusion (universalTransition)
   const COL = { etat: "#F09D86", secu: "#EE8FB4", pens: "#C94A6E", ct: "#D9A441", ue: "#A79BC8",
                 cot: "#8C79C0" };
 
@@ -252,11 +251,22 @@
     })).sort((a, b) => b.value - a.value);
   }
 
-  function build(DATA, mode) {
+  // valeurs des 4 parts migrantes (remplies par build, servent à découper
+  // l'encart lors de la dispersion) + teinte « fantôme » pendant le vol
+  let MIG_VALUES = {};
+  const PALE = "#DCB4BF";
+
+  function build(DATA, mode, opts) {
+    opts = opts || {};
+    const ghost = !!opts.ghost;                 // cible(s) estompée(s) pendant le vol
     const nodeColor = {}; DATA.nodes.forEach((n) => (nodeColor[n.name] = n.color));
     const L = DATA.links;
     const sum = (p) => L.filter(p).reduce((s, l) => s + l.value, 0);
     const official = mode === "officiel";
+    // pendant le vol des rectangles, les emplacements migrants du NOUVEAU layout
+    // sont estompés (couleur pâle, sans étiquette) puis révélés à l'arrivée
+    const migColor = ghost ? PALE : DEFICIT;
+    const migLabel = (extra) => ghost ? { show: false } : Object.assign({ color: "#FFFFFF" }, extra || {});
 
     const versePens = {};
     L.filter((l) => l.target === PENS && l.source.indexOf("É · ") === 0)
@@ -285,8 +295,7 @@
     if (official && totalVp > 0.01) {
       vpBreak.sort((a, b) => b[1] - a[1]);
       familles.push({ name: "→ Retraites (CAS Pensions)", value: Math.round(totalVp * 100) / 100,
-        itemStyle: { color: DEFICIT }, label: { color: "#FFFFFF" }, _est: true,
-        groupId: GID, universalTransition: true,
+        itemStyle: { color: migColor }, label: migLabel(), _est: true,
         _tip: "≈ " + fmt(totalVp) + " Md€ prélevés sur les budgets des ministères comme " +
               "« contribution employeur au CAS Pensions », mais qui financent en réalité les retraites " +
               "(dont " + vpBreak.slice(0, 4).map((x) => x[0] + " " + fmt(x[1])).join(", ") + "…)." });
@@ -304,8 +313,7 @@
       }));
     if (official && secuTr > 0.01)
       branches.push({ name: "→ Transferts aux retraites", value: Math.round(secuTr * 100) / 100,
-        itemStyle: { color: DEFICIT }, label: { color: "#FFFFFF" }, _est: true,
-        groupId: GID, universalTransition: true,
+        itemStyle: { color: migColor }, label: migLabel(), _est: true,
         _tip: "≈ " + fmt(secuTr) + " Md€ de transferts des autres branches vers la vieillesse." });
     const secu = { name: "Sécurité sociale", children: branches,
       itemStyle: { color: COL.secu }, upperLabel: { show: true, color: "#1E2430" },
@@ -322,7 +330,7 @@
             { name: "Transferts (TVA, dotations)", value: Math.round((ctIn - cnracl) * 100) / 100,
               itemStyle: { color: COL.ct }, label: { color: inkFor(COL.ct) } },
             { name: "→ CNRACL", value: Math.round(cnracl * 100) / 100,
-              itemStyle: { color: DEFICIT }, label: { color: "#FFFFFF", fontSize: 11 }, _est: true,
+              itemStyle: { color: migColor }, label: migLabel({ fontSize: 11 }), _est: true,
               _tip: "≈ " + fmt(cnracl) + " Md€ de surcotisations retraites (CNRACL) des agents " +
                     "territoriaux et hospitaliers, logées dans le budget des collectivités." },
           ], upperLabel: { show: true, color: "#1E2430" } }
@@ -334,6 +342,10 @@
     const cot = sum((l) => l.target === SYST && l.source.indexOf("Cotisations retraites") === 0);
     const impots = sum((l) => l.target === SYST && l.source.indexOf("Cotisations retraites") !== 0);
     let retraites;
+    // valeurs des 4 parts migrantes — remplies dans les DEUX modes (la dispersion
+    // réalité → officiel en a besoin pour découper l'encart et étiqueter les vols)
+    MIG_VALUES = { "→ Retraites (CAS Pensions)": totalVp, "→ Transferts aux retraites": secuTr,
+                   "→ CNRACL": cnracl, "Impôts affectés & dette": impots };
     if (official) {
       retraites = { name: "Retraites — financées directement (331 Md€)",
         itemStyle: { color: COL.pens }, upperLabel: { show: true, color: "#1E2430" },
@@ -342,13 +354,11 @@
               "des ministères, de la Sécu et des collectivités (parts hachurées) : le maquillage comptable.",
         children: [
           { name: "Cotisations", value: Math.round(cot * 100) / 100,
-            itemStyle: { color: COL.pens }, label: { color: inkFor(COL.pens) },
-            groupId: "cotis", universalTransition: true },
+            itemStyle: { color: COL.pens }, label: { color: inkFor(COL.pens) } },
           // même dans la présentation « directe », les impôts affectés & la dette
           // sont de l'argent NON CONTRIBUTIF → cramoisi, et ils rejoindront le 136.
           { name: "Impôts affectés & dette", value: Math.round(impots * 100) / 100,
-            itemStyle: { color: DEFICIT }, label: { color: "#FFFFFF" },
-            groupId: GID, universalTransition: true,
+            itemStyle: { color: migColor }, label: migLabel(),
             _tip: "CSG-FSV, fractions de TVA et impôts affectés à la vieillesse, dette : non contributif." },
         ] };
     } else {
@@ -366,8 +376,6 @@
       // Le déséquilibre = APLAT plein cramoisi (pas de hachure : réservée aux
       // estimations). borderWidth 0 → le CRAMOISI SEUL = exactement 136 (aire
       // proportionnelle honnête) ; une légère ombre le décolle du bloc « pensions ».
-      // groupId GID + universalTransition : au basculement, les morceaux cramoisis
-      // dispersés dans les budgets (mode officiel) FUSIONNENT dans cet encart.
       retraites = { name: "Retraites — 405 Md€",
         itemStyle: { color: COL.pens, gapWidth: 0 }, upperLabel: { show: true, color: "#1E2430" },
         _tip: "405 Md€ de pensions versées (tous régimes). Les cotisations n'en couvrent que 269 : " +
@@ -375,13 +383,12 @@
         children: [
           { name: "Financé par les cotisations", value: Math.round(cot * 100) / 100,
             itemStyle: { color: COL.pens, borderColor: COL.pens, borderWidth: 0, gapWidth: 0 },
-            label: { color: inkFor(COL.pens) }, groupId: "cotis", universalTransition: true,
+            label: { color: inkFor(COL.pens) },
             _tip: "269 Md€ de cotisations vieillesse tous régimes (≈ 2/3 des ressources — COR)." },
           { name: "Déséquilibre des retraites", value: deficit,
-            itemStyle: { color: DEFICIT, borderColor: DEFICIT, borderWidth: 0, gapWidth: 0,
-              shadowBlur: 12, shadowColor: "rgba(74,10,26,.40)" },
-            label: { color: "#FFFFFF", fontWeight: 800 },
-            groupId: GID, universalTransition: true, _tip: brk },
+            itemStyle: { color: migColor, borderColor: migColor, borderWidth: 0, gapWidth: 0,
+              shadowBlur: ghost ? 0 : 12, shadowColor: "rgba(74,10,26,.40)" },
+            label: migLabel({ fontWeight: 800 }), _tip: brk },
         ] };
     }
 
@@ -488,17 +495,138 @@
     const a = selA.value; selA.value = selB.value; selB.value = a; renderCompare();
   });
 
-  /* ============ switch de mode ============ */
+  /* ============ switch de mode + chorégraphie de migration ============
+   * Bascule en DEUX TEMPS (surcouche de divs animées — le morphing auto
+   * d'ECharts déraille sur treemap) :
+   *   officiel → réalité : ① chaque part « devient cramoisie » DANS son bloc
+   *   (un voile couleur du budget hôte s'estompe) ; ② les 4 rectangles QUITTENT
+   *   leurs blocs et volent se fondre dans l'encart 136.
+   *   réalité → officiel : l'encart se scinde en 4 et vole vers les budgets. */
   const modeToggle = document.getElementById("mode-toggle");
-  function setMode(mode) {
+  const stageEl = document.getElementById("chart-stage");
+  let migrating = false;
+
+  const MIG_HOSTS = {                          // couleur du bloc hôte (phase révélation)
+    "→ Retraites (CAS Pensions)": COL.etat,
+    "→ Transferts aux retraites": COL.secu,
+    "→ CNRACL": COL.ct,
+    "Impôts affectés & dette": COL.pens,
+  };
+  const MIG_TARGET = "Déséquilibre des retraites";
+
+  function layoutsOf(names) {
+    const map = {};
+    chart.getModel().getSeriesByIndex(0).getData().tree.root.eachNode((n) => {
+      const l = names.indexOf(n.name) !== -1 && n.getLayout();
+      if (l && l.width > 0.5) map[n.name] = { x: l.x, y: l.y, w: l.width, h: l.height };
+    });
+    return map;
+  }
+  function mkGhost(r, color, label) {
+    const d = document.createElement("div");
+    d.className = "mig-ghost";
+    d.style.cssText = "position:absolute;z-index:4;pointer-events:none;border-radius:2px;" +
+      "display:flex;align-items:center;justify-content:center;overflow:hidden;" +
+      "font:700 11px " + '"Helvetica Neue",Helvetica,Arial,sans-serif' + ";color:#fff;" +
+      "left:" + r.x + "px;top:" + r.y + "px;width:" + r.w + "px;height:" + r.h + "px;" +
+      "background:" + color + ";";
+    if (label && r.w > 46 && r.h > 22) d.textContent = label;
+    stageEl.appendChild(d);
+    return d;
+  }
+  const rectOf = (l, off) => ({ x: l.x + off.x, y: l.y + off.y, w: l.w, h: l.h });
+
+  function migrate(to) {
+    migrating = true;
+    const off = { x: el.offsetLeft, y: el.offsetTop };
+    const ghosts = [];
+    let finished = false;
+    const finish = () => {
+      if (finished) return;
+      finished = true;
+      ghosts.forEach((g) => g.remove());
+      chart.setOption({ series: [{ data: build(DATA_G, to), animationDurationUpdate: 350 }] });
+      migrating = false;
+    };
+    setTimeout(finish, 3200);                          // garde-fou (onglet en arrière-plan…)
+    const FLY = { duration: 950, easing: "cubic-bezier(.45,.05,.2,1)", fill: "forwards" };
+    const css = (r) => ({ left: r.x + "px", top: r.y + "px", width: r.w + "px", height: r.h + "px" });
+
+    if (to === "realite") {
+      /* ---- REGROUPEMENT ---- */
+      const src = layoutsOf(Object.keys(MIG_HOSTS));
+      // ① révélation : voile couleur du budget hôte qui s'estompe → la part
+      //   « devient cramoisie » à l'intérieur de son bloc d'origine
+      Object.keys(src).forEach((name) => {
+        const veil = mkGhost(rectOf(src[name], off), MIG_HOSTS[name]);
+        veil.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 700, easing: "ease-in", fill: "forwards" });
+        ghosts.push(veil);
+      });
+      // ② vol : les rectangles cramoisis quittent leurs blocs → encart 136
+      setTimeout(() => {
+        const flyers = Object.keys(src).map((name) =>
+          mkGhost(rectOf(src[name], off), DEFICIT, fmt(MIG_VALUES[name] || 0)));
+        ghosts.push.apply(ghosts, flyers);
+        chart.setOption({ series: [{ data: build(DATA_G, to, { ghost: true }), animationDurationUpdate: 600 }] });
+        setTimeout(() => {
+          const t = layoutsOf([MIG_TARGET])[MIG_TARGET];
+          if (!t) { finish(); return; }
+          const dst = css(rectOf(t, off));
+          let done = 0;
+          flyers.forEach((f, i) => {
+            const a = f.animate([css({ x: f.offsetLeft, y: f.offsetTop, w: f.offsetWidth, h: f.offsetHeight }), dst],
+              Object.assign({ delay: i * 90 }, FLY));
+            a.onfinish = () => { if (++done === flyers.length) finish(); };
+          });
+        }, 80);
+      }, 750);
+    } else {
+      /* ---- DISPERSION : l'encart se scinde en 4 bandes qui volent vers les budgets ---- */
+      const t = layoutsOf([MIG_TARGET])[MIG_TARGET];
+      if (!t) { finish(); return; }
+      const names = Object.keys(MIG_HOSTS);
+      const total = names.reduce((s, n) => s + (MIG_VALUES[n] || 1), 0);
+      const flyers = {};
+      let cx = t.x;
+      names.forEach((name) => {
+        const w = t.w * (MIG_VALUES[name] || 1) / total;
+        flyers[name] = mkGhost(rectOf({ x: cx, y: t.y, w: w, h: t.h }, off), DEFICIT, fmt(MIG_VALUES[name] || 0));
+        ghosts.push(flyers[name]);
+        cx += w;
+      });
+      chart.setOption({ series: [{ data: build(DATA_G, to, { ghost: true }), animationDurationUpdate: 600 }] });
+      setTimeout(() => {
+        const dsts = layoutsOf(names);
+        let done = 0, count = 0;
+        names.forEach((name, i) => {
+          const f = flyers[name], d = dsts[name];
+          if (!d) return;
+          count++;
+          const a = f.animate([css({ x: f.offsetLeft, y: f.offsetTop, w: f.offsetWidth, h: f.offsetHeight }),
+                               css(rectOf(d, off))], Object.assign({ delay: i * 90 }, FLY));
+          a.onfinish = () => { if (++done === count) finish(); };
+        });
+        if (!count) finish();
+      }, 80);
+    }
+  }
+
+  function setMode(mode, animate) {
+    if (migrating) { modeToggle.checked = (MODE === "realite"); return; }
+    const changed = mode !== MODE;
     MODE = mode;
     document.body.dataset.mode = mode;
     // curseur À DROITE (= checked) sur le libellé de droite « …finance les
     // retraites » = mode réalité ; à gauche « tel que présenté » = officiel.
     modeToggle.checked = (mode === "realite");
     history.replaceState(null, "", mode === "officiel" ? "#officiel" : "#realite");
-    // setOption en fusion (structure identique) → animation de morphing native
-    if (DATA_G) chart.setOption({ series: [{ data: build(DATA_G, mode) }] });
+    if (!DATA_G) return;
+    const reduced = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (!changed || animate === false || reduced) {
+      chart.setOption({ series: [{ data: build(DATA_G, mode) }] });
+      return;
+    }
+    migrate(mode);
   }
   modeToggle.addEventListener("change", () => setMode(modeToggle.checked ? "realite" : "officiel"));
 
@@ -571,8 +699,9 @@
       }
     });
 
-    // défaut = « budget tel qu'il finance les retraites » (réalité), sauf hash explicite
-    setMode(location.hash === "#officiel" ? "officiel" : "realite");
+    // défaut = « budget tel qu'il finance les retraites » (réalité), sauf hash
+    // explicite — sans chorégraphie au chargement (animate: false)
+    setMode(location.hash === "#officiel" ? "officiel" : "realite", false);
     renderCompare();
   }
 
