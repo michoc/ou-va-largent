@@ -10,7 +10,7 @@
   <meta property="og:description" content="Chaque euro en rectangles proportionnels, le déséquilibre des retraites (136 Md€) en évidence, un switch qui révèle le maquillage comptable.">
   <meta property="og:image" content="https://michoc.github.io/ou-va-largent/assets/og-card.png">
   <link rel="preconnect" href="https://cdnjs.cloudflare.com">
-  <link rel="stylesheet" href="style.css?v=20260711f">
+  <link rel="stylesheet" href="style.css?v=20260711g">
 </head>
 <body class="mondrian" data-mode="realite">
   <header class="masthead">
@@ -102,14 +102,14 @@
   </dialog>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/echarts/5.5.0/echarts.min.js"></script>
-  <script src="treemap.js?v=20260711f"></script>
+  <script src="treemap.js?v=20260711g"></script>
   <script>
     // légende dynamique du switch + dialogue d'explication
     (function () {
       const cap = document.getElementById("mode-caption");
       const texts = {
         realite: "Réalité : administrations nettes ; les parts cramoisies des budgets se sont regroupées dans le bloc « Retraites », qui affiche ses vrais 405 Md€ (dont 136 de déséquilibre). Basculez pour voir d'où vient le trou.",
-        officiel: "Présentation officielle : les parts cramoisies (74 Md€) sont logées dans les budgets des ministères, de la Sécu et des collectivités — les retraites semblent ne coûter que 331 Md€. Basculez : ces parts migrent et forment le déficit.",
+        officiel: "Présentation officielle : les 136 Md€ non contributifs (parts cramoisies) sont dispersés — 74 logés dans les budgets (ministères, Sécu, collectivités), 62 dans les impôts affectés & la dette. Les retraites semblent ne coûter que 331 Md€. Basculez : tout se regroupe en un déficit.",
       };
       function refresh() { cap.textContent = texts[document.body.dataset.mode] || texts.realite; }
       new MutationObserver(refresh).observe(document.body, { attributes: true, attributeFilter: ["data-mode"] });
