@@ -10,7 +10,7 @@
   <meta property="og:description" content="Chaque euro en rectangles proportionnels, le déséquilibre des retraites (136 Md€) en évidence, un switch qui révèle le maquillage comptable.">
   <meta property="og:image" content="https://michoc.github.io/ou-va-largent/assets/og-card.png">
   <link rel="preconnect" href="https://cdnjs.cloudflare.com">
-  <link rel="stylesheet" href="style.css?v=20260711p">
+  <link rel="stylesheet" href="style.css?v=20260711q">
 </head>
 <body class="mondrian" data-mode="realite">
   <header class="masthead">
@@ -105,17 +105,19 @@
   </dialog>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/echarts/5.5.0/echarts.min.js"></script>
-  <script src="treemap.js?v=20260711p"></script>
+  <script src="treemap.js?v=20260711q"></script>
   <script>
     // légende dynamique du switch + dialogue d'explication
     (function () {
       const cap = document.getElementById("mode-caption");
+      const SW = '<span style="display:inline-block;width:13px;height:13px;border-radius:3px;' +
+        'background:#8E1B38;vertical-align:-2px;margin-right:5px"></span>';
       const texts = {
         officiel: "① Le budget tel que l'État le présente : les 136 Md€ non contributifs des retraites sont fondus dans les budgets bruts — invisibles, comme dans les documents budgétaires. Les retraites semblent ne coûter que 331 Md€.",
-        revele: "② Le même budget, révélé : chaque part cramoisie est une somme qui finance en réalité les retraites, à sa place dans son budget — ministères 51,9 · Sécu 12,9 · collectivités 8,8 · impôts affectés & dette 62,4, soit 136 Md€. La forme du Mondrian n'a pas changé.",
+        revele: SW + "② Le même budget, révélé : en cramoisi, les <strong>subventions d'équilibre des retraites</strong>, prélevées sur les budgets sans le dire — contributions « employeur » des ministères au CAS Pensions (<strong>51,9 Md€</strong>), transferts des branches Sécu (12,9), surcotisations CNRACL des collectivités (8,8), impôts affectés &amp; dette (62,4). <strong>Total : 136 Md€.</strong> La forme du Mondrian n'a pas changé.",
         realite: "③ Le vrai coût : ces sommes ont quitté les budgets (affichés nets) et forment le bloc « Déficit des retraites — 136 Md€ » ; le bloc Retraites montre ses vrais 405 Md€.",
       };
-      function refresh() { cap.textContent = texts[document.body.dataset.mode] || texts.realite; }
+      function refresh() { cap.innerHTML = texts[document.body.dataset.mode] || texts.realite; }
       new MutationObserver(refresh).observe(document.body, { attributes: true, attributeFilter: ["data-mode"] });
       refresh();
       const dlg = document.getElementById("mode-dlg");

@@ -567,13 +567,25 @@
       const w = r.w * k, h = r.h * k;
       const d = document.createElement("div");
       d.className = "mig-ghost";
-      d.style.cssText = "position:absolute;z-index:4;pointer-events:none;border-radius:2px;" +
-        "display:flex;align-items:center;justify-content:center;overflow:hidden;" +
-        "box-shadow:0 2px 10px rgba(74,10,26,.30);" +
-        "font:700 11px " + '"Helvetica Neue",Helvetica,Arial,sans-serif' + ";color:#fff;" +
+      // « part à détacher » : liseré pointillé crème (elle quittera ce budget en ③),
+      // même grammaire que les tuiles (coins 3px, gap crème), ombre discrète
+      d.style.cssText = "position:absolute;z-index:4;pointer-events:none;border-radius:3px;" +
+        "display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;" +
+        "overflow:hidden;text-align:center;padding:2px;" +
+        "outline:2px solid #FAF6EF;border:1.5px dashed rgba(250,246,239,.75);" +
+        "box-shadow:0 2px 8px rgba(74,10,26,.28);" +
+        "font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;color:#fff;" +
         "left:" + (r.x + r.w - w + off.x) + "px;top:" + (r.y + r.h - h + off.y) + "px;" +
         "width:" + w + "px;height:" + h + "px;background:" + DEFICIT + ";";
-      if (w > 42 && h > 20) d.textContent = fmt(s.value);
+      // contenu selon la place : libellé + montant → montant → nombre seul
+      if (w >= 108 && h >= 50) {
+        d.innerHTML = '<span style="font:600 10px/1.2 inherit;opacity:.85;letter-spacing:.02em">' +
+          "CAS Pensions</span><b style='font:800 12.5px/1.2 inherit'>" + fmt(s.value) + "&nbsp;Md€</b>";
+      } else if (w >= 62 && h >= 26) {
+        d.innerHTML = "<b style='font:800 11px/1.2 inherit'>" + fmt(s.value) + "&nbsp;Md€</b>";
+      } else if (w >= 30 && h >= 16) {
+        d.innerHTML = "<b style='font:800 10px/1.1 inherit'>" + fmt(s.value) + "</b>";
+      }
       stageEl.appendChild(d);
       if (fade) {
         d.style.opacity = "0";
