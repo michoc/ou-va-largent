@@ -630,17 +630,22 @@
       const full = "<b style='font:800 " + (phone ? 11 : 12.5) + "px/1 inherit'>" + fmt(s.value) +
         "&nbsp;Md€</b><span style='font:600 " + (phone ? 9.5 : 10.5) +
         "px/1 inherit;opacity:.92;margin-left:5px'>· " + pct + "&nbsp;%</span>";
-      const money = "<b style='font:800 " + (phone ? 10 : 11) + "px/1 inherit'>" +
-        fmt(s.value) + (phone ? "" : "&nbsp;Md€") + "</b>";
+      const moneyMd = "<b style='font:800 " + (phone ? 10 : 11) + "px/1 inherit'>" +
+        fmt(s.value) + "&nbsp;Md€</b>";
+      const moneyBare = "<b style='font:800 " + (phone ? 10 : 11) + "px/1 inherit'>" +
+        fmt(s.value) + "</b>";
       if (bh >= 18 && r.w >= 90) d.innerHTML = full;
-      else if (bh >= 13 && r.w >= 40) d.innerHTML = money;
+      else if (bh >= 13 && r.w >= 40) d.innerHTML = moneyMd;
       stageEl.appendChild(d);
       // garde-fou anti-troncature : un nombre coupé induit en erreur (« 24,3 »
-      // tronqué en « 4,3 »). Si le texte déborde de la bande, on rétrograde
-      // full → montant seul → rien (jamais de chiffre à moitié).
+      // tronqué en « 4,3 »). Si le texte déborde, on rétrograde par paliers —
+      // « X Md€ · Y % » → « X Md€ » → « X » → rien (jamais de chiffre à moitié).
       if (d.innerHTML && d.scrollWidth > d.clientWidth + 1) {
-        d.innerHTML = money;
-        if (d.scrollWidth > d.clientWidth + 1) d.innerHTML = "";
+        d.innerHTML = moneyMd;
+        if (d.scrollWidth > d.clientWidth + 1) {
+          d.innerHTML = moneyBare;
+          if (d.scrollWidth > d.clientWidth + 1) d.innerHTML = "";
+        }
       }
       if (fade) {
         d.style.opacity = "0";
@@ -779,7 +784,11 @@
         upperLabel: { show: true, height: 22, fontSize: 12, fontWeight: 700, color: "#1E2430",
           formatter: (p) => p.name, overflow: "truncate", ellipsis: "…" },
         itemStyle: { borderColor: "#FAF6EF", borderWidth: 2, gapWidth: 2 },
+        // au survol/tap on met en avant la branche, mais SANS effacer le reste
+        // (sur mobile le tap = survol persistant : un « focus ancestor » agressif
+        // délavait tout le Mondrian) → on garde les autres blocs bien lisibles.
         emphasis: { focus: "ancestor" },
+        blur: { itemStyle: { opacity: 0.72 }, label: { opacity: 0.6 } },
         // ⚠ levels[0] = RACINE VIRTUELLE (pas le 1er niveau de données) :
         // on y masque le label hérité du nom de série (breadcrumb seulement)
         levels: [
