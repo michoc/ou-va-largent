@@ -296,7 +296,7 @@
                   "au CAS Pensions : ils financent en réalité les retraites." });
         if (vp > 0.01) migSrc.push({ type: "strip", host: court, frac: vp / l.value, value: vp });
         familles.push({
-          name: court, children: kids,
+          name: court, children: kids, _brut: l.value,
           itemStyle: { color: nodeColor[fam] }, upperLabel: { show: true, color: "#1E2430" },
           _tip: official
             ? fmt(l.value) + " Md€ de crédits votés (bruts), dont ≈ " + fmt(vp) +
@@ -305,6 +305,9 @@
               " Md€ re-versés aux retraites (CAS Pensions).",
         });
       });
+    // tri par valeur BRUTE (clé STABLE entre les deux modes) : avec sort:false
+    // sur la série, la géographie des familles ne bouge pas au basculement
+    familles.sort((a, b) => b._brut - a._brut);
 
     // — Sécurité sociale (branches ± transfert retraites) —
     const secuTr = sum((l) => l.source === SECU_N && l.target.indexOf("Régimes") === 0);
@@ -316,6 +319,9 @@
         itemStyle: { color: nodeColor[l.target] }, label: { color: inkFor(nodeColor[l.target]) },
         upperLabel: { show: true, color: "#1E2430" },
       }));
+    // ordre stable des branches (clé indépendante du mode), le transfert
+    // camouflé toujours EN DERNIER → sa position ne saute pas au basculement
+    branches.sort((a, b) => (b.value || 999) - (a.value || 999));
     if (official && secuTr > 0.01)
       // camouflé : même rose que la Sécu — comme dans la présentation officielle
       branches.push({ name: "Transferts entre branches", value: Math.round(secuTr * 100) / 100,
@@ -402,13 +408,19 @@
         ] };
     }
 
+    // ⚠ ORDRE IDENTIQUE dans les deux modes + series.sort:false → la géographie
+    // des grands blocs est STABLE au basculement (seules les tailles s'ajustent).
+    // Sans ça, le tri par valeur d'ECharts fait échanger leurs places aux blocs
+    // (officiel : État > Sécu > Retraites ; réalité : Retraites > État > Sécu)
+    // et chaque bascule est un chambardement illisible.
     return [
+      retraites,
       { name: "Ministères de l'État", children: familles, itemStyle: { color: COL.etat },
         upperLabel: { show: true, color: "#1E2430" },
         _tip: "Budget général : familles → missions → programmes → actions (mêmes plongées que le poster)." +
               (official ? " Brut — les contributions retraites (CAS Pensions) sont fondues dans chaque famille."
                         : " Net des re-fléchages retraites.") },
-      secu, retraites, ct,
+      secu, ct,
       { name: "Union européenne", value: Math.round(ue * 100) / 100,
         itemStyle: { color: COL.ue }, label: { color: inkFor(COL.ue) },
         _tip: "Prélèvement sur recettes au profit de l'Union européenne." },
@@ -572,75 +584,87 @@
       chart.setOption({ series: [{ data: build(DATA_G, to), animationDurationUpdate: 350 }] });
       migrating = false;
     };
-    setTimeout(finish, 4200);                          // garde-fou (onglet en arrière-plan…)
-    const FLY = { duration: 1000, easing: "cubic-bezier(.45,.05,.2,1)", fill: "forwards" };
+    setTimeout(finish, 7000);                          // garde-fou (onglet en arrière-plan…)
     const css = (r) => ({ left: r.x + "px", top: r.y + "px", width: r.w + "px", height: r.h + "px" });
     const curRect = (f) => ({ x: f.offsetLeft, y: f.offsetTop, w: f.offsetWidth, h: f.offsetHeight });
+    const FLY = { duration: 1100, easing: "cubic-bezier(.5,.05,.25,1)", fill: "forwards" };
+
+    /* Chorégraphie STRICTEMENT SÉQUENTIELLE (~4,5-5 s, budget accordé) : à tout
+       instant, SOIT le fond bouge, SOIT les rectangles volent — jamais les deux.
+       La géographie étant stabilisée (sort:false), l'ajustement du fond n'est
+       plus qu'une respiration de tailles. */
 
     if (to === "realite") {
-      /* ---- RÉVÉLATION puis REGROUPEMENT ---- */
-      // ① fond IMMOBILE : les parts cachées « deviennent cramoisies » dans leurs
-      //    blocs d'origine (fondu d'apparition in situ, 800 ms)
-      const flyers = migRects(off).map((s) => {
+      /* ① RÉVÉLATION (0→1,5 s) : fond officiel IMMOBILE, les sommes cachées
+         apparaissent en cramoisi dans leurs budgets, l'une après l'autre */
+      const flyers = migRects(off).map((s, i) => {
         const f = mkGhost(s.rect, DEFICIT, fmt(s.value));
         f.style.opacity = "0";
-        f.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 800, easing: "ease-out", fill: "forwards" });
+        f.animate([{ opacity: 0 }, { opacity: 1 }],
+          { duration: 700, delay: i * 90, easing: "ease-out", fill: "forwards" });
         ghosts.push(f);
         return f;
       });
-      // ② vol : les rectangles quittent leurs blocs pendant que le fond se
-      //    réarrange VITE (450 ms) — l'encart cible reste estompé jusqu'à l'arrivée
+      /* ② PAUSE de lecture (1,5→2,0 s), puis le FOND s'ajuste SEUL (2,0→2,7 s) :
+         budgets bruts → nets, l'encart cible apparaît en pâle. Les rectangles
+         cramoisis restent immobiles, détachés, au-dessus. */
       setTimeout(() => {
-        chart.setOption({ series: [{ data: build(DATA_G, to, { ghost: true }), animationDurationUpdate: 450 }] });
-        setTimeout(() => {
-          const t = layoutsOf([MIG_TARGET])[MIG_TARGET];
-          if (!t) { finish(); return; }
-          const dst = css(rectOf(t, off));
-          let done = 0;
-          flyers.forEach((f, i) => {
-            const a = f.animate([css(curRect(f)), dst], Object.assign({ delay: i * 70 }, FLY));
-            a.onfinish = () => { if (++done === flyers.length) finish(); };
-          });
-        }, 80);
-      }, 900);
+        chart.setOption({ series: [{ data: build(DATA_G, to, { ghost: true }), animationDurationUpdate: 650 }] });
+      }, 2000);
+      /* ③ VOL (2,8→4,6 s) : fond désormais STABLE, les rectangles convergent
+         un à un vers l'encart et s'y fondent */
+      setTimeout(() => {
+        const t = layoutsOf([MIG_TARGET])[MIG_TARGET];
+        if (!t) { finish(); return; }
+        const dst = css(rectOf(t, off));
+        let done = 0;
+        flyers.forEach((f, i) => {
+          const a = f.animate([css(curRect(f)), dst], Object.assign({ delay: i * 80 }, FLY));
+          a.onfinish = () => { if (++done === flyers.length) finish(); };
+        });
+      }, 2800);
     } else {
-      /* ---- SCISSION puis CAMOUFLAGE : l'encart se découpe en bandes ∝ qui
-         volent chacune s'enfouir dans son budget, puis s'y fondent ---- */
+      /* ---- sens inverse : SCISSION, ajustement du fond, DISPERSION, CAMOUFLAGE ---- */
       const t = layoutsOf([MIG_TARGET])[MIG_TARGET];
       if (!t) { finish(); return; }
-      // il faut le détail des parts : build(officiel) remplit MIG_SRC
+      // détail des parts (build(officiel) remplit MIG_SRC) — data réutilisée en ②
       const officialData = build(DATA_G, to);
       const parts = MIG_SRC.slice().sort((a, b) => b.value - a.value);
       const total = parts.reduce((s, p) => s + p.value, 0) || 1;
-      const flyers = {};
+      /* ① SCISSION (0→0,6 s) : l'encart se découpe en bandes ∝ (liserés qui
+         apparaissent), fond immobile */
+      const flyers = [];
       let cx = t.x + off.x;
       parts.forEach((p) => {
         const w = Math.max(2, (t.w * p.value) / total);
-        flyers[p.host] = mkGhost({ x: cx, y: t.y + off.y, w: w, h: t.h }, DEFICIT, fmt(p.value));
-        ghosts.push(flyers[p.host]);
+        const f = mkGhost({ x: cx, y: t.y + off.y, w: w, h: t.h }, DEFICIT, fmt(p.value));
+        f.style.boxShadow = "inset 1px 0 0 rgba(250,246,239,.55)";   // liseré de découpe
+        ghosts.push(f); flyers.push(f);
         cx += w;
       });
-      // le fond bascule vite vers le layout officiel (camouflé, sans cramoisi)
-      chart.setOption({ series: [{ data: officialData, animationDurationUpdate: 450 }] });
+      /* ② le FOND s'ajuste SEUL (0,6→1,3 s) : budgets nets → bruts (camouflés),
+         les bandes restent immobiles au-dessus */
       setTimeout(() => {
-        const dsts = migRects(off);                    // positions dans le NOUVEAU layout
-        // ré-associe par valeur (hôtes triés pareil des deux côtés)
-        const sorted = parts.map((p) => flyers[p.host]);
+        chart.setOption({ series: [{ data: officialData, animationDurationUpdate: 650 }] });
+      }, 600);
+      /* ③ DISPERSION (1,4→3,3 s) : fond STABLE, chaque bande vole vers son
+         budget puis s'y CAMOUFLE (fondu de disparition) */
+      setTimeout(() => {
+        const dsts = migRects(off);                    // triées par valeur, comme parts
         let done = 0, count = 0;
         dsts.forEach((d, i) => {
-          const f = sorted[i];
+          const f = flyers[i];
           if (!f) return;
           count++;
-          const a = f.animate([css(curRect(f)), css(d.rect)], Object.assign({ delay: i * 70 }, FLY));
+          const a = f.animate([css(curRect(f)), css(d.rect)], Object.assign({ delay: i * 80 }, FLY));
           a.onfinish = () => {
-            // arrivée : la part se CAMOUFLE (fondu de disparition dans le budget)
             const fade = f.animate([{ opacity: 1 }, { opacity: 0 }],
-              { duration: 450, easing: "ease-in", fill: "forwards" });
+              { duration: 500, easing: "ease-in", fill: "forwards" });
             fade.onfinish = () => { if (++done === count) finish(); };
           };
         });
         if (!count) finish();
-      }, 80);
+      }, 1400);
     }
   }
 
@@ -687,6 +711,9 @@
       },
       series: [{
         type: "treemap", name: "Vue d'ensemble", data: build(DATA, MODE), leafDepth: 2, roam: false,
+        // ⚠ sort:false = on garde l'ORDRE DES DONNÉES (identique dans les deux
+        // modes, tris manuels stables dans build) → géographie stable au basculement
+        sort: false,
         width: "100%", height: "94%", top: 30,
         // sur mobile, on masque les tuiles trop petites (étiquettes illisibles)
         visibleMin: isPhone() ? 24 : 8,
