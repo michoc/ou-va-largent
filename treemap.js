@@ -344,16 +344,19 @@
         "cotisation par : impôts affectés & dette " + fmt(impots) + " · subventions d'équilibre " +
         "des ministères (CAS Pensions) " + fmt(minCAS) + " · CNRACL " + fmt(cnracl) +
         " · transferts Sécu " + fmt(secuTr) + ". Part non contributive.";
+      // gapWidth:0 → les enfants sont FLUSH (pas de liseré crème) : le bloc se lit
+      // comme UN SEUL rectangle de 405 dont la zone rouge (136) est encastrée.
       retraites = { name: "Retraites — 405 Md€",
-        itemStyle: { color: COL.pens }, upperLabel: { show: true, color: "#1E2430" },
+        itemStyle: { color: COL.pens, gapWidth: 0 }, upperLabel: { show: true, color: "#1E2430" },
         _tip: "405 Md€ de pensions versées (tous régimes). Les cotisations n'en couvrent que 269 : " +
               "il manque 136 Md€ (la zone rouge).",
         children: [
           { name: "Financé par les cotisations", value: Math.round(cot * 100) / 100,
-            itemStyle: { color: COL.pens, borderColor: COL.pens }, label: { color: inkFor(COL.pens) },
+            itemStyle: { color: COL.pens, borderColor: COL.pens, borderWidth: 0, gapWidth: 0 },
+            label: { color: inkFor(COL.pens) },
             _tip: "269 Md€ de cotisations vieillesse tous régimes (≈ 2/3 des ressources — COR)." },
           { name: "Déséquilibre des retraites", value: deficit,
-            itemStyle: { color: HATCH_RED, borderColor: ACCENT, borderWidth: 3 },
+            itemStyle: { color: HATCH_RED, borderColor: ACCENT, borderWidth: 3, gapWidth: 0 },
             label: { color: "#7E1D33", fontWeight: 800 }, _tip: brk },
         ] };
     }
