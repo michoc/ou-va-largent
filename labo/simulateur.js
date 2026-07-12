@@ -359,10 +359,16 @@
     '<span class="repere" data-an="2070" style="cursor:pointer;border-bottom:1px dotted #B9AE97">2070</span></div></div></div>' +
     '<div class="ctl" id="ctl-inv-taux"><label for="inv-taux">LEVIER 1 — taux de cotisation vieillesse ' +
     '<output id="out-inv-taux"></output></label>' +
-    '<input type="range" id="inv-taux" min="8" max="60" step="0.1"></div>' +
+    '<input type="range" id="inv-taux" min="8" max="60" step="0.1">' +
+    '<div class="reperes" style="display:flex;gap:4px 10px;flex-wrap:wrap;font-size:11px;color:var(--ink-soft);margin-top:3px">Situation actuelle : ' +
+    '<span class="repere" data-taux="28.1" style="cursor:pointer;border-bottom:1px dotted #B9AE97"><b>28,1 %</b></span>' +
+    ' · 1980 : 19 %</div></div>' +
     '<div class="ctl" id="ctl-inv-age"><label for="inv-age">LEVIER 2 — âge de départ (durée de cotisation) ' +
     '<output id="out-inv-age"></output></label>' +
-    '<input type="range" id="inv-age" min="60" max="85" step="1"></div>' +
+    '<input type="range" id="inv-age" min="60" max="85" step="1">' +
+    '<div class="reperes" style="display:flex;gap:4px 10px;flex-wrap:wrap;font-size:11px;color:var(--ink-soft);margin-top:3px">Situation actuelle : ' +
+    '<span class="repere" data-age="64" style="cursor:pointer;border-bottom:1px dotted #B9AE97"><b>64 ans</b> (âge légal)</span>' +
+    ' · départ moyen constaté ≈ 62,8 ans</div></div>' +
     '<div class="sal-fixe">💶 Salaire des cotisants : <b>figé</b> au salaire brut moyen ' +
     'PAR TÊTE des 30,4 M de cotisants — ' + fmt0(P.salaireMoyenBrut) + ' € bruts (≈ ' +
     fmt0(SAL_NET_MOYEN) + ' € nets), calé pour retrouver les <b>269 Md€</b> de cotisations ' +
@@ -382,6 +388,8 @@
     const r = e.target.closest(".repere"); if (!r) return;
     if (r.dataset.cible) INV.cible = +r.dataset.cible;
     if (r.dataset.an) INV.annee = +r.dataset.an;
+    if (r.dataset.taux && !estPasse()) INV.tauxPct = +r.dataset.taux;
+    if (r.dataset.age && !estPasse()) INV.age = +r.dataset.age;
     renderInverse();
   });
 
@@ -489,10 +497,14 @@
     $("ctl-inv-age").classList.toggle("locked", passe);
     $("out-inv-cible").textContent = fmt0(INV.cible) + " € nets";
     $("out-inv-annee").textContent = INV.annee + (passe ? " (figé)" : "");
-    $("out-inv-taux").textContent = pct1(txt / 100) + " %" + (passe ? " 🔒" : "");
+    const dT = txt - 28.1;
+    $("out-inv-taux").textContent = pct1(txt / 100) + " %" + (passe ? " 🔒"
+      : (Math.abs(dT) >= 0.3 ? " (" + (dT > 0 ? "+" : "−") + pct1(Math.abs(dT) / 100) +
+         " pt" + (Math.abs(dT) >= 2 ? "s" : "") + ")" : ""));
     const neRet = INV.annee - age, durRet = Math.max(0, evGen(neRet).mixte - age);
     $("out-inv-age").textContent = age + " ans" + (passe ? " 🔒"
-      : " · retraite ≈ " + durRet + " an" + (durRet > 1 ? "s" : ""));
+      : (age !== 64 ? " (" + (age > 64 ? "+" : "−") + Math.abs(age - 64) + ")" : "") +
+        " · retraite ≈ " + durRet + " an" + (durRet > 1 ? "s" : ""));
 
     $("inv-verrou").textContent = "🔒 Démographie " + INV.annee + " : " +
       fmt2(interp(P.ratio, INV.annee)) + " cotisant(s) par retraité — " +
