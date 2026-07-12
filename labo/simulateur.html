@@ -5,89 +5,109 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <!-- 🧪 LABO : prototype non référencé, non lié depuis l'accueil -->
   <meta name="robots" content="noindex,nofollow">
-  <title>Labo — Ma retraite : combien je verse, combien je touche ?</title>
-  <link rel="stylesheet" href="../style.css?v=labo1">
+  <title>Labo — Retraites : le compte d'une vie</title>
+  <link rel="stylesheet" href="../style.css?v=labo5">
   <style>
     /* ---- styles propres au labo (on ne touche pas au style.css du site) ---- */
     .labo-band { background: #F5E663; color: #1E2430; font-weight: 700; font-size: 13px;
       text-align: center; padding: 7px 12px; border-bottom: 2px solid #1E2430; }
-    .sim-wrap { max-width: 1300px; margin: 0 auto; padding: 0 16px 60px; }
-    .sim-grid { display: grid; grid-template-columns: minmax(400px, 590px) 1fr; gap: 24px;
-      align-items: start; }
-    @media (max-width: 900px) { .sim-grid { grid-template-columns: 1fr; } }
+    .sim-wrap { max-width: 1240px; margin: 0 auto; padding: 0 16px 60px; }
     .sim-card { background: var(--paper); border: 1px solid var(--rule); border-radius: 12px;
       box-shadow: 0 2px 14px rgba(30,36,48,.06); padding: 18px 20px; }
-    .sim-card h3 { margin: 0 0 10px; font-size: 16px; }
-    .profils { display: flex; flex-wrap: wrap; gap: 7px; margin: 4px 0 14px; }
-    .profil-chip { font: 700 12px/1 inherit; color: #4A5265; background: #FBF7EE;
-      border: 1px solid var(--rule); border-radius: 999px; padding: 7px 12px; cursor: pointer;
+    .acte-titre { font: 800 22px/1.25 Georgia, serif; margin: 34px 0 4px; }
+    .acte-titre .n { color: var(--accent); }
+    .acte-sous { color: var(--ink-soft); font-size: 14px; margin: 0 0 14px; }
+
+    /* --- barre profils + dette --- */
+    .bar { display: flex; flex-wrap: wrap; gap: 8px 14px; align-items: center; margin: 10px 0 14px; }
+    .profil-chip { font: 700 13px/1 inherit; color: #4A5265; background: #FBF7EE;
+      border: 1px solid var(--rule); border-radius: 999px; padding: 8px 14px; cursor: pointer;
       transition: background .15s, color .15s; }
     .profil-chip:hover { background: #F5E663; color: #1E2430; }
     .profil-chip.on { background: #1E2430; color: #fff; border-color: #1E2430; }
-    .ctl { margin: 19px 0; }
-    .ctl label { display: flex; justify-content: space-between; align-items: baseline;
-      font-size: 13px; font-weight: 700; color: var(--ink); margin-bottom: 4px; }
-    .ctl label output { font-variant-numeric: tabular-nums; color: var(--accent); }
-    .ctl input[type=range] { width: 100%; height: 30px; accent-color: #C13B55; cursor: pointer; }
-    .reperes { display: flex; flex-wrap: wrap; gap: 4px 10px; font-size: 11px;
-      color: var(--ink-soft); margin-top: 3px; }
-    .reperes b { font-weight: 700; }
-    .repere { cursor: pointer; border-bottom: 1px dotted #B9AE97; white-space: nowrap; }
-    .repere:hover { color: var(--accent); border-bottom-color: var(--accent); }
-    .cohr { margin-top: 16px; padding: 12px 14px; background: #FBF7EE;
+    .sw-inline { display: flex; gap: 8px; align-items: center; font-size: 12.5px; font-weight: 700;
+      color: #8E1B38; margin-left: auto; cursor: pointer; }
+    .sw-inline input { accent-color: #8E1B38; transform: scale(1.2); cursor: pointer; }
+
+    /* --- les 4 cartes générations --- */
+    .gen-cards { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+    @media (max-width: 980px) { .gen-cards { grid-template-columns: repeat(2, 1fr); } }
+    .gen-card { text-align: left; font: inherit; background: var(--paper);
+      border: 2px solid var(--rule); border-radius: 12px; padding: 14px 15px 12px;
+      cursor: pointer; transition: border-color .15s, transform .1s;
+      box-shadow: 0 2px 10px rgba(30,36,48,.05); }
+    .gen-card:hover { transform: translateY(-2px); }
+    .gen-card.on { border-color: var(--accent); box-shadow: 0 4px 16px rgba(193,59,85,.18); }
+    .gc-year { display: block; font: 700 13px/1 inherit; color: var(--ink-soft); }
+    .gc-ratio { display: block; font: 800 40px/1.1 Georgia, serif; margin: 6px 0 2px; }
+    .gc-ratio.gagnant { color: #3E7A4E; }
+    .gc-ratio.perdant { color: #8E1B38; }
+    .gc-sub { display: block; font-size: 11px; color: var(--ink-soft); margin-bottom: 8px; }
+    .gc-squares { display: block; margin: 4px 0 6px; }
+    .gc-facts { display: block; font-size: 11.5px; line-height: 1.55; color: var(--ink); }
+    .gc-facts b { font-variant-numeric: tabular-nums; }
+    .gc-mode { display: inline-block; font: 700 10px/1 inherit; padding: 3px 8px;
+      border-radius: 999px; margin-top: 8px; }
+    .gc-mode.passe { background: #EFE8F7; color: #5C4580; }
+    .gc-mode.futur { background: #FDE8ED; color: #8E1B38; }
+    .gen-caption { text-align: center; font-style: italic; color: var(--ink-soft);
+      font-size: 13px; margin: 10px 0 0; }
+
+    /* --- détail « et vous » --- */
+    #detail { margin-top: 18px; }
+    .det-grid { display: grid; grid-template-columns: 1fr minmax(280px, 380px); gap: 20px;
+      align-items: start; }
+    @media (max-width: 900px) { .det-grid { grid-template-columns: 1fr; } }
+    .res-phrase { font-size: 15px; line-height: 1.55; margin: 10px 0 4px; }
+    .res-phrase b { color: #8E1B38; }
+    .mode-tag { display: inline-block; font: 700 11px/1 inherit; padding: 4px 9px;
+      border-radius: 999px; margin-bottom: 6px; }
+    .mode-tag.passe { background: #EFE8F7; color: #5C4580; }
+    .mode-tag.futur { background: #FDE8ED; color: #8E1B38; }
+    .mini-stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+      gap: 10px; margin-top: 12px; }
+    .mini { background: #FBF7EE; border: 1px solid var(--rule); border-radius: 9px;
+      padding: 10px 12px; }
+    .mini b { display: block; font-size: 16px; color: var(--ink); font-variant-numeric: tabular-nums; }
+    .mini span { font-size: 11px; color: var(--ink-soft); }
+    #sim-chart { width: 100%; height: 280px; margin-top: 8px; }
+    .cohr { margin-top: 2px; padding: 12px 14px; background: #FBF7EE;
       border: 1px solid var(--rule); border-left: 5px solid #A2683A; border-radius: 10px;
       font-size: 12.5px; line-height: 1.6; }
     .cohr h4 { margin: 0 0 6px; font-size: 12.5px; color: #A2683A; }
-    .cohr b { font-variant-numeric: tabular-nums; }
     .cohr .use { color: var(--accent); font-weight: 700; cursor: pointer;
       border-bottom: 1px dotted var(--accent); white-space: nowrap; }
-    .dual { position: relative; height: 34px; }
-    .dual input[type=range] { position: absolute; left: 0; top: 0; width: 100%; margin: 0;
-      pointer-events: none; background: transparent; height: 34px; }
-    .dual input[type=range]::-webkit-slider-thumb { pointer-events: auto; }
-    .dual input[type=range]::-moz-range-thumb { pointer-events: auto; }
     .avance { margin-top: 12px; border-top: 1px dashed var(--rule); padding-top: 10px; }
     .avance summary { cursor: pointer; font-size: 12.5px; font-weight: 700; color: var(--ink-soft); }
     .avance[open] summary { color: var(--accent); }
-    #inverse-card { margin-top: 22px; }
-    #inverse-card h3 .lock { font-size: 11.5px; color: var(--ink-soft); font-weight: 600; }
-    .inv-grid { display: grid; grid-template-columns: minmax(300px, 460px) 1fr; gap: 20px;
+    .ctl { margin: 14px 0; }
+    .ctl label { display: flex; justify-content: space-between; align-items: baseline;
+      font-size: 13px; font-weight: 700; color: var(--ink); margin-bottom: 4px; }
+    .ctl label output { font-variant-numeric: tabular-nums; color: var(--accent); }
+    .ctl input[type=range] { width: 100%; height: 28px; accent-color: #C13B55; cursor: pointer; }
+    .custom-tag { display: none; font: 700 11px/1 inherit; color: #A2683A; margin-left: 8px; }
+    .custom .custom-tag { display: inline; }
+
+    /* --- acte 2 : la balance --- */
+    #balance-svg { display: block; margin: 6px auto 2px; max-width: 100%; }
+    .bal-caption { text-align: center; font-size: 13px; color: var(--ink); margin: 4px 0 14px; }
+    .bal-caption b { color: #8E1B38; }
+    .verrou { display: inline-block; background: #EEE9DD; color: #6A6152;
+      font-weight: 700; font-size: 12px; border-radius: 999px; padding: 5px 11px; margin: 2px 0 10px; }
+    .inv-grid { display: grid; grid-template-columns: minmax(300px, 440px) 1fr; gap: 22px;
       align-items: start; }
     @media (max-width: 900px) { .inv-grid { grid-template-columns: 1fr; } }
-    .inv-phrase { font-size: 15px; line-height: 1.6; margin: 6px 0; }
+    .scenars { display: flex; flex-wrap: wrap; gap: 7px; margin: 10px 0 4px; }
+    .scenar { font: 700 12px/1.3 inherit; color: #4A5265; background: #FBF7EE;
+      border: 1px solid var(--rule); border-radius: 999px; padding: 7px 12px; cursor: pointer; }
+    .scenar:hover { background: #F5E663; color: #1E2430; }
+    .inv-phrase { font-size: 15px; line-height: 1.6; margin: 8px 0; }
     .inv-phrase b { color: #8E1B38; }
-    .ratio-chip { display: inline-block; background: #FDE8ED; color: #8E1B38; font-weight: 700;
-      font-size: 12px; border-radius: 999px; padding: 4px 10px; margin: 2px 0 8px; }
-    .sw { display: flex; gap: 10px; align-items: flex-start; margin-top: 16px; padding: 12px;
-      background: #FFF5F7; border: 1.5px solid var(--accent); border-radius: 10px; }
-    .sw input { margin-top: 3px; accent-color: #8E1B38; transform: scale(1.25); }
-    .sw label { font-size: 12.5px; color: var(--ink); cursor: pointer; }
-    .sw label b { color: #8E1B38; }
-    .sw.off { opacity: .45; }
-    /* --- résultats --- */
-    .res-top { display: flex; gap: 18px; align-items: center; flex-wrap: wrap; }
-    .res-ratio { font: 800 44px/1 Georgia, serif; color: #8E1B38; white-space: nowrap; }
-    .res-ratio small { display: block; font: 700 12px/1.3 Helvetica, Arial, sans-serif;
-      color: var(--ink-soft); margin-top: 4px; }
-    .res-squares svg { display: block; }
-    .res-phrase { font-size: 15px; line-height: 1.55; margin: 14px 0 4px; }
-    .res-phrase b { color: #8E1B38; }
-    .mode-tag { display: inline-block; font: 700 11px/1 inherit; padding: 4px 9px;
-      border-radius: 999px; margin-bottom: 10px; }
-    .mode-tag.passe { background: #EFE8F7; color: #5C4580; }
-    .mode-tag.futur { background: #FDE8ED; color: #8E1B38; }
-    .mini-stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-      gap: 10px; margin-top: 14px; }
-    .mini { background: #FBF7EE; border: 1px solid var(--rule); border-radius: 9px;
-      padding: 10px 12px; }
-    .mini b { display: block; font-size: 17px; color: var(--ink); font-variant-numeric: tabular-nums; }
-    .mini span { font-size: 11px; color: var(--ink-soft); }
-    #sim-chart { width: 100%; height: 300px; margin-top: 8px; }
-    .metho { margin-top: 22px; font-size: 13px; }
+    .inv-note { font-size: 12px; color: #A2683A; font-weight: 700; min-height: 16px; }
+    .metho { margin-top: 26px; font-size: 13px; }
     .metho summary { cursor: pointer; font-weight: 700; }
     .metho li { margin: 7px 0; line-height: 1.5; }
     .flag { color: #A2683A; font-weight: 700; }
-    .verse-detail { font-size: 12px; color: var(--ink-soft); margin-top: 6px; }
   </style>
 </head>
 <body class="mondrian">
@@ -95,76 +115,82 @@
   <header class="masthead">
     <div class="masthead-inner">
       <p class="kicker"><a class="home-link" href="../index.html">← Accueil</a>
-        &nbsp;·&nbsp; Labo · simulateur retraites · prototype</p>
-      <h1><span class="hl">Ma retraite : combien je verse, combien je touche&nbsp;?</span></h1>
+        &nbsp;·&nbsp; Labo · retraites · prototype</p>
+      <h1><span class="hl">Retraites : le compte d'une vie</span></h1>
       <p class="standfirst">
-        Réglez votre situation : le simulateur calcule ce que vous <strong>versez au système de
-        retraites</strong> sur toute votre carrière et ce que vous <strong>toucherez en pensions</strong>.
-        Générations déjà parties : les règles réelles. Générations futures : <strong>un jeu à somme
-        nulle</strong> — vos pensions = ce que les cotisants de votre époque pourront financer,
-        selon la démographie de <em>votre</em> génération.
+        <strong>① La même vie, née quatre fois</strong> — même métier, même salaire, même carrière :
+        seule l'année de naissance change, et tout bascule.
+        <strong>② Qui paie une pension&nbsp;?</strong> — la balance entre un retraité et les
+        cotisants qui le financent, et les seuls leviers qui existent.
       </p>
     </div>
   </header>
 
   <main class="sim-wrap">
-    <div class="profils" id="profils" role="group" aria-label="Profils types"></div>
-    <div class="sim-grid">
-      <section class="sim-card" aria-label="Réglages">
-        <h3>Votre situation</h3>
-        <div id="controls"></div>
-        <details class="avance" id="avance"><summary>Réglages avancés — âge d'entrée, fin de vie, salaires début/fin</summary><div id="controls-adv"></div></details>
-        <div class="cohr" id="coherence"></div>
-        <div class="sw" id="sw-dette-wrap">
-          <input type="checkbox" id="sw-dette">
-          <label for="sw-dette"><b>Rembourser la dette laissée par le système&nbsp;?</b><br>
-            Si activé, vos années travaillées après 2025 paient aussi votre quote-part des
-            <b>136&nbsp;Md€/an</b> de subventions d'équilibre (impôts &amp; dette) qui comblent
-            aujourd'hui le trou des retraites — un coût déjà réel, mais invisible sur la fiche de paie.</label>
-        </div>
-      </section>
-
-      <section class="sim-card" aria-live="polite" aria-label="Résultats">
-        <span class="mode-tag" id="mode-tag"></span>
-        <div class="res-top">
-          <div class="res-ratio" id="res-ratio"></div>
-          <div class="res-squares" id="res-squares"></div>
-        </div>
-        <p class="res-phrase" id="res-phrase"></p>
-        <p class="verse-detail" id="verse-detail"></p>
-        <div class="mini-stats" id="mini-stats"></div>
-        <div id="sim-chart"></div>
-      </section>
+    <!-- ═══════════ ACTE 1 ═══════════ -->
+    <h2 class="acte-titre"><span class="n">①</span> La même vie, née quatre fois</h2>
+    <p class="acte-sous">Choisissez un métier. Les quatre cartes vivent la <b>même carrière</b> —
+      seule l'année de naissance (et les règles qu'elle subit) change.</p>
+    <div class="bar">
+      <span id="profils"></span>
+      <label class="sw-inline"><input type="checkbox" id="sw-dette">
+        rembourser la dette laissée par le système&nbsp;?</label>
     </div>
+    <div class="gen-cards" id="gen-cards"></div>
+    <p class="gen-caption" id="gen-caption"></p>
 
-    <section class="sim-card" id="inverse-card" aria-label="Simulateur inverse" aria-live="polite">
-      <h3>⇄ Et qui paiera VOTRE pension&nbsp;? <span class="lock">— jeu à somme nulle&nbsp;:
-        bouger un curseur ajuste les autres</span></h3>
-      <span class="ratio-chip" id="inv-ratio"></span>
-      <div class="inv-grid">
-        <div id="inv-controls"></div>
+    <section class="sim-card" id="detail" aria-live="polite">
+      <h3 style="margin:0 0 4px">Et vous, précisément&nbsp;? <span class="custom-tag">— réglage personnalisé</span></h3>
+      <span class="mode-tag" id="mode-tag"></span>
+      <div class="det-grid">
         <div>
-          <p class="inv-phrase" id="inv-phrase"></p>
-          <p class="verse-detail" id="inv-note"></p>
+          <p class="res-phrase" id="res-phrase"></p>
+          <p id="verse-detail" style="font-size:12px;color:var(--ink-soft)"></p>
+          <div class="mini-stats" id="mini-stats"></div>
+          <div id="sim-chart"></div>
+        </div>
+        <div>
+          <div class="cohr" id="coherence"></div>
+          <details class="avance" id="avance">
+            <summary>Réglages avancés — année précise, âges, salaires début/fin</summary>
+            <div id="controls-adv"></div>
+          </details>
         </div>
       </div>
     </section>
 
-    <details class="metho sim-card" style="margin-top:22px">
+    <!-- ═══════════ ACTE 2 ═══════════ -->
+    <h2 class="acte-titre"><span class="n">②</span> Qui paie une pension&nbsp;?</h2>
+    <p class="acte-sous">Une pension n'est pas de l'argent mis de côté : elle est prélevée
+      <b>chaque mois</b> sur le salaire des cotisants d'alors. Voici la balance — et les seuls
+      leviers qui existent.</p>
+    <section class="sim-card" id="inverse-card" aria-live="polite">
+      <span class="verrou" id="inv-verrou"></span>
+      <div class="inv-grid">
+        <div>
+          <div id="inv-controls"></div>
+          <div class="scenars" id="scenarios"></div>
+          <p class="inv-note" id="inv-note"></p>
+        </div>
+        <div>
+          <svg id="balance-svg"></svg>
+          <p class="bal-caption" id="bal-caption"></p>
+          <p class="inv-phrase" id="inv-phrase"></p>
+        </div>
+      </div>
+    </section>
+
+    <details class="metho sim-card">
       <summary>Méthodologie, hypothèses &amp; sources (prototype)</summary>
       <ul>
-        <li><b>Euros constants 2025</b>, sans actualisation : on compare des pouvoirs d'achat, pas des valeurs financières.</li>
-        <li><b>Salaires saisis en NET</b> (ce que vous connaissez). Le moteur reconvertit en brut (net ÷ 0,78, approximation secteur privé) car les cotisations se prélèvent sur le brut. Les <b>pensions sont affichées nettes</b> (−9,1 % de CSG-CRDS-Casa sur la pension brute). <span class="flag">Ratios de conversion à consolider.</span></li>
-        <li><b>Encadré « repères de votre génération »</b> : espérance de vie à 65 ans PROJETÉE pour votre cohorte (≈ +1 mois par an, plafonnée à +5 ans — scénario central INSEE 2070 ; variantes cadre +2,5 ans / ouvrier −3 ans), ratio cotisants/retraité à votre année de départ (COR), taux de cotisation réellement vécus sur votre carrière. <span class="flag">Projections indicatives, à consolider.</span></li>
-        <li><b>Ce que vous versez</b> = chaque année de carrière, salaire brut × <b>taux de cotisation vieillesse de l'année</b> (part salariale + patronale, tous régimes). Série ≈ 15,5&nbsp;% (1970) → 28,1&nbsp;% (2025), calée sur les moyennes 22&nbsp;% / 28&nbsp;% par génération (estimation S.&nbsp;Catherine). <span class="flag">Série à consolider ligne à ligne.</span></li>
-        <li><b>Générations déjà parties (départ ≤ 2025)</b> : pension = taux de remplacement observé × salaire de fin (≈ 80&nbsp;% au SMIC, dégressif vers ≈ 60&nbsp;% pour un cadre — approximation DREES). <span class="flag">À consolider.</span></li>
-        <li><b>Générations futures (départ &gt; 2025) : équilibre strict de VOTRE génération</b> — pension = taux de cotisation (28&nbsp;%) × ratio cotisants/retraité à votre départ × salaire de fin. Ratio : 1,67 (2025) → 1,5 (2040) → 1,2 (2070), projections COR/INSEE. C'est un jeu à somme nulle : aucune dette nouvelle, chaque génération reçoit ce que la suivante peut payer.</li>
-        <li><b>Interrupteur dette</b> : ajoute, pour chaque année travaillée après 2025, votre quote-part des 136&nbsp;Md€/an non financés par les cotisations (COR juin 2025) : ≈ 4&nbsp;470&nbsp;€/an par cotisant au prorata de votre salaire. Hypothèse : déficit stable en € constants.</li>
-        <li><b>Durée de retraite</b> = votre curseur « fin de vie » − âge de départ. Repères : espérance de vie <b>à 65 ans</b> (INSEE 2023) ≈ 85 ans (hommes) / 88 ans (femmes) ; écart cadre/ouvrier ≈ ±3 ans. <span class="flag">Piège évité : ne pas utiliser l'espérance de vie à la naissance.</span></li>
-        <li><b>Heures de travail</b> : total versé ÷ salaire horaire brut moyen de votre carrière (1&nbsp;600 h/an). Années de SMIC : total ÷ 17&nbsp;900&nbsp;€ net/an (référentiel du comparateur du site).</li>
-        <li><b>Simulateur inverse (« qui paiera votre pension ? »)</b> : équation à somme nulle pension nette = taux × ratio cotisants/retraité × salaire brut moyen des cotisants × 0,909. Le ratio est FIXÉ par la démographie à votre année de départ ; bouger la pension ajuste le taux, bouger le taux ou le salaire ajuste la pension. Chaque retraité mobilise l'intégralité des cotisations vieillesse de « ratio » cotisants.</li>
-        <li>Non modélisés en V1 : plafonds (PASS), minimum contributif, redistribution, carrières hachées, fonction publique et régimes spéciaux (présents seulement en repères), réversion. <b>Ordres de grandeur, pas un droit à pension.</b></li>
-        <li>Sources : <a href="https://www.cor-retraites.fr/sites/default/files/2025-06/Synthèse_Def_.pdf">COR, synthèse juin 2025</a> · <a href="https://www.insee.fr/fr/statistiques/2416631">INSEE, espérance de vie</a> · <a href="https://x.com/sc_cath/status/1955025559919980629">S. Catherine (heures &amp; taux par génération)</a> · <a href="https://docs.google.com/spreadsheets/d/1VMvwlbG37IsAkWsQ--E-q1GeYnc1FvwKW2ew6dn0abU/">tableur de travail « niveau de vie des +65 ans »</a>.</li>
+        <li><b>Euros constants 2025</b>, sans actualisation. <b>Salaires saisis en NET</b> (÷ 0,78 → brut pour les cotisations, approximation privé) ; <b>pensions affichées nettes</b> (−9,1 % CSG-CRDS-Casa). <span class="flag">Ratios à consolider.</span></li>
+        <li><b>Les 4 cartes</b> : même carrière (salaires constants 2025), âge de départ RÉALISTE par génération (61 · 64 · 65 · 66 — règles vécues/prévisibles), fin de vie = espérance de vie projetée de la cohorte (à 65 ans, +≈1 mois/an plafonné +5 ans, variantes cadre/ouvrier). <span class="flag">À consolider.</span></li>
+        <li><b>Ce que chacun verse</b> = salaire brut × taux de cotisation vieillesse DE CHAQUE ANNÉE (série ≈ 15,5 % en 1970 → 28,1 % en 2025, calée sur les moyennes générationnelles 22 % / 28 %, estimation S. Catherine).</li>
+        <li><b>Départs ≤ 2025</b> : règles réelles (taux de remplacement observé, dégressif). <b>Départs &gt; 2025 : jeu à somme nulle</b> — pension = taux × ratio cotisants/retraité de la génération (COR : 1,67 → 1,5 en 2040 → 1,2 en 2070) × salaire brut fin.</li>
+        <li><b>Interrupteur dette</b> : les années travaillées après 2025 paient la quote-part des <b>136 Md€/an</b> non financés par les cotisations (COR juin 2025) : ≈ 4 470 €/an par cotisant, au prorata du salaire.</li>
+        <li><b>La balance (acte ②)</b> : équation à somme nulle pension nette = taux × ratio × salaire brut cotisants × 0,909. La démographie est verrouillée par l'année de départ ; seuls la bougent l'ÂGE de départ (≈ +0,06 cotisant/retraité par année de report — estimation) et la natalité (effet ≈ +0,1 mais seulement 25 ans plus tard). Chaque retraité mobilise l'intégralité des cotisations vieillesse de « ratio » cotisants.</li>
+        <li>Non modélisés : plafonds, minimum contributif, redistribution, carrières hachées, fonction publique et régimes spéciaux, réversion. <b>Ordres de grandeur pédagogiques, pas un droit à pension.</b></li>
+        <li>Sources : <a href="https://www.cor-retraites.fr/sites/default/files/2025-06/Synthèse_Def_.pdf">COR juin 2025</a> · <a href="https://www.insee.fr/fr/statistiques/2416631">INSEE espérance de vie</a> · <a href="https://x.com/sc_cath/status/1955025559919980629">S. Catherine</a> · <a href="https://docs.google.com/spreadsheets/d/1VMvwlbG37IsAkWsQ--E-q1GeYnc1FvwKW2ew6dn0abU/">tableur de travail</a>.</li>
       </ul>
     </details>
   </main>
@@ -174,6 +200,6 @@
   </footer>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/echarts/5.5.0/echarts.min.js"></script>
-  <script src="simulateur.js?v=labo4"></script>
+  <script src="simulateur.js?v=labo5"></script>
 </body>
 </html>
