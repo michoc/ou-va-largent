@@ -313,20 +313,23 @@
           if (vp > 0.01) {
             const net = Math.round((l.value - vp) * 100) / 100, cas = Math.round(vp * 100) / 100;
             // conteneur SANS bandeau-titre : le nom (complet, replié) reste DANS la
-            // grande sous-tuile nette ; la bordure crème du conteneur encadre les
-            // deux → « bloc scindé » net / cramoisi, comme la scission du ③.
+            // grande sous-tuile nette. gapWidth:0 + borderWidth:0 (comme la scission
+            // « cotisations | déséquilibre » du ③) → les deux moitiés se TOUCHENT,
+            // AUCUN écart crème entre net et cramoisi. La bordure crème du conteneur
+            // (niveau 2) sépare seulement les familles entre elles.
             familles.push({
               name: court, _brut: l.value,
-              itemStyle: { color: famColor }, upperLabel: { show: false },
+              itemStyle: { color: famColor, gapWidth: 0 }, upperLabel: { show: false },
               _tip: fmt(l.value) + " Md€ bruts, dont ≈ " + fmt(vp) +
                     " Md€ de subvention retraites (CAS Pensions).",
               children: [
-                { name: court, value: net, itemStyle: { color: famColor },
+                { name: court, value: net,
+                  itemStyle: { color: famColor, borderColor: famColor, borderWidth: 0, gapWidth: 0 },
                   label: { color: inkFor(famColor) },
                   _tip: fmt(net) + " Md€ de crédits, nets de la subvention retraites." },
                 { name: "Subvention retraites — " + court, value: cas, _est: true,
-                  itemStyle: { color: DEFICIT }, label: { color: "#FFFFFF", fontWeight: 700,
-                    formatter: () => fmt(cas) + " Md€" },
+                  itemStyle: { color: DEFICIT, borderColor: DEFICIT, borderWidth: 0, gapWidth: 0 },
+                  label: { color: "#FFFFFF", fontWeight: 700, formatter: () => fmt(cas) + " Md€" },
                   _tip: "≈ " + fmt(vp) + " Md€ prélevés sur « " + court + " » et versés au CAS " +
                         "Pensions : ils financent les retraites (présentés comme une dépense du ministère)." },
               ],
