@@ -614,16 +614,21 @@
       const r = lay[s.host];
       if (!r) return;
       const pct = Math.round(s.frac * 100);
-      const bh = Math.max(phone ? 5 : 7, r.h * s.frac);   // hauteur = part × hauteur du bloc
+      const bh = Math.max(phone ? 6 : 8, r.h * s.frac);   // hauteur = part × hauteur du bloc
+      // On veut un vrai BLOC SCINDÉ, pas une vignette posée : la partie basse EST
+      // le bloc, dans une autre couleur. Donc PAS de coins arrondis, un léger
+      // retrait (inset) pour que la bordure crème du bloc ENCADRE le cramoisi, et
+      // un séparateur de la MÊME crème que les interstices du treemap (#FAF6EF) →
+      // œil lit « moitié classique / moitié cramoisie » comme la scission du ③.
+      const inset = phone ? 2 : 3;
       const d = document.createElement("div");
       d.className = "mig-ghost";
       d.style.cssText = "position:absolute;z-index:4;pointer-events:none;overflow:hidden;" +
-        "background:" + DEFICIT + ";color:#fff;border-top:1.5px solid rgba(250,246,239,.85);" +
-        "border-bottom-left-radius:3px;border-bottom-right-radius:3px;" +
+        "background:" + DEFICIT + ";color:#fff;border-top:2.5px solid #FAF6EF;box-sizing:border-box;" +
         "display:flex;align-items:center;justify-content:center;text-align:center;" +
         "font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;white-space:nowrap;" +
-        "left:" + (r.x + off.x) + "px;top:" + (r.y + r.h - bh + off.y) + "px;" +
-        "width:" + r.w + "px;height:" + bh + "px;";
+        "left:" + (r.x + inset + off.x) + "px;top:" + (r.y + r.h - bh + off.y) + "px;" +
+        "width:" + (r.w - 2 * inset) + "px;height:" + (bh - inset) + "px;";
       // « X Md€ · Y % » si la bande est assez épaisse ET large, sinon montant
       // seul, sinon rien (la bande proportionnelle parle d'elle-même ;
       // « % du budget » est explicité dans la légende / l'infobulle)
