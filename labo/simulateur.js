@@ -330,15 +330,15 @@
   }
 
   $("inv-controls").innerHTML =
-    '<div class="cible-block"><span class="titre">🎯 VOTRE OBJECTIF — la variable de base</span>' +
+    '<div class="cible-block"><span class="titre">🎯 VOTRE OBJECTIF — « je veux telle pension, telle année »</span>' +
     '<div class="ctl"><label for="inv-cible">« Je veux une pension de… » ' +
     '<output id="out-inv-cible"></output></label>' +
     '<input type="range" id="inv-cible" min="500" max="4000" step="10">' +
     '<div class="reperes" style="display:flex;gap:4px 10px;flex-wrap:wrap;font-size:11px;color:var(--ink-soft);margin-top:3px">Repères : ' +
     '<span class="repere" data-cible="1426" style="cursor:pointer;border-bottom:1px dotted #B9AE97">SMIC 1 426</span> · ' +
     '<span class="repere" data-cible="1480" style="cursor:pointer;border-bottom:1px dotted #B9AE97">pension moyenne 1 480</span> · ' +
-    '<span class="repere" data-cible="2000" style="cursor:pointer;border-bottom:1px dotted #B9AE97">confortable 2 000</span></div></div></div>' +
-    '<div class="ctl" id="ctl-inv-annee"><label for="inv-annee">…en quelle année ? (le contexte) ' +
+    '<span class="repere" data-cible="2000" style="cursor:pointer;border-bottom:1px dotted #B9AE97">confortable 2 000</span></div></div>' +
+    '<div class="ctl" id="ctl-inv-annee" style="margin-top:12px"><label for="inv-annee">« …en quelle année ? » ' +
     '<output id="out-inv-annee"></output></label>' +
     '<input type="range" id="inv-annee" min="1975" max="2070" step="1">' +
     '<div class="reperes" style="display:flex;gap:4px 10px;flex-wrap:wrap;font-size:11px;color:var(--ink-soft);margin-top:3px">Repères : ' +
@@ -346,7 +346,7 @@
     '<span class="repere" data-an="2000" style="cursor:pointer;border-bottom:1px dotted #B9AE97">2000</span> · ' +
     '<span class="repere" data-an="2025" style="cursor:pointer;border-bottom:1px dotted #B9AE97">aujourd\u2019hui</span> · ' +
     '<span class="repere" data-an="2050" style="cursor:pointer;border-bottom:1px dotted #B9AE97">2050</span> · ' +
-    '<span class="repere" data-an="2070" style="cursor:pointer;border-bottom:1px dotted #B9AE97">2070</span></div></div>' +
+    '<span class="repere" data-an="2070" style="cursor:pointer;border-bottom:1px dotted #B9AE97">2070</span></div></div></div>' +
     '<div class="ctl" id="ctl-inv-taux"><label for="inv-taux">LEVIER 1 — taux de cotisation vieillesse ' +
     '<output id="out-inv-taux"></output></label>' +
     '<input type="range" id="inv-taux" min="8" max="60" step="0.1"></div>' +
