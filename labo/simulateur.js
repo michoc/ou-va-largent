@@ -352,7 +352,7 @@
     '<input type="range" id="inv-taux" min="8" max="60" step="0.1"></div>' +
     '<div class="ctl" id="ctl-inv-age"><label for="inv-age">LEVIER 2 — âge de départ (durée de cotisation) ' +
     '<output id="out-inv-age"></output></label>' +
-    '<input type="range" id="inv-age" min="60" max="75" step="1"></div>' +
+    '<input type="range" id="inv-age" min="60" max="85" step="1"></div>' +
     '<div class="sal-fixe">💶 Salaire des cotisants : <b>figé</b> au salaire moyen France — ' +
     fmt0(SAL_NET_MOYEN) + ' € nets (' + fmt0(P.salaireMoyenBrut) +
     ' € bruts, INSEE). Pas un levier : on isole démographie et taux.</div>';
@@ -381,7 +381,7 @@
       } },
     { lab: "→ Fermer l\u2019écart par l\u2019ÂGE", run: () => {
         if (estPasse()) return "passe";
-        INV.age = Math.round(clamp(ageNecessaire(), 60, 75));
+        INV.age = Math.round(clamp(ageNecessaire(), 60, 85));
       } },
     { lab: "Natalité +0,2 enfant/femme", run: () => { INV.natal = !INV.natal; } },
     { lab: "↺ Règles d\u2019aujourd\u2019hui", run: () => {
@@ -479,7 +479,9 @@
     $("out-inv-cible").textContent = fmt0(INV.cible) + " € nets";
     $("out-inv-annee").textContent = INV.annee + (passe ? " (figé)" : "");
     $("out-inv-taux").textContent = pct1(txt / 100) + " %" + (passe ? " 🔒" : "");
-    $("out-inv-age").textContent = age + " ans" + (passe ? " 🔒" : "");
+    const neRet = INV.annee - age, durRet = Math.max(0, evGen(neRet).mixte - age);
+    $("out-inv-age").textContent = age + " ans" + (passe ? " 🔒"
+      : " · retraite ≈ " + durRet + " an" + (durRet > 1 ? "s" : ""));
 
     $("inv-verrou").textContent = "🔒 Démographie " + INV.annee + " : " +
       fmt2(interp(P.ratio, INV.annee)) + " cotisant(s) par retraité — " +
@@ -526,12 +528,16 @@
       phr = "Avec ces réglages, il manque <b>" + fmt0(gap) + " €/mois</b>. Pour obtenir VOS " +
         fmt0(INV.cible) + " € en " + INV.annee + " : taux à <b>" +
         (tN > 60 ? "plus de 60 %" : pct1(Math.min(tN, 60) / 100) + " %") + "</b> <b>OU</b> départ à <b>" +
-        (aN > 75 ? "plus de 75 ans" : Math.ceil(aN) + " ans") +
+        (aN > 85 ? "plus de 85 ans (autant dire jamais)" : Math.ceil(aN) + " ans") +
         "</b> — ou réviser l\u2019objectif à la baisse.";
     }
     $("inv-phrase").innerHTML = phr;
 
+    const neR = INV.annee - age, dR = evGen(neR).mixte - age;
     $("inv-note").textContent = scenNote ||
+      (!passe && dR <= 5 ? "⚠ À ce départ, la retraite ne durerait plus que ≈ " + Math.max(0, dR) +
+        " an" + (dR > 1 ? "s" : "") + " (espérance de vie de cette génération : ≈ " +
+        evGen(neR).mixte + " ans)." : "") ||
       (INV.natal && INV.annee < 2050 && !passe
         ? "⚠ Natalité : aucun effet avant ~2050 (les bébés d\u2019aujourd\u2019hui cotisent dans 25 ans)."
         : (INV.natal && INV.annee >= 2050 ? "Natalité +0,2 : ratio +0,1 — le levier le plus lent." : ""));
