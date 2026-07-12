@@ -306,7 +306,7 @@
    *   projetée et deux seuls leviers — taux et âge (≈ +0,06 ratio/an de
    *   report ; natalité +0,1 mais seulement après 2050).
    * Contrôle de cohérence : 2025 → ≈ 1 480 € nets ≈ pension moyenne réelle. */
-  const INV = { annee: 2050, tauxPct: 28.1, age: 64, natal: false };
+  const INV = { annee: 2050, cible: 1480, tauxPct: 28.1, age: 64, natal: false };
   const ageHisto = (an) => an < 1983 ? 65 : an < 2011 ? 60 : an < 2023 ? 62 : 64;
   const estPasse = () => INV.annee <= 2025;
   const effTauxPct = () => estPasse() ? interp(P.taux, INV.annee) * 100 : INV.tauxPct;
@@ -317,13 +317,28 @@
     return clamp(base + 0.06 * (INV.age - 64) +
                  (INV.natal && INV.annee >= 2050 ? 0.1 : 0), 0.5, 3.2);
   }
-  const pensionOut = () => (effTauxPct() / 100) * ratioEff() * P.salaireMoyenBrut * P.PNET;
-  // la référence : ce que l'équation finance AUJOURD'HUI (≈ pension moyenne)
-  const BASELINE = 0.281 * interp(P.ratio, 2025) * P.salaireMoyenBrut * P.PNET;
+  // ce que les réglages courants FINANCENT (l'objectif, lui, est fixé par l'utilisateur)
+  const financeOut = () => (effTauxPct() / 100) * ratioEff() * P.salaireMoyenBrut * P.PNET;
+  const BASELINE = 0.281 * interp(P.ratio, 2025) * P.salaireMoyenBrut * P.PNET;   // ≈ 1 478 €
   const SAL_NET_MOYEN = Math.round(P.salaireMoyenBrut * P.NET2BRUT);
+  // leviers nécessaires pour ATTEINDRE la cible (ferment l'écart à somme nulle)
+  const tauxNecessaire = () => INV.cible / (ratioEff() * P.salaireMoyenBrut * P.PNET) * 100;
+  function ageNecessaire() {
+    const needRatio = INV.cible / ((INV.tauxPct / 100) * P.salaireMoyenBrut * P.PNET);
+    return 64 + (needRatio - interp(P.ratio, INV.annee) -
+                 (INV.natal && INV.annee >= 2050 ? 0.1 : 0)) / 0.06;
+  }
 
   $("inv-controls").innerHTML =
-    '<div class="ctl" id="ctl-inv-annee"><label for="inv-annee">Financer une pension en… ' +
+    '<div class="cible-block"><span class="titre">🎯 VOTRE OBJECTIF — la variable de base</span>' +
+    '<div class="ctl"><label for="inv-cible">« Je veux une pension de… » ' +
+    '<output id="out-inv-cible"></output></label>' +
+    '<input type="range" id="inv-cible" min="500" max="4000" step="10">' +
+    '<div class="reperes" style="display:flex;gap:4px 10px;flex-wrap:wrap;font-size:11px;color:var(--ink-soft);margin-top:3px">Repères : ' +
+    '<span class="repere" data-cible="1426" style="cursor:pointer;border-bottom:1px dotted #B9AE97">SMIC 1 426</span> · ' +
+    '<span class="repere" data-cible="1480" style="cursor:pointer;border-bottom:1px dotted #B9AE97">pension moyenne 1 480</span> · ' +
+    '<span class="repere" data-cible="2000" style="cursor:pointer;border-bottom:1px dotted #B9AE97">confortable 2 000</span></div></div></div>' +
+    '<div class="ctl" id="ctl-inv-annee"><label for="inv-annee">…en quelle année ? (le contexte) ' +
     '<output id="out-inv-annee"></output></label>' +
     '<input type="range" id="inv-annee" min="1975" max="2070" step="1">' +
     '<div class="reperes" style="display:flex;gap:4px 10px;flex-wrap:wrap;font-size:11px;color:var(--ink-soft);margin-top:3px">Repères : ' +
@@ -332,16 +347,17 @@
     '<span class="repere" data-an="2025" style="cursor:pointer;border-bottom:1px dotted #B9AE97">aujourd\u2019hui</span> · ' +
     '<span class="repere" data-an="2050" style="cursor:pointer;border-bottom:1px dotted #B9AE97">2050</span> · ' +
     '<span class="repere" data-an="2070" style="cursor:pointer;border-bottom:1px dotted #B9AE97">2070</span></div></div>' +
-    '<div class="ctl" id="ctl-inv-taux"><label for="inv-taux">Taux de cotisation vieillesse ' +
+    '<div class="ctl" id="ctl-inv-taux"><label for="inv-taux">LEVIER 1 — taux de cotisation vieillesse ' +
     '<output id="out-inv-taux"></output></label>' +
     '<input type="range" id="inv-taux" min="8" max="60" step="0.1"></div>' +
-    '<div class="ctl" id="ctl-inv-age"><label for="inv-age">Âge de départ (durée de cotisation) ' +
+    '<div class="ctl" id="ctl-inv-age"><label for="inv-age">LEVIER 2 — âge de départ (durée de cotisation) ' +
     '<output id="out-inv-age"></output></label>' +
     '<input type="range" id="inv-age" min="60" max="70" step="1"></div>' +
     '<div class="sal-fixe">💶 Salaire des cotisants : <b>figé</b> au salaire moyen France — ' +
     fmt0(SAL_NET_MOYEN) + ' € nets (' + fmt0(P.salaireMoyenBrut) +
-    ' € bruts, INSEE). Le curseur n\u2019existe pas : on isole démographie et taux.</div>';
+    ' € bruts, INSEE). Pas un levier : on isole démographie et taux.</div>';
 
+  $("inv-cible").addEventListener("input", (e) => { INV.cible = +e.target.value; renderInverse(); });
   $("inv-annee").addEventListener("input", (e) => { INV.annee = +e.target.value; renderInverse(); });
   $("inv-taux").addEventListener("input", (e) => {
     if (estPasse()) return;
@@ -351,19 +367,21 @@
     if (estPasse()) return;
     INV.age = +e.target.value; renderInverse();
   });
-  $("ctl-inv-annee").addEventListener("click", (e) => {
+  $("inv-controls").addEventListener("click", (e) => {
     const r = e.target.closest(".repere"); if (!r) return;
-    INV.annee = +r.dataset.an; renderInverse();
+    if (r.dataset.cible) INV.cible = +r.dataset.cible;
+    if (r.dataset.an) INV.annee = +r.dataset.an;
+    renderInverse();
   });
 
   const SCENARIOS = [
-    { lab: "→ Maintenir la pension d\u2019aujourd\u2019hui (ajuste le taux)", run: () => {
+    { lab: "→ Fermer l\u2019écart par le TAUX", run: () => {
         if (estPasse()) return "passe";
-        INV.tauxPct = clamp(BASELINE / (ratioEff() * P.salaireMoyenBrut * P.PNET) * 100, 8, 60);
+        INV.tauxPct = clamp(tauxNecessaire(), 8, 60);
       } },
-    { lab: "Réforme de l\u2019âge : 64 → 66", run: () => {
+    { lab: "→ Fermer l\u2019écart par l\u2019ÂGE", run: () => {
         if (estPasse()) return "passe";
-        INV.age = 66;
+        INV.age = Math.round(clamp(ageNecessaire(), 60, 70));
       } },
     { lab: "Natalité +0,2 enfant/femme", run: () => { INV.natal = !INV.natal; } },
     { lab: "↺ Règles d\u2019aujourd\u2019hui", run: () => {
@@ -401,33 +419,45 @@
     }
     return s + "</g>";
   }
-  function renderBalance(pension) {
+  // le bloc pension = L'OBJECTIF : rempli à hauteur du FINANCÉ, le manque
+  // en POINTILLÉ cramoisi (même langage que le cotisant manquant)
+  function renderBalance(cible, finance) {
     const R = ratioEff();
     const full = Math.floor(R + 1e-9), frac = R - full;
     const nSil = full + (frac > 0.01 ? 1 : 0);
-    const parCot = (pension / P.PNET) / R;
+    const parCot = (finance / P.PNET) / R;
     const SW = 78;
-    const W = 210 + 70 + Math.max(nSil, 1) * SW + 10, H = 190;
+    const W = 210 + 70 + Math.max(nSil, 1) * SW + 10, H = 196;
     let s = '<svg id="balance-svg" width="' + W + '" height="' + H + '" viewBox="0 0 ' + W + " " + H + '">';
-    const ph = clamp(pension / 6000 * 150, 14, 150);
-    s += '<rect x="30" y="' + (128 - ph) + '" width="150" height="' + ph +
-         '" rx="4" fill="#C94A6E"></rect>' +
-         '<text x="105" y="' + (128 - ph / 2 + 5) + '" text-anchor="middle" style="font:800 17px Helvetica" fill="#fff">' +
-         fmt0(pension) + " €</text>" +
-         '<text x="105" y="148" text-anchor="middle" style="font:700 12px Helvetica" fill="#1E2430">LE RETRAITÉ</text>' +
-         '<text x="105" y="163" text-anchor="middle" style="font:600 10.5px Helvetica" fill="#4A5265">pension nette / mois — RÉSULTAT</text>';
-    s += '<text x="' + (210 + 20) + '" y="86" style="font:800 26px Georgia" fill="#1E2430">⚖</text>';
+    const hC = clamp(cible / 4000 * 150, 16, 150);
+    const hF = hC * clamp(finance / cible, 0, 1);
+    const y0 = 132;
+    // objectif : cadre pointillé cramoisi ; financé : rempli plein depuis le bas
+    s += '<rect x="30" y="' + (y0 - hC) + '" width="150" height="' + hC +
+         '" rx="4" fill="none" stroke="#8E1B38" stroke-width="2" stroke-dasharray="6 4"></rect>' +
+         '<rect x="30" y="' + (y0 - hF) + '" width="150" height="' + hF +
+         '" rx="3" fill="#C94A6E"></rect>';
+    if (hF > 24)
+      s += '<text x="105" y="' + (y0 - hF / 2 + 5) + '" text-anchor="middle" style="font:800 15px Helvetica" fill="#fff">' +
+           fmt0(finance) + " €</text>";
+    if (finance < cible * 0.99 && hC - hF > 15)
+      s += '<text x="105" y="' + (y0 - hF - (hC - hF) / 2 + 4) + '" text-anchor="middle" style="font:700 11px Helvetica" fill="#8E1B38">manque ' +
+           fmt0(cible - finance) + " €</text>";
+    s += '<text x="105" y="152" text-anchor="middle" style="font:700 12px Helvetica" fill="#1E2430">L\u2019OBJECTIF : ' +
+         fmt0(cible) + " €</text>" +
+         '<text x="105" y="167" text-anchor="middle" style="font:600 10.5px Helvetica" fill="#4A5265">rempli = financé par les réglages</text>';
+    s += '<text x="' + (210 + 20) + '" y="88" style="font:800 26px Georgia" fill="#1E2430">⚖</text>';
     const x0 = 210 + 70;
     for (let i = 0; i < full; i++)
-      s += '<g transform="translate(' + (x0 + i * SW) + ',18)">' + silhouette(0, 1, "#8C79C0", false) + "</g>";
+      s += '<g transform="translate(' + (x0 + i * SW) + ',20)">' + silhouette(0, 1, "#8C79C0", false) + "</g>";
     if (frac > 0.01)
-      s += '<g transform="translate(' + (x0 + full * SW) + ',18)">' + silhouette(0, frac, "#8C79C0", true) + "</g>";
+      s += '<g transform="translate(' + (x0 + full * SW) + ',20)">' + silhouette(0, frac, "#8C79C0", true) + "</g>";
     for (let i = 0; i < nSil; i++) {
       const last = (i === nSil - 1) && frac > 0.01;
-      s += '<text x="' + (x0 + i * SW + 30) + '" y="148" text-anchor="middle" style="font:700 11px Helvetica" fill="#1E2430">' +
+      s += '<text x="' + (x0 + i * SW + 30) + '" y="152" text-anchor="middle" style="font:700 11px Helvetica" fill="#1E2430">' +
         (last ? "× " + fmt2(frac) : fmt0(parCot) + " €") + "</text>";
       if (!last)
-        s += '<text x="' + (x0 + i * SW + 30) + '" y="162" text-anchor="middle" style="font:600 9.5px Helvetica" fill="#4A5265">/mois</text>';
+        s += '<text x="' + (x0 + i * SW + 30) + '" y="166" text-anchor="middle" style="font:600 9.5px Helvetica" fill="#4A5265">/mois</text>';
     }
     s += "</svg>";
     $("balance-svg").outerHTML = s;              // remplace le svg (garde l'id)
@@ -435,15 +465,18 @@
 
   function renderInverse() {
     const passe = estPasse();
-    const R = ratioEff(), p = pensionOut(), txt = effTauxPct(), age = effAge();
+    const R = ratioEff(), finance = financeOut(), txt = effTauxPct(), age = effAge();
+    const gap = INV.cible - finance;
+    const atteint = Math.abs(gap) <= INV.cible * 0.01 || finance > INV.cible;
 
-    // curseurs : valeurs effectives + verrouillage dans le passé
+    $("inv-cible").value = Math.round(INV.cible / 10) * 10;
     $("inv-annee").value = INV.annee;
     $("inv-taux").value = Math.round(txt * 10) / 10;
     $("inv-age").value = age;
     $("inv-taux").disabled = passe; $("inv-age").disabled = passe;
     $("ctl-inv-taux").classList.toggle("locked", passe);
     $("ctl-inv-age").classList.toggle("locked", passe);
+    $("out-inv-cible").textContent = fmt0(INV.cible) + " € nets";
     $("out-inv-annee").textContent = INV.annee + (passe ? " (figé)" : "");
     $("out-inv-taux").textContent = pct1(txt / 100) + " %" + (passe ? " 🔒" : "");
     $("out-inv-age").textContent = age + " ans" + (passe ? " 🔒" : "");
@@ -452,42 +485,48 @@
       fmt2(interp(P.ratio, INV.annee)) + " cotisant(s) par retraité — " +
       (passe ? "historique (le passé ne se refait pas)" : "projection COR (seuls l\u2019âge et la natalité, 25 ans plus tard, la font bouger)");
 
-    // — LE RÉSULTAT : la pension finançable, comparée à aujourd\u2019hui —
-    const delta = (p / BASELINE - 1) * 100;
-    $("inv-result").innerHTML = '<span class="big">' + fmt0(p) + " € nets/mois</span>" +
-      (Math.abs(delta) >= 1
-        ? '<span class="delta ' + (delta < 0 ? "neg" : "pos") + '">' +
-          (delta > 0 ? "+" : "−") + Math.abs(Math.round(delta)) + " % vs aujourd\u2019hui</span>"
-        : '<span class="delta pos">≈ la pension moyenne d\u2019aujourd\u2019hui</span>') +
-      '<span class="lab">pension finançable en ' + INV.annee + " — le RÉSULTAT de l\u2019équation, pas un réglage</span>";
+    // — LE TABLEAU DE BORD DE L'ÉCART —
+    const pctFill = clamp(finance / INV.cible * 100, 0, 100);
+    $("inv-result").innerHTML = atteint
+      ? '<span class="big ok">✓ objectif financé</span>' +
+        '<span class="lab">votre pension de ' + fmt0(INV.cible) + " € en " + INV.annee +
+        " est payée : taux " + pct1(txt / 100) + " %, départ à " + age + " ans</span>" +
+        '<div class="jauge"><div class="fill ok" style="width:100%"></div></div>'
+      : '<span class="big">' + fmt0(finance) + " € financés</span>" +
+        '<span class="delta neg">manque ' + fmt0(gap) + " €/mois</span>" +
+        '<span class="lab">pour VOTRE objectif de ' + fmt0(INV.cible) + " € en " + INV.annee +
+        " — fermez l\u2019écart avec les leviers</span>" +
+        '<div class="jauge"><div class="fill" style="width:' + pctFill + '%"></div></div>';
 
-    renderBalance(p);
-    const parCot = (p / P.PNET) / R;
+    renderBalance(INV.cible, finance);
+    const parCot = (finance / P.PNET) / R;
     $("bal-caption").innerHTML = "<b>" + fmt2(R) + " cotisant" + (R >= 2 ? "s" : "") +
-      "</b> au salaire moyen — pas un de plus — financent cette pension" +
-      (R % 1 > 0.01 ? " (en pointillé : le cotisant qui manque)" : "") + ".";
+      "</b> au salaire moyen — pas un de plus — versent chacun <b>" + fmt0(parCot) +
+      " €/mois</b> (" + pct1(txt / 100) + " % de leur brut)" +
+      (R % 1 > 0.01 ? ". En pointillé : le cotisant qui manque" : "") + ".";
 
     let phr;
     if (passe) {
-      phr = "En <b>" + INV.annee + "</b>, chaque retraité était porté par <b>" + fmt2(R) +
-        " cotisants</b> : <b>" + pct1(txt / 100) + " %</b> de cotisation (départ à " + age +
-        " ans) suffisaient à financer <b>≈ " + fmt0(p) + " € nets</b>. Le passé est figé — rien à régler.";
+      phr = "En <b>" + INV.annee + "</b> : " + fmt2(R) + " cotisants, " + pct1(txt / 100) +
+        " % de cotisation (départ à " + age + " ans) finançaient <b>≈ " + fmt0(finance) +
+        " € nets</b>" +
+        (INV.cible <= finance
+          ? " — votre objectif de " + fmt0(INV.cible) + " € était <b>couvert sans effort</b>."
+          : " — votre objectif de " + fmt0(INV.cible) + " € aurait déjà manqué de " +
+            fmt0(INV.cible - finance) + " €.") +
+        " Le passé est figé.";
+    } else if (atteint) {
+      phr = "<b>Voilà ce que coûte votre pension de " + fmt0(INV.cible) + " € en " + INV.annee +
+        "</b> : " + fmt2(R) + " cotisant(s) y consacrent " + pct1(txt / 100) +
+        " % de leur salaire brut (" + fmt0(parCot) + " €/mois chacun)" +
+        (txt > 28.4 ? ", contre 28,1 % aujourd\u2019hui (+" + pct1((txt - 28.1) / 100) + " pt)." : ".");
     } else {
-      phr = "En <b>" + INV.annee + "</b>, " + fmt2(R) + " cotisant(s) × " + pct1(txt / 100) +
-        " % du salaire moyen → <b>≈ " + fmt0(p) + " € nets</b> (chacun y consacre " +
-        fmt0(parCot) + " €/mois).";
-      if (p < BASELINE * 0.99) {
-        const tauxN = BASELINE / (ratioEff() * P.salaireMoyenBrut * P.PNET) * 100;
-        const needRatio = BASELINE / ((INV.tauxPct / 100) * P.salaireMoyenBrut * P.PNET);
-        const ageN = 64 + (needRatio - interp(P.ratio, INV.annee) -
-          (INV.natal && INV.annee >= 2050 ? 0.1 : 0)) / 0.06;
-        phr += " Pour <b>maintenir la pension d\u2019aujourd\u2019hui</b> (≈ " + fmt0(BASELINE) +
-          " €) : taux à <b>" + pct1(Math.min(tauxN, 60) / 100) + " %</b>" +
-          (tauxN > 60 ? " (insuffisant même à 60 %)" : "") +
-          " <b>OU</b> départ à <b>" +
-          (ageN > 70 ? "plus de 70 ans" : Math.ceil(ageN) + " ans") +
-          "</b> — ou accepter la baisse.";
-      }
+      const tN = tauxNecessaire(), aN = ageNecessaire();
+      phr = "Avec ces réglages, il manque <b>" + fmt0(gap) + " €/mois</b>. Pour obtenir VOS " +
+        fmt0(INV.cible) + " € en " + INV.annee + " : taux à <b>" +
+        (tN > 60 ? "plus de 60 %" : pct1(Math.min(tN, 60) / 100) + " %") + "</b> <b>OU</b> départ à <b>" +
+        (aN > 70 ? "plus de 70 ans" : Math.ceil(aN) + " ans") +
+        "</b> — ou réviser l\u2019objectif à la baisse.";
     }
     $("inv-phrase").innerHTML = phr;
 

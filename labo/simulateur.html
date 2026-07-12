@@ -101,6 +101,16 @@
     .scenar { font: 700 12px/1.3 inherit; color: #4A5265; background: #FBF7EE;
       border: 1px solid var(--rule); border-radius: 999px; padding: 7px 12px; cursor: pointer; }
     .scenar:hover { background: #F5E663; color: #1E2430; }
+    .cible-block { background: #FFF5F7; border: 1.5px solid var(--accent); border-radius: 10px;
+      padding: 12px 14px 10px; margin: 0 0 8px; }
+    .cible-block .ctl { margin: 0; }
+    .cible-block .titre { display: block; font: 800 13px/1.3 inherit; color: var(--accent);
+      margin-bottom: 6px; }
+    .jauge { height: 10px; background: #F0E9DA; border-radius: 999px; margin: 8px auto 0;
+      max-width: 360px; overflow: hidden; }
+    .jauge .fill { height: 100%; background: #C94A6E; transition: width .2s; }
+    .jauge .fill.ok { background: #3E7A4E; }
+    #inv-result .big.ok { color: #3E7A4E; }
     #inv-result { text-align: center; margin: 2px 0 6px; }
     #inv-result .big { font: 800 34px/1.1 Georgia, serif; color: #8E1B38; }
     #inv-result .delta { display: inline-block; font: 700 13px/1 inherit; border-radius: 999px;
@@ -173,9 +183,10 @@
     <!-- ═══════════ ACTE 2 ═══════════ -->
     <h2 class="acte-titre"><span class="n">②</span> Qui paie une pension&nbsp;?</h2>
     <p class="acte-sous">Une pension n'est pas de l'argent mis de côté : elle est prélevée
-      <b>chaque mois</b> sur le salaire des cotisants d'alors. Choisissez une année : hier,
-      3 cotisants suffisaient ; demain, il en manquera. <b>La pension est le RÉSULTAT</b> de
-      l'équation — les seuls leviers sont le taux et l'âge.</p>
+      <b>chaque mois</b> sur le salaire des cotisants d'alors. Fixez <b>votre objectif</b>
+      (« je veux telle pension, telle année ») : le simulateur montre ce que les règles
+      financent et <b>l'écart à combler</b> — à somme nulle, seuls le taux et l'âge peuvent
+      le fermer. Hier, 3 cotisants suffisaient ; demain, il en manquera.</p>
     <section class="sim-card" id="inverse-card" aria-live="polite">
       <span class="verrou" id="inv-verrou"></span>
       <div class="inv-grid">
@@ -201,7 +212,7 @@
         <li><b>Ce que chacun verse</b> = salaire brut × taux de cotisation vieillesse DE CHAQUE ANNÉE (série ≈ 15,5 % en 1970 → 28,1 % en 2025, calée sur les moyennes générationnelles 22 % / 28 %, estimation S. Catherine).</li>
         <li><b>Départs ≤ 2025</b> : règles réelles (taux de remplacement observé, dégressif). <b>Départs &gt; 2025 : jeu à somme nulle</b> — pension = taux × ratio cotisants/retraité de la génération (COR : 1,67 → 1,5 en 2040 → 1,2 en 2070) × salaire brut fin.</li>
         <li><b>Interrupteur dette</b> : les années travaillées après 2025 paient la quote-part des <b>136 Md€/an</b> non financés par les cotisations (COR juin 2025) : ≈ 4 470 €/an par cotisant, au prorata du salaire.</li>
-        <li><b>La balance (acte ②)</b> : la pension est le RÉSULTAT — pension nette = taux × ratio cotisants/retraité × salaire moyen brut France × 0,909. Le <b>salaire des cotisants est figé</b> au salaire moyen France (3 466 € bruts ≈ 2 703 € nets, INSEE 2023, euros constants — pour isoler démographie et taux). Le <b>curseur ANNÉE</b> voyage de 1975 à 2070 : dans le PASSÉ tout est figé (taux et âge légal de l'époque, démographie historique ≈ 3,0 cotisants en 1970 → 2,0 en 2005 — <span class="flag">série rétrospective à consolider</span>) ; dans le FUTUR, la démographie est projetée (COR) et seuls bougent le taux et l'âge (≈ +0,06 cotisant/retraité par année de report, estimation ; natalité +0,1 seulement après 2050). Contrôle de cohérence : la balance donne ≈ 1 480 € nets en 2025 — proche de la pension moyenne réelle.</li>
+        <li><b>La balance (acte ②)</b> : la pension est un <b>OBJECTIF</b> que l'utilisateur fixe (« je veux telle pension en telle année ») ; le simulateur montre ce qui est FINANCÉ par les réglages courants et <b>l'écart à combler</b> — à somme nulle, seuls le taux et l'âge peuvent le fermer. Équation : pension financée = pension nette = taux × ratio cotisants/retraité × salaire moyen brut France × 0,909. Le <b>salaire des cotisants est figé</b> au salaire moyen France (3 466 € bruts ≈ 2 703 € nets, INSEE 2023, euros constants — pour isoler démographie et taux). Le <b>curseur ANNÉE</b> voyage de 1975 à 2070 : dans le PASSÉ tout est figé (taux et âge légal de l'époque, démographie historique ≈ 3,0 cotisants en 1970 → 2,0 en 2005 — <span class="flag">série rétrospective à consolider</span>) ; dans le FUTUR, la démographie est projetée (COR) et seuls bougent le taux et l'âge (≈ +0,06 cotisant/retraité par année de report, estimation ; natalité +0,1 seulement après 2050). Contrôle de cohérence : la balance donne ≈ 1 480 € nets en 2025 — proche de la pension moyenne réelle.</li>
         <li>Non modélisés : plafonds, minimum contributif, redistribution, carrières hachées, fonction publique et régimes spéciaux, réversion. <b>Ordres de grandeur pédagogiques, pas un droit à pension.</b></li>
         <li>Sources : <a href="https://www.cor-retraites.fr/sites/default/files/2025-06/Synthèse_Def_.pdf">COR juin 2025</a> · <a href="https://www.insee.fr/fr/statistiques/2416631">INSEE espérance de vie</a> · <a href="https://x.com/sc_cath/status/1955025559919980629">S. Catherine</a> · <a href="https://docs.google.com/spreadsheets/d/1VMvwlbG37IsAkWsQ--E-q1GeYnc1FvwKW2ew6dn0abU/">tableur de travail</a>.</li>
       </ul>
@@ -213,6 +224,6 @@
   </footer>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/echarts/5.5.0/echarts.min.js"></script>
-  <script src="simulateur.js?v=labo6"></script>
+  <script src="simulateur.js?v=labo7"></script>
 </body>
 </html>
