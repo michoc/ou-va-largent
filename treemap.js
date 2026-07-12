@@ -300,18 +300,54 @@
     L.filter((l) => l.source === "État (budget général)" && l.target.indexOf("É · ") === 0)
       .forEach((l) => {
         const fam = l.target, vp = versePens[fam] || 0, court = fam.replace("É · ", "");
+        const famColor = nodeColor[fam];
         totalVp += vp;
+        if (vp > 0.01) migSrc.push({ type: "strip", host: court, frac: vp / l.value, value: vp });
+        if (revealed) {
+          // ② BLOC SCINDÉ NATIF : la famille devient un conteneur (bandeau-titre) ;
+          // à l'intérieur, la part NETTE (couleur du ministère) et la SUBVENTION
+          // RETRAITES (cramoisi) sont deux VRAIES sous-tuiles dessinées par ECharts
+          // (fini le calque HTML). Aire cramoisie = part exacte du budget. Les
+          // familles SANS CAS restent des tuiles pleines (feuilles) → leafDepth 3
+          // ne déroule pas les missions à la vue d'ensemble.
+          if (vp > 0.01) {
+            const net = Math.round((l.value - vp) * 100) / 100, cas = Math.round(vp * 100) / 100;
+            // conteneur SANS bandeau-titre : le nom (complet, replié) reste DANS la
+            // grande sous-tuile nette ; la bordure crème du conteneur encadre les
+            // deux → « bloc scindé » net / cramoisi, comme la scission du ③.
+            familles.push({
+              name: court, _brut: l.value,
+              itemStyle: { color: famColor }, upperLabel: { show: false },
+              _tip: fmt(l.value) + " Md€ bruts, dont ≈ " + fmt(vp) +
+                    " Md€ de subvention retraites (CAS Pensions).",
+              children: [
+                { name: court, value: net, itemStyle: { color: famColor },
+                  label: { color: inkFor(famColor) },
+                  _tip: fmt(net) + " Md€ de crédits, nets de la subvention retraites." },
+                { name: "Subvention retraites — " + court, value: cas, _est: true,
+                  itemStyle: { color: DEFICIT }, label: { color: "#FFFFFF", fontWeight: 700,
+                    formatter: () => fmt(cas) + " Md€" },
+                  _tip: "≈ " + fmt(vp) + " Md€ prélevés sur « " + court + " » et versés au CAS " +
+                        "Pensions : ils financent les retraites (présentés comme une dépense du ministère)." },
+              ],
+            });
+          } else {
+            familles.push({ name: court, value: Math.round(l.value * 100) / 100, _brut: l.value,
+              itemStyle: { color: famColor }, label: { color: inkFor(famColor) },
+              _tip: fmt(l.value) + " Md€ de crédits votés." });
+          }
+          return;
+        }
         const factor = (l.value - vp) / l.value;
-        const kids = kidsOf(DATA, fam, factor, nodeColor[fam], 1) || [];
+        const kids = kidsOf(DATA, fam, factor, famColor, 1) || [];
         if (official && vp > 0.01)
           kids.push({ name: "Contribution retraites (CAS Pensions)", value: Math.round(vp * 100) / 100,
-            itemStyle: { color: migColor(nodeColor[fam]) }, label: { color: migInk(nodeColor[fam]) }, _est: true,
+            itemStyle: { color: migColor(famColor) }, label: { color: migInk(famColor) }, _est: true,
             _tip: "≈ " + fmt(vp) + " Md€ présentés comme une dépense de cette famille, mais versés " +
                   "au CAS Pensions : ils financent en réalité les retraites." });
-        if (vp > 0.01) migSrc.push({ type: "strip", host: court, frac: vp / l.value, value: vp });
         familles.push({
           name: court, children: kids, _brut: l.value,
-          itemStyle: { color: nodeColor[fam] }, upperLabel: { show: true, color: "#1E2430" },
+          itemStyle: { color: famColor }, upperLabel: { show: true, color: "#1E2430" },
           _tip: official
             ? fmt(l.value) + " Md€ de crédits votés (bruts), dont ≈ " + fmt(vp) +
               " Md€ de contribution retraites (CAS Pensions) fondue dans le total."
@@ -328,8 +364,11 @@
     const branches = L.filter((l) => l.source === SECU_N && l.target !== PENS &&
                                      l.target.indexOf("Régimes") !== 0)
       .map((l) => ({
-        name: l.target, children: kidsOf(DATA, l.target, 1, nodeColor[l.target], 1),
-        value: DATA.drill[l.target] ? undefined : l.value,
+        name: l.target,
+        // ② : branches en FEUILLES (pas de plongée) → avec leafDepth 3, la Sécu
+        // ne se déroule pas en programmes à la vue d'ensemble (① et ③ inchangés).
+        children: revealed ? undefined : kidsOf(DATA, l.target, 1, nodeColor[l.target], 1),
+        value: (revealed || !DATA.drill[l.target]) ? Math.round(l.value * 100) / 100 : undefined,
         itemStyle: { color: nodeColor[l.target] }, label: { color: inkFor(nodeColor[l.target]) },
         upperLabel: { show: true, color: "#1E2430" },
       }));
@@ -695,11 +734,8 @@
     }).join('<span class="tm-crumb-sep" aria-hidden="true">›</span>');
   }
   function renderView() {
-    clearPatches();
     chart.setOption({ series: [{ data: viewData() }] });
     renderCrumb();
-    // les bandes cramoisies du mode ② n'ont de sens qu'à la vue d'ensemble
-    if (MODE === "revele" && !navPath.length) setTimeout(() => showPatches(false), 30);
   }
   if (crumbEl) crumbEl.addEventListener("click", (e) => {
     const b = e.target.closest(".tm-crumb-item"); if (!b) return;
@@ -718,16 +754,10 @@
     history.replaceState(null, "", HASHES[mode] || "#realite");
     if (!DATA_G) return;
     navPath = [];   // un changement de phase repart de la vue d'ensemble
-    clearPatches();
-    chart.setOption({ series: [{ data: build(DATA_G, mode),
+    // ② montre 3 niveaux (Ministères → famille → net/cramoisi scindés) ; ①/③ 2.
+    chart.setOption({ series: [{ data: build(DATA_G, mode), leafDepth: mode === "revele" ? 3 : 2,
       animationDurationUpdate: animate === false ? 0 : 800 }] });
     renderCrumb();
-    if (mode === "revele") {
-      // ①→② : mêmes valeurs, layout identique → patchs immédiats ;
-      // ③→② : le layout se réajuste (net → brut) → attendre la fin (800 ms)
-      const wait = (animate === false) ? 30 : 850;
-      setTimeout(() => showPatches(animate !== false), wait);
-    }
   }
   stepBtns.forEach((b) => b.addEventListener("click", () => {
     if (b.dataset.mode !== MODE) setMode(b.dataset.mode);
@@ -759,7 +789,8 @@
         },
       },
       series: [{
-        type: "treemap", name: "Vue d'ensemble", data: build(DATA, MODE), leafDepth: 2, roam: false,
+        type: "treemap", name: "Vue d'ensemble", data: build(DATA, MODE),
+        leafDepth: MODE === "revele" ? 3 : 2, roam: false,
         // ⚠ on PILOTE nous-mêmes le drill (nodeClick:false) : le zoom natif
         // plongeait dans les FEUILLES (nœuds sans enfant) → grand espace blanc
         // en haut. Ici, seuls les blocs AVEC enfants se déroulent (voir chart.on
@@ -846,7 +877,5 @@
     // le seuil de tuiles visibles dépend du format → on reconstruit au besoin
     if (DATA_G) chart.setOption({ series: [{ visibleMin: isPhone() ? 24 : 8 }] });
     chart.resize();
-    // les bandes du mode « révélé » suivent le nouveau layout (vue d'ensemble seule)
-    if (MODE === "revele" && !navPath.length) setTimeout(() => showPatches(false), 60);
   });
 })();
