@@ -40,7 +40,12 @@
             [2005, 2.0], [2010, 1.85], [2020, 1.71], [2025, 1.67],
             [2040, 1.5], [2055, 1.35], [2070, 1.2], [2120, 1.2]],
     NET2BRUT: 0.78, PNET: 0.909,
-    subvParActif: 4470, salaireMoyenBrut: 3466,
+    subvParActif: 4470,
+    // salaire brut moyen PAR TÊTE des 30,4 M de cotisants, CALÉ pour retrouver
+    // les 269 Md€ de cotisations réelles (30,4 M × 2 620 × 12 × 28,1 % ≈ 269) —
+    // ⚠ ne PAS remettre le 3 466 EQTP privé : il gonflait les cotisations de
+    // ~30 % et masquait le déficit actuel (fausse calibration détectée)
+    salaireMoyenBrut: 2620,
     smicNetAnnuel: 17900, heuresParAn: 1600,
     evBase: 86.5, evPente: 0.09, evMin: -1.5, evMax: 5, evCadre: 2.5, evOuvrier: -3,
   };
@@ -305,7 +310,10 @@
    *   légal de l'époque, démographie historique) ; dans le FUTUR, démographie
    *   projetée et deux seuls leviers — taux et âge (≈ +0,06 ratio/an de
    *   report ; natalité +0,1 mais seulement après 2050).
-   * Contrôle de cohérence : 2025 → ≈ 1 480 € nets ≈ pension moyenne réelle. */
+   * Calibration : salaire cotisant PAR TÊTE calé sur les 269 Md€ réels →
+   * en 2025 la balance finance ≈ 1 120 € nets, alors que la pension moyenne
+   * versée est ≈ 1 480 € : l'écart = impôts & dette (les 136 Md€). Le ROUGE
+   * existe donc DÈS AUJOURD'HUI — c'est voulu (balance « cotisations pures »). */
   const INV = { annee: 2050, cible: 1480, tauxPct: 28.1, age: 64, natal: false };
   const ageHisto = (an) => an < 1983 ? 65 : an < 2011 ? 60 : an < 2023 ? 62 : 64;
   const estPasse = () => INV.annee <= 2025;
@@ -319,7 +327,9 @@
   }
   // ce que les réglages courants FINANCENT (l'objectif, lui, est fixé par l'utilisateur)
   const financeOut = () => (effTauxPct() / 100) * ratioEff() * P.salaireMoyenBrut * P.PNET;
-  const BASELINE = 0.281 * interp(P.ratio, 2025) * P.salaireMoyenBrut * P.PNET;   // ≈ 1 478 €
+  // pension moyenne nette réellement VERSÉE (droit direct, DREES) — financée à
+  // ~2/3 par les cotisations, le reste par impôts & dette (269/405)
+  const PENSION_MOYENNE = 1480;
   const SAL_NET_MOYEN = Math.round(P.salaireMoyenBrut * P.NET2BRUT);
   // leviers nécessaires pour ATTEINDRE la cible (ferment l'écart à somme nulle)
   const tauxNecessaire = () => INV.cible / (ratioEff() * P.salaireMoyenBrut * P.PNET) * 100;
@@ -353,9 +363,10 @@
     '<div class="ctl" id="ctl-inv-age"><label for="inv-age">LEVIER 2 — âge de départ (durée de cotisation) ' +
     '<output id="out-inv-age"></output></label>' +
     '<input type="range" id="inv-age" min="60" max="85" step="1"></div>' +
-    '<div class="sal-fixe">💶 Salaire des cotisants : <b>figé</b> au salaire moyen France — ' +
-    fmt0(SAL_NET_MOYEN) + ' € nets (' + fmt0(P.salaireMoyenBrut) +
-    ' € bruts, INSEE). Pas un levier : on isole démographie et taux.</div>';
+    '<div class="sal-fixe">💶 Salaire des cotisants : <b>figé</b> au salaire brut moyen ' +
+    'PAR TÊTE des 30,4 M de cotisants — ' + fmt0(P.salaireMoyenBrut) + ' € bruts (≈ ' +
+    fmt0(SAL_NET_MOYEN) + ' € nets), calé pour retrouver les <b>269 Md€</b> de cotisations ' +
+    'réellement encaissées. Pas un levier : on isole démographie et taux.</div>';
 
   $("inv-cible").addEventListener("input", (e) => { INV.cible = +e.target.value; renderInverse(); });
   $("inv-annee").addEventListener("input", (e) => { INV.annee = +e.target.value; renderInverse(); });
@@ -498,7 +509,8 @@
       : '<span class="big">' + fmt0(finance) + " € financés</span>" +
         '<span class="delta neg">manque ' + fmt0(gap) + " €/mois</span>" +
         '<span class="lab">pour VOTRE objectif de ' + fmt0(INV.cible) + " € en " + INV.annee +
-        " — fermez l\u2019écart avec les leviers</span>" +
+        (passe ? " — c\u2019est la part des cotisations ; le reste est pris aux impôts et à la dette"
+               : " — fermez l\u2019écart avec les leviers") + "</span>" +
         '<div class="jauge"><div class="fill" style="width:' + pctFill + '%"></div></div>';
 
     renderBalance(INV.cible, finance);
@@ -515,8 +527,13 @@
         " € nets</b>" +
         (INV.cible <= finance
           ? " — votre objectif de " + fmt0(INV.cible) + " € était <b>couvert sans effort</b>."
-          : " — votre objectif de " + fmt0(INV.cible) + " € aurait déjà manqué de " +
-            fmt0(INV.cible - finance) + " €.") +
+          : " — votre objectif de " + fmt0(INV.cible) + " € manquait déjà de " +
+            fmt0(INV.cible - finance) + " €" +
+            (INV.annee >= 2000
+              ? ", un manque bien réel : il est comblé par les <b>impôts et la dette</b> — " +
+                "aujourd\u2019hui <b>136 Md€/an</b>, <a href=\"../treemap.html#realite\">le bloc " +
+                "cramoisi du Mondrian</a>"
+              : "") + ".") +
         " Le passé est figé.";
     } else if (atteint) {
       phr = "<b>Voilà ce que coûte votre pension de " + fmt0(INV.cible) + " € en " + INV.annee +
