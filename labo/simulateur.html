@@ -11,8 +11,8 @@
     /* ---- styles propres au labo (on ne touche pas au style.css du site) ---- */
     .labo-band { background: #F5E663; color: #1E2430; font-weight: 700; font-size: 13px;
       text-align: center; padding: 7px 12px; border-bottom: 2px solid #1E2430; }
-    .sim-wrap { max-width: 1180px; margin: 0 auto; padding: 0 16px 60px; }
-    .sim-grid { display: grid; grid-template-columns: minmax(320px, 460px) 1fr; gap: 22px;
+    .sim-wrap { max-width: 1300px; margin: 0 auto; padding: 0 16px 60px; }
+    .sim-grid { display: grid; grid-template-columns: minmax(400px, 590px) 1fr; gap: 24px;
       align-items: start; }
     @media (max-width: 900px) { .sim-grid { grid-template-columns: 1fr; } }
     .sim-card { background: var(--paper); border: 1px solid var(--rule); border-radius: 12px;
@@ -24,16 +24,23 @@
       transition: background .15s, color .15s; }
     .profil-chip:hover { background: #F5E663; color: #1E2430; }
     .profil-chip.on { background: #1E2430; color: #fff; border-color: #1E2430; }
-    .ctl { margin: 13px 0; }
+    .ctl { margin: 19px 0; }
     .ctl label { display: flex; justify-content: space-between; align-items: baseline;
       font-size: 13px; font-weight: 700; color: var(--ink); margin-bottom: 4px; }
     .ctl label output { font-variant-numeric: tabular-nums; color: var(--accent); }
-    .ctl input[type=range] { width: 100%; accent-color: #C13B55; }
+    .ctl input[type=range] { width: 100%; height: 30px; accent-color: #C13B55; cursor: pointer; }
     .reperes { display: flex; flex-wrap: wrap; gap: 4px 10px; font-size: 11px;
       color: var(--ink-soft); margin-top: 3px; }
     .reperes b { font-weight: 700; }
     .repere { cursor: pointer; border-bottom: 1px dotted #B9AE97; white-space: nowrap; }
     .repere:hover { color: var(--accent); border-bottom-color: var(--accent); }
+    .cohr { margin-top: 16px; padding: 12px 14px; background: #FBF7EE;
+      border: 1px solid var(--rule); border-left: 5px solid #A2683A; border-radius: 10px;
+      font-size: 12.5px; line-height: 1.6; }
+    .cohr h4 { margin: 0 0 6px; font-size: 12.5px; color: #A2683A; }
+    .cohr b { font-variant-numeric: tabular-nums; }
+    .cohr .use { color: var(--accent); font-weight: 700; cursor: pointer;
+      border-bottom: 1px dotted var(--accent); white-space: nowrap; }
     .sw { display: flex; gap: 10px; align-items: flex-start; margin-top: 16px; padding: 12px;
       background: #FFF5F7; border: 1.5px solid var(--accent); border-radius: 10px; }
     .sw input { margin-top: 3px; accent-color: #8E1B38; transform: scale(1.25); }
@@ -89,6 +96,7 @@
       <section class="sim-card" aria-label="Réglages">
         <h3>Votre situation</h3>
         <div id="controls"></div>
+        <div class="cohr" id="coherence"></div>
         <div class="sw" id="sw-dette-wrap">
           <input type="checkbox" id="sw-dette">
           <label for="sw-dette"><b>Rembourser la dette laissée par le système&nbsp;?</b><br>
@@ -115,6 +123,8 @@
       <summary>Méthodologie, hypothèses &amp; sources (prototype)</summary>
       <ul>
         <li><b>Euros constants 2025</b>, sans actualisation : on compare des pouvoirs d'achat, pas des valeurs financières.</li>
+        <li><b>Salaires saisis en NET</b> (ce que vous connaissez). Le moteur reconvertit en brut (net ÷ 0,78, approximation secteur privé) car les cotisations se prélèvent sur le brut. Les <b>pensions sont affichées nettes</b> (−9,1 % de CSG-CRDS-Casa sur la pension brute). <span class="flag">Ratios de conversion à consolider.</span></li>
+        <li><b>Encadré « repères de votre génération »</b> : espérance de vie à 65 ans PROJETÉE pour votre cohorte (≈ +1 mois par an, plafonnée à +5 ans — scénario central INSEE 2070 ; variantes cadre +2,5 ans / ouvrier −3 ans), ratio cotisants/retraité à votre année de départ (COR), taux de cotisation réellement vécus sur votre carrière. <span class="flag">Projections indicatives, à consolider.</span></li>
         <li><b>Ce que vous versez</b> = chaque année de carrière, salaire brut × <b>taux de cotisation vieillesse de l'année</b> (part salariale + patronale, tous régimes). Série ≈ 15,5&nbsp;% (1970) → 28,1&nbsp;% (2025), calée sur les moyennes 22&nbsp;% / 28&nbsp;% par génération (estimation S.&nbsp;Catherine). <span class="flag">Série à consolider ligne à ligne.</span></li>
         <li><b>Générations déjà parties (départ ≤ 2025)</b> : pension = taux de remplacement observé × salaire de fin (≈ 80&nbsp;% au SMIC, dégressif vers ≈ 60&nbsp;% pour un cadre — approximation DREES). <span class="flag">À consolider.</span></li>
         <li><b>Générations futures (départ &gt; 2025) : équilibre strict de VOTRE génération</b> — pension = taux de cotisation (28&nbsp;%) × ratio cotisants/retraité à votre départ × salaire de fin. Ratio : 1,67 (2025) → 1,5 (2040) → 1,2 (2070), projections COR/INSEE. C'est un jeu à somme nulle : aucune dette nouvelle, chaque génération reçoit ce que la suivante peut payer.</li>
@@ -132,6 +142,6 @@
   </footer>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/echarts/5.5.0/echarts.min.js"></script>
-  <script src="simulateur.js?v=labo2"></script>
+  <script src="simulateur.js?v=labo3"></script>
 </body>
 </html>
