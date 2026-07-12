@@ -2,25 +2,25 @@
  * 🧪 LABO — Simulateur « Ma retraite : combien je verse, combien je touche ? »
  * --------------------------------------------------------------------------
  * Prototype (non lié depuis le site). Tout en EUROS CONSTANTS 2025.
- * Les SALAIRES se saisissent en NET (ce que les gens connaissent) ; le moteur
- * reconvertit en brut (net ÷ 0,78) car les cotisations se prélèvent sur le
- * brut. Les PENSIONS s'affichent NETTES (−9,1 % CSG-CRDS-Casa).
+ * SALAIRES saisis en NET (÷ 0,78 → brut pour les cotisations) ; PENSIONS
+ * affichées NETTES (−9,1 % CSG-CRDS-Casa).
  *
- * Deux régimes de calcul :
- *  · départ ≤ 2025 (générations parties) : règles RÉELLES observées —
- *    pension brute = taux de remplacement (dégressif) × salaire brut fin.
- *  · départ  > 2025 (générations futures) : JEU À SOMME NULLE — la pension
- *    est celle que l'ÉQUILIBRE de la génération peut payer :
- *    pension brute = taux cotisation × ratio cotisants/retraité (année du
- *    départ) × salaire brut fin.  (formule du tableur de travail)
- *  · interrupteur DETTE : les années travaillées après 2025 paient en plus
- *    la quote-part des 136 Md€/an de subventions d'équilibre (impôts+dette).
+ * UI resserrée (demande commanditaire) : DEUX commandes principales —
+ *  · la « frise de vie » : UN double curseur naissance → année de départ ;
+ *  · UN curseur « salaire net moyen de carrière ».
+ * Le reste (âge d'entrée, fin de vie, salaires début/fin) vit dans
+ * « Réglages avancés » ; la fin de vie SUIT l'espérance de vie projetée de la
+ * génération tant que l'utilisateur n'y a pas touché.
  *
- * DONNÉES DE PÉRIODE (rendues visibles dans l'encadré « repères ») :
- *  · taux de cotisation vieillesse de CHAQUE année de la carrière ;
- *  · ratio démographique à l'année du départ ;
- *  · espérance de vie PROJETÉE de la cohorte (à 65 ans, +≈1 mois/an,
- *    plafonné +5 ans — scénario central INSEE ; cadre +2,5 / ouvrier −3).
+ * Régimes de calcul :
+ *  · départ ≤ 2025 : règles RÉELLES (taux de remplacement dégressif) ;
+ *  · départ  > 2025 : JEU À SOMME NULLE — pension = taux × ratio
+ *    cotisants/retraité (année du départ) × salaire brut fin ;
+ *  · interrupteur DETTE : quote-part des 136 Md€/an (années > 2025).
+ *
+ * SIMULATEUR INVERSE (« qui paiera votre pension ? ») : même équation, lue à
+ * l'envers — pension nette = taux × ratio × salaire brut cotisants × 0,909,
+ * ratio FIXÉ par la démographie ; bouger un curseur ajuste les autres.
  * ========================================================================== */
 
 (function () {
@@ -35,28 +35,20 @@
 
   /* ---------- paramètres sourcés (prototype — « à consolider ») ---------- */
   const P = {
-    // taux de cotisation vieillesse GLOBAL (salarié+employeur, tous régimes),
-    // par année civile — calé sur les moyennes générationnelles 22 % / 28 %
-    // (S. Catherine) et le taux actuel ≈ 28,1 %. Interpolation linéaire.
     taux: [[1970, 0.155], [1980, 0.19], [1990, 0.225], [2000, 0.25],
            [2010, 0.267], [2017, 0.279], [2025, 0.281], [2110, 0.281]],
-    // ratio cotisants / retraité à l'année du DÉPART (COR 2025 : 1,67 ;
-    // projections → 1,5 en 2040, ~1,2 en 2070, stable ensuite)
     ratio: [[2005, 2.0], [2010, 1.85], [2020, 1.71], [2025, 1.67],
             [2040, 1.5], [2055, 1.35], [2070, 1.2], [2120, 1.2]],
     NET2BRUT: 0.78,                // net ≈ brut × 0,78 (approx. privé — à consolider)
-    PNET: 0.909,                   // pension nette ≈ brute × (1 − 9,1 % CSG-CRDS-Casa)
+    PNET: 0.909,                   // pension nette ≈ brute × (1 − 9,1 %)
     subvParActif: 4470,            // 136 Md€ / ~30,4 M cotisants (COR 2025)
     salaireMoyenBrut: 3466,        // €/mois brut EQTP privé (INSEE 2023)
-    smicNetAnnuel: 17900,          // référentiel du comparateur du site
+    smicNetAnnuel: 17900,
     heuresParAn: 1600,
-    // espérance de vie à 65 ans, MIXTE, en 2025 → âge ≈ 86,5 ; dérive
-    // +0,09 an/an (≈ +1 mois), bornée [−1,5 ; +5] (scénario central INSEE)
     evBase: 86.5, evPente: 0.09, evMin: -1.5, evMax: 5,
     evCadre: 2.5, evOuvrier: -3,
-    // salaires NETS de repère (2025)
-    salReps: { smic: 1426, median: 2183, cadre: 4290 },
   };
+  const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
   const interp = (T, x) => {
     if (x <= T[0][0]) return T[0][1];
     if (x >= T[T.length - 1][0]) return T[T.length - 1][1];
@@ -66,93 +58,137 @@
     }
     return T[T.length - 1][1];
   };
-  // espérance de vie (âge de fin de vie) projetée pour la cohorte née en Y
   function evGen(naissance) {
-    const drift = Math.max(P.evMin, Math.min(P.evMax, (naissance + 65 - 2025) * P.evPente));
+    const drift = clamp((naissance + 65 - 2025) * P.evPente, P.evMin, P.evMax);
     const mixte = P.evBase + drift;
     return { mixte: Math.round(mixte), cadre: Math.round(mixte + P.evCadre),
              ouvrier: Math.round(mixte + P.evOuvrier) };
   }
-  // taux de remplacement OBSERVÉ (générations parties), sur le salaire BRUT :
-  // ≈ 80 % au SMIC, dégressif (≈ 65 % pour un cadre) — approximation DREES
   const tauxRemplacement = (brutFin) =>
-    Math.min(0.85, Math.max(0.50, 0.80 - (brutFin - 1800) * (0.15 / 3700)));
+    clamp(0.80 - (brutFin - 1800) * (0.15 / 3700), 0.50, 0.85);
 
-  /* ---------- curseurs (bornes LARGES : l'utilisateur fait SES hypothèses) -- */
-  const CTLS = [
-    { id: "naissance", lab: "Année de naissance", min: 1940, max: 2026, step: 1, val: 1950,
-      fmt: (v) => v,
-      reps: [["1950 (boom)", 1950], ["1975", 1975], ["2000", 2000], ["2026", 2026]] },
-    { id: "entree", lab: "Âge d'entrée dans la vie active", min: 16, max: 30, step: 1, val: 20,
-      fmt: (v) => v + " ans",
-      reps: [["apprenti 16", 16], ["bac+2 20", 20], ["bac+5 23", 23], ["doctorat 27", 27]] },
-    { id: "depart", lab: "Âge de départ à la retraite", min: 52, max: 75, step: 1, val: 60,
-      fmt: (v) => v + " ans",
-      reps: [["SNCF ≈ 57", 57], ["moyen 62,8", 63], ["âge légal 64", 64], ["tardif 70", 70]] },
-    { id: "s0", lab: "Salaire NET mensuel — début de carrière", min: 1200, max: 12000, step: 50, val: 1950,
-      fmt: (v) => fmt0(v) + " € net",
-      reps: [["SMIC 1 426", 1426], ["enseignant déb. 1 900", 1900], ["cadre déb. 2 350", 2350]] },
-    { id: "s1", lab: "Salaire NET mensuel — fin de carrière", min: 1200, max: 12000, step: 50, val: 4290,
-      fmt: (v) => fmt0(v) + " € net",
-      reps: [["médian 2 183", 2183], ["cadre 4 290", 4290], ["haut cadre 7 000", 7000]] },
-    { id: "deces", lab: "Fin de vie (espérance)", min: 72, max: 105, step: 1, val: 85,
-      fmt: (v) => v + " ans",
-      reps: [["ouvrier ≈ 82", 82], ["homme 85", 85], ["femme 88", 88], ["centenaire 100", 100]] },
-  ];
+  /* ---------- état ---------- */
+  const S = { naissance: 1950, anDepart: 2010, entree: 20, deces: 85, s0: 1950, s1: 4290 };
+  let detteOn = false, decesTouche = true;      // le profil d'ouverture fixe sa fin de vie
+  const departAge = () => S.anDepart - S.naissance;
 
   /* ---------- profils types (salaires en NET) ---------- */
   const PROFILS = [
-    { nom: "Cadre né en 1950", v: { naissance: 1950, entree: 20, depart: 60, s0: 1950, s1: 4290, deces: 85 } },
-    { nom: "Cadre né en 2000", v: { naissance: 2000, entree: 22, depart: 65, s0: 1950, s1: 4290, deces: 87 } },
-    { nom: "Smicard né en 1975", v: { naissance: 1975, entree: 18, depart: 64, s0: 1426, s1: 1426, deces: 84 } },
-    { nom: "Enseignante née en 1980", v: { naissance: 1980, entree: 23, depart: 64, s0: 1900, s1: 3100, deces: 89 } },
-    { nom: "Ouvrier né en 1965", v: { naissance: 1965, entree: 18, depart: 62, s0: 1480, s1: 1870, deces: 82 } },
-    { nom: "Née en 2026", v: { naissance: 2026, entree: 22, depart: 66, s0: 1950, s1: 3500, deces: 92 } },
+    { nom: "Cadre né en 1950", v: { naissance: 1950, anDepart: 2010, entree: 20, s0: 1950, s1: 4290, deces: 85 } },
+    { nom: "Cadre né en 2000", v: { naissance: 2000, anDepart: 2065, entree: 22, s0: 1950, s1: 4290, deces: 87 } },
+    { nom: "Smicard né en 1975", v: { naissance: 1975, anDepart: 2039, entree: 18, s0: 1426, s1: 1426, deces: 84 } },
+    { nom: "Enseignante née en 1980", v: { naissance: 1980, anDepart: 2044, entree: 23, s0: 1900, s1: 3100, deces: 89 } },
+    { nom: "Ouvrier né en 1965", v: { naissance: 1965, anDepart: 2027, entree: 18, s0: 1480, s1: 1870, deces: 82 } },
+    { nom: "Née en 2026", v: { naissance: 2026, anDepart: 2092, entree: 22, s0: 1950, s1: 3500, deces: 92 } },
   ];
 
-  /* ---------- état + construction de l'UI ---------- */
-  const S = {};
-  CTLS.forEach((c) => (S[c.id] = c.val));
-  let detteOn = false;
-
   const $ = (id) => document.getElementById(id);
-  const ctlBox = $("controls");
-  CTLS.forEach((c) => {
-    const div = document.createElement("div");
-    div.className = "ctl";
-    div.innerHTML = '<label for="in-' + c.id + '">' + c.lab +
-      ' <output id="out-' + c.id + '"></output></label>' +
-      '<input type="range" id="in-' + c.id + '" min="' + c.min + '" max="' + c.max +
-      '" step="' + c.step + '" value="' + c.val + '">' +
-      '<div class="reperes">Repères : ' + c.reps.map((r) =>
-        '<span class="repere" data-ctl="' + c.id + '" data-v="' + r[1] + '">' + r[0] + "</span>"
-      ).join(" · ") + "</div>";
-    ctlBox.appendChild(div);
+
+  /* ---------- UI : commandes PRINCIPALES ---------- */
+  // 1) la « frise de vie » : un DOUBLE curseur naissance → année de départ
+  const AXE0 = 1940, AXE1 = 2101;
+  $("controls").innerHTML =
+    '<div class="ctl"><label>Votre vie — naissance → départ en retraite ' +
+    '<output id="out-vie"></output></label>' +
+    '<div class="dual">' +
+    '<input type="range" id="in-naissance" min="' + AXE0 + '" max="' + AXE1 + '" step="1">' +
+    '<input type="range" id="in-anDepart" min="' + AXE0 + '" max="' + AXE1 + '" step="1">' +
+    "</div>" +
+    '<div class="reperes">Repères : ' +
+    '<span class="repere" data-act="nais" data-v="1950">né en 1950</span> · ' +
+    '<span class="repere" data-act="nais" data-v="2000">né en 2000</span> · ' +
+    '<span class="repere" data-act="nais" data-v="2026">né en 2026</span> · ' +
+    '<span class="repere" data-act="dep63">départ 62,8 (moyen)</span> · ' +
+    '<span class="repere" data-act="dep64">départ 64 (légal)</span></div></div>' +
+    '<div class="ctl"><label for="in-smoyen">Salaire NET mensuel moyen de carrière ' +
+    '<output id="out-smoyen"></output></label>' +
+    '<input type="range" id="in-smoyen" min="1200" max="10000" step="50">' +
+    '<div class="reperes">Repères : ' +
+    '<span class="repere" data-act="sal" data-v="1426">SMIC 1 426</span> · ' +
+    '<span class="repere" data-act="sal" data-v="2183">médian 2 183</span> · ' +
+    '<span class="repere" data-act="sal" data-v="3120">cadre (carrière) 3 120</span> · ' +
+    '<span class="repere" data-act="sal" data-v="6000">très haut 6 000</span></div></div>';
+
+  // 2) réglages AVANCÉS (dépliés à la demande)
+  const ADV = [
+    { id: "entree", lab: "Âge d'entrée dans la vie active", min: 16, max: 30, step: 1,
+      fmt: (v) => v + " ans" },
+    { id: "deces", lab: "Fin de vie (suit l'espérance de vie de votre génération tant que vous n'y touchez pas)",
+      min: 72, max: 105, step: 1, fmt: (v) => v + " ans" },
+    { id: "s0", lab: "Salaire net — début de carrière", min: 1200, max: 12000, step: 50,
+      fmt: (v) => fmt0(v) + " €" },
+    { id: "s1", lab: "Salaire net — fin de carrière", min: 1200, max: 12000, step: 50,
+      fmt: (v) => fmt0(v) + " €" },
+  ];
+  $("controls-adv").innerHTML = ADV.map((c) =>
+    '<div class="ctl"><label for="in-' + c.id + '">' + c.lab +
+    ' <output id="out-' + c.id + '"></output></label>' +
+    '<input type="range" id="in-' + c.id + '" min="' + c.min + '" max="' + c.max +
+    '" step="' + c.step + '"></div>').join("");
+
+  /* ---------- synchronisation des commandes ---------- */
+  function syncInputs() {
+    $("in-naissance").value = S.naissance;
+    $("in-anDepart").value = S.anDepart;
+    $("in-smoyen").value = Math.round((S.s0 + S.s1) / 2 / 10) * 10;
+    ADV.forEach((c) => { $("in-" + c.id).value = S[c.id]; });
+  }
+  function contraintes() {
+    S.naissance = clamp(S.naissance, 1940, 2026);
+    S.anDepart = clamp(S.anDepart, S.naissance + S.entree + 1, Math.min(S.naissance + 75, AXE1));
+    if (!decesTouche) S.deces = Math.max(evGen(S.naissance).mixte, departAge() + 1);
+    S.deces = clamp(Math.max(S.deces, departAge() + 1), 72, 105);
+    if (S.s1 < S.s0) S.s1 = S.s0;
+  }
+
+  $("in-naissance").addEventListener("input", (e) => {
+    const age = departAge();
+    S.naissance = clamp(+e.target.value, 1940, 2026);
+    S.anDepart = S.naissance + age;            // on préserve l'âge de départ
+    contraintes(); clearProfil(); syncInputs(); render();
+  });
+  $("in-anDepart").addEventListener("input", (e) => {
+    S.anDepart = +e.target.value;
+    contraintes(); clearProfil(); syncInputs(); render();
+  });
+  $("in-smoyen").addEventListener("input", (e) => {
+    // un seul curseur : on fait GLISSER début et fin proportionnellement
+    const cible = +e.target.value, m = (S.s0 + S.s1) / 2, k = cible / m;
+    S.s0 = clamp(Math.round(S.s0 * k / 10) * 10, 1200, 12000);
+    S.s1 = clamp(Math.round(S.s1 * k / 10) * 10, 1200, 12000);
+    contraintes(); clearProfil(); syncInputs(); render();
+  });
+  ADV.forEach((c) => {
     $("in-" + c.id).addEventListener("input", (e) => {
       S[c.id] = +e.target.value;
-      // cohérence : fin ≥ début, décès > départ, départ > entrée
-      if (c.id === "s0" && S.s1 < S.s0) { S.s1 = S.s0; $("in-s1").value = S.s0; }
-      if (c.id === "s1" && S.s1 < S.s0) { S.s0 = S.s1; $("in-s0").value = S.s1; }
-      if (c.id === "depart" && S.depart <= S.entree) { S.depart = S.entree + 1; e.target.value = S.depart; }
-      if ((c.id === "deces" || c.id === "depart") && S.deces <= S.depart) {
-        S.deces = S.depart + 1; $("in-deces").value = S.deces;
-      }
-      clearProfil(); render();
+      if (c.id === "deces") decesTouche = true;
+      if (c.id === "s0" && S.s1 < S.s0) S.s1 = S.s0;
+      if (c.id === "s1" && S.s1 < S.s0) S.s0 = S.s1;
+      contraintes(); clearProfil(); syncInputs(); render();
     });
   });
-  ctlBox.addEventListener("click", (e) => {
+  $("controls").addEventListener("click", (e) => {
     const r = e.target.closest(".repere"); if (!r) return;
-    S[r.dataset.ctl] = +r.dataset.v; $("in-" + r.dataset.ctl).value = r.dataset.v;
-    clearProfil(); render();
+    if (r.dataset.act === "nais") {
+      const age = departAge();
+      S.naissance = +r.dataset.v; S.anDepart = S.naissance + age;
+    } else if (r.dataset.act === "dep63") S.anDepart = S.naissance + 63;
+    else if (r.dataset.act === "dep64") S.anDepart = S.naissance + 64;
+    else if (r.dataset.act === "sal") {
+      const m = (S.s0 + S.s1) / 2, k = (+r.dataset.v) / m;
+      S.s0 = clamp(Math.round(S.s0 * k / 10) * 10, 1200, 12000);
+      S.s1 = clamp(Math.round(S.s1 * k / 10) * 10, 1200, 12000);
+    }
+    contraintes(); clearProfil(); syncInputs(); render();
   });
 
   const profBox = $("profils");
-  PROFILS.forEach((p, i) => {
+  PROFILS.forEach((p) => {
     const b = document.createElement("button");
-    b.type = "button"; b.className = "profil-chip"; b.textContent = p.nom; b.dataset.i = i;
+    b.type = "button"; b.className = "profil-chip"; b.textContent = p.nom;
     b.addEventListener("click", () => {
-      Object.assign(S, p.v);
-      CTLS.forEach((c) => ($("in-" + c.id).value = S[c.id]));
+      Object.assign(S, p.v); decesTouche = true;
+      contraintes(); syncInputs();
       [].forEach.call(profBox.children, (x) => x.classList.remove("on"));
       b.classList.add("on");
       render();
@@ -163,19 +199,18 @@
 
   $("sw-dette").addEventListener("change", (e) => { detteOn = e.target.checked; render(); });
 
-  /* ---------- moteur ---------- */
+  /* ---------- moteur (identique v2, âge de départ dérivé de la frise) ------ */
   function compute() {
-    const anDepart = S.naissance + S.depart;
-    const futur = anDepart > 2025;
-    const nAns = S.depart - S.entree;
+    const futur = S.anDepart > 2025;
+    const aDep = departAge();
+    const nAns = aDep - S.entree;
     const netMensuel = (age) =>
       S.s0 + (S.s1 - S.s0) * (nAns <= 1 ? 1 : (age - S.entree) / (nAns - 1));
     const brutMensuel = (age) => netMensuel(age) / P.NET2BRUT;
 
-    // — versé : cotisations sur le BRUT, année par année (+ quote-part dette) —
     let cot = 0, impots = 0, tauxSum = 0;
     const cumVerse = [];
-    for (let a = S.entree; a < S.depart; a++) {
+    for (let a = S.entree; a < aDep; a++) {
       const an = S.naissance + a;
       const tx = interp(P.taux, an);
       tauxSum += tx;
@@ -186,32 +221,112 @@
     }
     const verse = cot + impots;
     const tauxDebut = interp(P.taux, S.naissance + S.entree);
-    const tauxFin = interp(P.taux, S.naissance + S.depart - 1);
+    const tauxFin = interp(P.taux, S.anDepart - 1);
     const tauxMoyen = nAns > 0 ? tauxSum / nAns : 0;
 
-    // — pension : brute selon le régime de calcul, AFFICHÉE nette —
-    const ratio = interp(P.ratio, anDepart);
+    const ratio = interp(P.ratio, S.anDepart);
     const brutFin = S.s1 / P.NET2BRUT;
     const pensionBrute = futur
-      ? interp(P.taux, anDepart) * ratio * brutFin       // équilibre de la génération
-      : tauxRemplacement(brutFin) * brutFin;             // règles réelles observées
-    const pension = pensionBrute * P.PNET;               // nette
-    const duree = S.deces - S.depart;
+      ? interp(P.taux, S.anDepart) * ratio * brutFin
+      : tauxRemplacement(brutFin) * brutFin;
+    const pension = pensionBrute * P.PNET;
+    const duree = S.deces - aDep;
     const recu = pension * 12 * duree;
 
-    // — indicateurs —
     const ratioMise = recu / verse;
-    const beAge = S.depart + verse / (pension * 12);
+    const beAge = aDep + verse / (pension * 12);
     const brutMoyenAnnuel = (S.s0 + S.s1) / 2 / P.NET2BRUT * 12;
     const heures = verse / (brutMoyenAnnuel / P.heuresParAn);
     const smicAns = recu / P.smicNetAnnuel;
 
-    return { futur, anDepart, ratio, cot, impots, verse, pension, duree, recu,
+    return { futur, anDepart: S.anDepart, aDep, ratio, cot, impots, verse, pension, duree, recu,
              ratioMise, beAge: beAge <= S.deces ? beAge : null, heures, smicAns,
              cumVerse, tauxDebut, tauxFin, tauxMoyen };
   }
 
-  /* ---------- rendu ---------- */
+  /* ---------- SIMULATEUR INVERSE : « qui paiera votre pension ? » ----------
+   * pensionNette = taux × ratio × (salaireNetCotisant ÷ 0,78) × 0,909
+   * ratio FIXÉ par la démographie de l'année de départ. Somme nulle :
+   * pension bougée → le TAUX s'ajuste ; taux ou salaire bougés → la PENSION. */
+  const INV = { pension: 1500, tauxPct: 28.1, salNet: 2700, actif: false };
+  $("inv-controls").innerHTML = [
+    ['inv-pension', "Votre pension NETTE visée (€/mois)", 400, 6000, 10],
+    ['inv-taux', "Taux de cotisation vieillesse des actifs (%)", 8, 60, 0.1],
+    ['inv-sal', "Salaire NET moyen des cotisants d'alors (€/mois)", 1200, 8000, 50],
+  ].map((c) =>
+    '<div class="ctl"><label for="' + c[0] + '">' + c[1] +
+    ' <output id="out-' + c[0] + '"></output></label>' +
+    '<input type="range" id="' + c[0] + '" min="' + c[2] + '" max="' + c[3] +
+    '" step="' + c[4] + '"></div>').join("") +
+    '<div class="reperes">Repères salaire : <span class="repere" data-inv="1426">SMIC 1 426</span> · ' +
+    '<span class="repere" data-inv="2183">médian 2 183</span> · ' +
+    '<span class="repere" data-inv="2700">moyen 2 700</span> — taux 2025 : 28,1 %</div>';
+
+  function invRatio() { return interp(P.ratio, S.anDepart); }
+  function invPensionFrom() {
+    return (INV.tauxPct / 100) * invRatio() * (INV.salNet / P.NET2BRUT) * P.PNET;
+  }
+  $("inv-pension").addEventListener("input", (e) => {
+    INV.pension = +e.target.value; INV.actif = true;
+    // la pension est visée → le TAUX encaisse (somme nulle)
+    INV.tauxPct = clamp(INV.pension / (invRatio() * (INV.salNet / P.NET2BRUT) * P.PNET) * 100, 8, 60);
+    INV.pension = invPensionFrom();            // re-cohérence si le taux a saturé
+    renderInverse();
+  });
+  $("inv-taux").addEventListener("input", (e) => {
+    INV.tauxPct = +e.target.value; INV.actif = true;
+    INV.pension = invPensionFrom();
+    renderInverse();
+  });
+  $("inv-sal").addEventListener("input", (e) => {
+    INV.salNet = +e.target.value; INV.actif = true;
+    INV.pension = invPensionFrom();
+    renderInverse();
+  });
+  $("inv-controls").addEventListener("click", (e) => {
+    const r = e.target.closest(".repere"); if (!r || !r.dataset.inv) return;
+    INV.salNet = +r.dataset.inv; INV.actif = true;
+    INV.pension = invPensionFrom();
+    renderInverse();
+  });
+
+  function renderInverse(simPension) {
+    // tant que l'utilisateur n'a pas touché la carte, elle SUIT la pension simulée
+    if (!INV.actif && simPension != null) {
+      INV.pension = simPension;
+      INV.tauxPct = clamp(INV.pension / (invRatio() * (INV.salNet / P.NET2BRUT) * P.PNET) * 100, 8, 60);
+      INV.pension = invPensionFrom();
+    }
+    $("inv-pension").value = Math.round(INV.pension / 10) * 10;
+    $("inv-taux").value = Math.round(INV.tauxPct * 10) / 10;
+    $("inv-sal").value = INV.salNet;
+    $("out-inv-pension").textContent = fmt0(INV.pension) + " € net";
+    $("out-inv-taux").textContent = pct1(INV.tauxPct / 100) + " %";
+    $("out-inv-sal").textContent = fmt0(INV.salNet) + " € net";
+    const R = invRatio();
+    $("inv-ratio").textContent = "Démographie verrouillée : " + fmt2(R) +
+      " cotisant(s) par retraité à votre départ (" + S.anDepart + ")";
+    // chaque retraité mobilise l'INTÉGRALITÉ des cotisations vieillesse de R cotisants
+    const parCot = (INV.pension / P.PNET) / R;
+    const haussePts = INV.tauxPct - 28.1;
+    $("inv-phrase").innerHTML =
+      "Pour vous verser <b>" + fmt0(INV.pension) + " € nets/mois</b>, il faudra que <b>" +
+      fmt2(R) + " cotisant(s)</b> (salaire net moyen " + fmt0(INV.salNet) +
+      " €) y consacrent chacun <b>" + fmt0(parCot) + " €/mois</b> — la totalité de leur " +
+      "cotisation vieillesse, soit <b>" + pct1(INV.tauxPct / 100) +
+      " % de leur salaire brut</b>" +
+      (Math.abs(haussePts) >= 0.3
+        ? haussePts > 0
+          ? ", contre <b>28,1 %</b> aujourd'hui (+" + pct1(haussePts / 100) + " point" +
+            (haussePts >= 2 ? "s" : "") + ")."
+          : ", contre 28,1 % aujourd'hui."
+        : " (le taux actuel).");
+    $("inv-note").textContent = INV.tauxPct >= 59.9
+      ? "⚠ Taux saturé à 60 % : cette pension n'est pas finançable par les cotisations à ce niveau de salaire."
+      : "";
+  }
+
+  /* ---------- rendu principal ---------- */
   const chart = echarts.init($("sim-chart"), null, { renderer: "canvas" });
 
   function squares(verse, recu) {
@@ -229,7 +344,6 @@
       'style="font:700 11px Helvetica,Arial">reçu</text></svg>';
   }
 
-  // encadré « repères de cohérence » : les données SPÉCIFIQUES à la génération
   function renderCoherence(r) {
     const ev = evGen(S.naissance);
     $("coherence").innerHTML =
@@ -242,25 +356,25 @@
       " cotisant(s)</b> pour 1 retraité<br>" +
       "Taux de cotisation vieillesse sur VOTRE carrière : <b>" + pct1(r.tauxDebut) +
       " %</b> (" + (S.naissance + S.entree) + ") → <b>" + pct1(r.tauxFin) + " %</b> (" +
-      (S.naissance + S.depart - 1) + "), moyenne <b>" + pct1(r.tauxMoyen) + " %</b><br>" +
+      (S.anDepart - 1) + "), moyenne <b>" + pct1(r.tauxMoyen) + " %</b><br>" +
       "Salaires nets 2025 : SMIC <b>1 426 €</b> · médian <b>2 183 €</b> · cadre moyen <b>≈ 4 290 €</b>";
   }
   $("coherence").addEventListener("click", (e) => {
     const u = e.target.closest(".use"); if (!u) return;
-    S.deces = Math.max(+u.dataset.set, S.depart + 1);
-    $("in-deces").value = S.deces;
-    clearProfil(); render();
+    S.deces = Math.max(+u.dataset.set, departAge() + 1);
+    decesTouche = true;
+    clearProfil(); syncInputs(); render();
   });
 
   function render() {
     const r = compute();
 
-    // valeurs courantes affichées à droite des labels
-    CTLS.forEach((c) => { $("out-" + c.id).textContent = c.fmt(S[c.id]); });
+    $("out-vie").textContent = S.naissance + " → " + S.anDepart + " (départ à " + r.aDep + " ans)";
+    $("out-smoyen").textContent = fmt0((S.s0 + S.s1) / 2) + " € net" +
+      (S.s0 !== S.s1 ? " (" + fmt0(S.s0) + " → " + fmt0(S.s1) + ")" : "");
+    ADV.forEach((c) => { $("out-" + c.id).textContent = c.fmt(S[c.id]); });
 
-    // dette : interrupteur grisé si aucune année travaillée après 2025
-    const finCarriere = S.naissance + S.depart;
-    $("sw-dette-wrap").classList.toggle("off", finCarriere <= 2025);
+    $("sw-dette-wrap").classList.toggle("off", S.anDepart <= 2025);
 
     renderCoherence(r);
 
@@ -298,7 +412,6 @@
       '<div class="mini"><b>' + fmt0(r.heures) + " h</b><span>de travail consacrées à cotiser</span></div>" +
       '<div class="mini"><b>' + fmt0(r.smicAns) + "</b><span>années de SMIC net reçues</span></div>";
 
-    // — courbe cumulée versé / reçu (le croisement = récupération de la mise) —
     const ages = [], vSer = [], rSer = [];
     let vFin = 0;
     for (let a = S.entree; a <= S.deces; a++) {
@@ -306,7 +419,7 @@
       const cv = r.cumVerse.filter((p) => p[0] <= a);
       if (cv.length) vFin = cv[cv.length - 1][1];
       vSer.push(Math.round(vFin));
-      rSer.push(a >= S.depart ? Math.round(r.pension * 12 * (a - S.depart)) : 0);
+      rSer.push(a >= r.aDep ? Math.round(r.pension * 12 * (a - r.aDep)) : 0);
     }
     chart.setOption({
       grid: { left: 70, right: 16, top: 34, bottom: 28 },
@@ -324,9 +437,13 @@
           areaStyle: { color: "rgba(142,27,56,.12)" } },
       ],
     });
+
+    renderInverse(r.pension);
   }
 
   window.addEventListener("resize", () => chart.resize());
+  contraintes(); syncInputs();
+  profBox.children.length || PROFILS.length;   // no-op lisible
   // profil d'ouverture : le cadre né en 1950 (la vedette du tableur)
   profBox.children[0].classList.add("on");
   render();

@@ -41,6 +41,23 @@
     .cohr b { font-variant-numeric: tabular-nums; }
     .cohr .use { color: var(--accent); font-weight: 700; cursor: pointer;
       border-bottom: 1px dotted var(--accent); white-space: nowrap; }
+    .dual { position: relative; height: 34px; }
+    .dual input[type=range] { position: absolute; left: 0; top: 0; width: 100%; margin: 0;
+      pointer-events: none; background: transparent; height: 34px; }
+    .dual input[type=range]::-webkit-slider-thumb { pointer-events: auto; }
+    .dual input[type=range]::-moz-range-thumb { pointer-events: auto; }
+    .avance { margin-top: 12px; border-top: 1px dashed var(--rule); padding-top: 10px; }
+    .avance summary { cursor: pointer; font-size: 12.5px; font-weight: 700; color: var(--ink-soft); }
+    .avance[open] summary { color: var(--accent); }
+    #inverse-card { margin-top: 22px; }
+    #inverse-card h3 .lock { font-size: 11.5px; color: var(--ink-soft); font-weight: 600; }
+    .inv-grid { display: grid; grid-template-columns: minmax(300px, 460px) 1fr; gap: 20px;
+      align-items: start; }
+    @media (max-width: 900px) { .inv-grid { grid-template-columns: 1fr; } }
+    .inv-phrase { font-size: 15px; line-height: 1.6; margin: 6px 0; }
+    .inv-phrase b { color: #8E1B38; }
+    .ratio-chip { display: inline-block; background: #FDE8ED; color: #8E1B38; font-weight: 700;
+      font-size: 12px; border-radius: 999px; padding: 4px 10px; margin: 2px 0 8px; }
     .sw { display: flex; gap: 10px; align-items: flex-start; margin-top: 16px; padding: 12px;
       background: #FFF5F7; border: 1.5px solid var(--accent); border-radius: 10px; }
     .sw input { margin-top: 3px; accent-color: #8E1B38; transform: scale(1.25); }
@@ -96,6 +113,7 @@
       <section class="sim-card" aria-label="Réglages">
         <h3>Votre situation</h3>
         <div id="controls"></div>
+        <details class="avance" id="avance"><summary>Réglages avancés — âge d'entrée, fin de vie, salaires début/fin</summary><div id="controls-adv"></div></details>
         <div class="cohr" id="coherence"></div>
         <div class="sw" id="sw-dette-wrap">
           <input type="checkbox" id="sw-dette">
@@ -119,6 +137,19 @@
       </section>
     </div>
 
+    <section class="sim-card" id="inverse-card" aria-label="Simulateur inverse" aria-live="polite">
+      <h3>⇄ Et qui paiera VOTRE pension&nbsp;? <span class="lock">— jeu à somme nulle&nbsp;:
+        bouger un curseur ajuste les autres</span></h3>
+      <span class="ratio-chip" id="inv-ratio"></span>
+      <div class="inv-grid">
+        <div id="inv-controls"></div>
+        <div>
+          <p class="inv-phrase" id="inv-phrase"></p>
+          <p class="verse-detail" id="inv-note"></p>
+        </div>
+      </div>
+    </section>
+
     <details class="metho sim-card" style="margin-top:22px">
       <summary>Méthodologie, hypothèses &amp; sources (prototype)</summary>
       <ul>
@@ -131,6 +162,7 @@
         <li><b>Interrupteur dette</b> : ajoute, pour chaque année travaillée après 2025, votre quote-part des 136&nbsp;Md€/an non financés par les cotisations (COR juin 2025) : ≈ 4&nbsp;470&nbsp;€/an par cotisant au prorata de votre salaire. Hypothèse : déficit stable en € constants.</li>
         <li><b>Durée de retraite</b> = votre curseur « fin de vie » − âge de départ. Repères : espérance de vie <b>à 65 ans</b> (INSEE 2023) ≈ 85 ans (hommes) / 88 ans (femmes) ; écart cadre/ouvrier ≈ ±3 ans. <span class="flag">Piège évité : ne pas utiliser l'espérance de vie à la naissance.</span></li>
         <li><b>Heures de travail</b> : total versé ÷ salaire horaire brut moyen de votre carrière (1&nbsp;600 h/an). Années de SMIC : total ÷ 17&nbsp;900&nbsp;€ net/an (référentiel du comparateur du site).</li>
+        <li><b>Simulateur inverse (« qui paiera votre pension ? »)</b> : équation à somme nulle pension nette = taux × ratio cotisants/retraité × salaire brut moyen des cotisants × 0,909. Le ratio est FIXÉ par la démographie à votre année de départ ; bouger la pension ajuste le taux, bouger le taux ou le salaire ajuste la pension. Chaque retraité mobilise l'intégralité des cotisations vieillesse de « ratio » cotisants.</li>
         <li>Non modélisés en V1 : plafonds (PASS), minimum contributif, redistribution, carrières hachées, fonction publique et régimes spéciaux (présents seulement en repères), réversion. <b>Ordres de grandeur, pas un droit à pension.</b></li>
         <li>Sources : <a href="https://www.cor-retraites.fr/sites/default/files/2025-06/Synthèse_Def_.pdf">COR, synthèse juin 2025</a> · <a href="https://www.insee.fr/fr/statistiques/2416631">INSEE, espérance de vie</a> · <a href="https://x.com/sc_cath/status/1955025559919980629">S. Catherine (heures &amp; taux par génération)</a> · <a href="https://docs.google.com/spreadsheets/d/1VMvwlbG37IsAkWsQ--E-q1GeYnc1FvwKW2ew6dn0abU/">tableur de travail « niveau de vie des +65 ans »</a>.</li>
       </ul>
@@ -142,6 +174,6 @@
   </footer>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/echarts/5.5.0/echarts.min.js"></script>
-  <script src="simulateur.js?v=labo3"></script>
+  <script src="simulateur.js?v=labo4"></script>
 </body>
 </html>

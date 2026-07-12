@@ -351,6 +351,13 @@
         familles.push({
           name: court, children: kids, _brut: l.value,
           itemStyle: { color: famColor }, upperLabel: { show: true, color: "#1E2430" },
+          // ③ : au CLIC sur le ministère, un RAPPEL cramoisi en pointillé montre
+          // la subvention retraites prélevée sur lui. Injecté par viewData() dans
+          // la vue plongée SEULEMENT (jamais dans l'arbre : le ministère est NET
+          // dans la vue d'ensemble, la somme resterait fausse sinon — les 136
+          // sont déjà dans le bloc « Déséquilibre »).
+          _casGhost: (!official && vp > 0.01)
+            ? { value: Math.round(vp * 100) / 100, court: court } : null,
           _tip: official
             ? fmt(l.value) + " Md€ de crédits votés (bruts), dont ≈ " + fmt(vp) +
               " Md€ de contribution retraites (CAS Pensions) fondue dans le total."
@@ -717,13 +724,48 @@
   // enfants du nœud courant ; RE-RÉSOLU depuis un build frais → la plongée
   // survit aux changements de phase (et se replie si le nœud n'existe plus)
   function viewData() {
-    let arr = topData();
+    let arr = topData(), node = null;
     for (let i = 0; i < navPath.length; i++) {
-      const node = arr.find((n) => n.name === navPath[i]);
-      if (!node || !node.children || !node.children.length) { navPath = navPath.slice(0, i); break; }
+      node = arr.find((n) => n.name === navPath[i]);
+      if (!node || !node.children || !node.children.length) { navPath = navPath.slice(0, i); node = null; break; }
       arr = node.children;
     }
+    // ③ « budget réel » : dans la PLONGÉE d'un ministère, on AJOUTE le rappel
+    // cramoisi en POINTILLÉ = la subvention retraites prélevée sur ce budget.
+    // Uniquement dans la vue plongée (les 136 restent comptés UNE fois, dans le
+    // bloc « Déséquilibre » de la vue d'ensemble).
+    if (node && node._casGhost && MODE === "realite") {
+      const g = node._casGhost;
+      return arr.concat([{
+        name: GHOST_NAME,
+        value: g.value, _est: true,
+        // ⚠ borderType:"dashed" est IGNORÉ par le treemap ECharts (vérifié au
+        // pixel) → le pointillé est dessiné par showGhostOutline() (contour HTML).
+        itemStyle: { color: DEFICIT, borderColor: "#FAF6EF", borderWidth: 2.5 },
+        label: { color: "#FFFFFF", fontWeight: 700 },
+        _tip: "≈ " + fmt(g.value) + " Md€ prélevés chaque année sur « " + g.court + " » pour " +
+              "équilibrer les retraites. Dans « budget réel », cette somme a QUITTÉ le budget " +
+              "affiché : elle est déjà comptée dans le bloc cramoisi « Déséquilibre des " +
+              "retraites » — ce rappel en pointillé ne compte pas deux fois.",
+      }]);
+    }
     return arr;
+  }
+  const GHOST_NAME = "Subvention retraites (comptée dans le bloc Déséquilibre)";
+  // contour POINTILLÉ du rappel (le treemap ECharts ne sait pas tracer un bord
+  // dashed) : un cadre superposé, transparent, non cliquable — rien n'est masqué
+  function showGhostOutline() {
+    clearPatches();
+    const lay = layoutsOf([GHOST_NAME])[GHOST_NAME];
+    if (!lay || lay.w < 6 || lay.h < 6) return;
+    const off = { x: el.offsetLeft, y: el.offsetTop };
+    const d = document.createElement("div");
+    d.className = "mig-ghost";
+    d.style.cssText = "position:absolute;z-index:4;pointer-events:none;box-sizing:border-box;" +
+      "border:3px dashed rgba(250,246,239,.95);border-radius:2px;" +
+      "left:" + (lay.x + off.x) + "px;top:" + (lay.y + off.y) + "px;" +
+      "width:" + lay.w + "px;height:" + lay.h + "px;";
+    stageEl.appendChild(d);
   }
   function renderCrumb() {
     if (!crumbEl) return;
@@ -737,8 +779,12 @@
     }).join('<span class="tm-crumb-sep" aria-hidden="true">›</span>');
   }
   function renderView() {
-    chart.setOption({ series: [{ data: viewData() }] });
+    clearPatches();
+    const data = viewData();
+    chart.setOption({ series: [{ data: data }] });
     renderCrumb();
+    // le rappel pointillé se trace une fois l'animation de plongée finie
+    if (data.some((n) => n.name === GHOST_NAME)) setTimeout(showGhostOutline, 820);
   }
   if (crumbEl) crumbEl.addEventListener("click", (e) => {
     const b = e.target.closest(".tm-crumb-item"); if (!b) return;
@@ -757,6 +803,7 @@
     history.replaceState(null, "", HASHES[mode] || "#realite");
     if (!DATA_G) return;
     navPath = [];   // un changement de phase repart de la vue d'ensemble
+    clearPatches(); // efface un éventuel contour pointillé de plongée
     // ② montre 3 niveaux (Ministères → famille → net/cramoisi scindés) ; ①/③ 2.
     chart.setOption({ series: [{ data: build(DATA_G, mode), leafDepth: mode === "revele" ? 3 : 2,
       animationDurationUpdate: animate === false ? 0 : 800 }] });
@@ -880,5 +927,7 @@
     // le seuil de tuiles visibles dépend du format → on reconstruit au besoin
     if (DATA_G) chart.setOption({ series: [{ visibleMin: isPhone() ? 24 : 8 }] });
     chart.resize();
+    // le contour pointillé du rappel suit le nouveau layout
+    if (stageEl.querySelector(".mig-ghost")) setTimeout(showGhostOutline, 150);
   });
 })();
