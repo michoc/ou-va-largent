@@ -69,11 +69,11 @@
 
   /* ---------- profils (carrières types, salaires NETS 2025) ---------- */
   const PROFILS = [
-    { id: "smic", nom: "Smicard", s0: 1426, s1: 1426, entree: 18 },
-    { id: "median", nom: "Salaire médian", s0: 1700, s1: 2600, entree: 20 },
-    { id: "ens", nom: "Enseignante", s0: 1900, s1: 3100, entree: 23 },
-    { id: "cadre", nom: "Cadre", s0: 1950, s1: 4290, entree: 22 },
-    { id: "ouvrier", nom: "Ouvrier", s0: 1480, s1: 1870, entree: 18 },
+    { id: "smic", nom: "Carrière au SMIC", carr: "au SMIC", s0: 1426, s1: 1426, entree: 18 },
+    { id: "median", nom: "Salaire médian", carr: "au salaire médian", s0: 1700, s1: 2600, entree: 20 },
+    { id: "ens", nom: "Enseignante", carr: "d'enseignante", s0: 1900, s1: 3100, entree: 23 },
+    { id: "cadre", nom: "Cadre", carr: "de cadre", s0: 1950, s1: 4290, entree: 22 },
+    { id: "ouvrier", nom: "Ouvrier", carr: "d'ouvrier", s0: 1480, s1: 1870, entree: 18 },
   ];
   // âge de départ RÉALISTE par génération (règles vécues / prévisibles)
   const GENS = [
@@ -85,7 +85,10 @@
 
   /* ---------- état ---------- */
   let profil = PROFILS[3];              // Cadre (la vedette du tableur)
-  let detteOn = false;
+  // régime des générations FUTURES : "equilibre" = pension coupée au niveau que la
+  // démographie finance (chacun vit selon ses moyens) ; "dette" = on maintient les
+  // pensions d'aujourd'hui et on lègue le trou aux enfants (redistribution actuelle).
+  let regime = "equilibre";
   let selGen = 2000;                    // carte sélectionnée
   let custom = null;                    // réglage avancé (sinon : profil × génération)
 
@@ -102,27 +105,32 @@
     const netM = (a) => L.s0 + (L.s1 - L.s0) * (nAns <= 1 ? 1 : (a - L.entree) / (nAns - 1));
     const brutM = (a) => netM(a) / P.NET2BRUT;
 
-    let cot = 0, impots = 0, tauxSum = 0;
+    let cot = 0, tauxSum = 0;
     const cumVerse = [];
     for (let a = L.entree; a < L.depart; a++) {
       const an = L.naissance + a, tx = interp(P.taux, an);
       tauxSum += tx;
       cot += brutM(a) * 12 * tx;
-      if (detteOn && an > 2025) impots += P.subvParActif * (brutM(a) / P.salaireMoyenBrut);
-      cumVerse.push([a + 1, cot + impots]);
+      cumVerse.push([a + 1, cot]);
     }
-    const verse = cot + impots;
+    const verse = cot;                       // la personne verse ses cotisations
     const ratio = interp(P.ratio, anDepart);
     const brutFin = L.s1 / P.NET2BRUT;
-    const pensionBrute = futur ? interp(P.taux, anDepart) * ratio * brutFin
-                               : tauxRemplacement(brutFin) * brutFin;
-    const pension = pensionBrute * P.PNET;
     const duree = L.deces - L.depart;
+    // deux pensions : « équilibre » (ce que la démographie finance) et « maintien »
+    // (les règles d'aujourd'hui, taux de remplacement observé — ce qu'a eu un
+    // retraité de 2010). Le passé a réellement eu le maintien ; le futur selon régime.
+    const pensionEq = interp(P.taux, anDepart) * ratio * brutFin * P.PNET;
+    const pensionMaint = tauxRemplacement(brutFin) * brutFin * P.PNET;
+    const pension = !futur ? pensionMaint : (regime === "dette" ? pensionMaint : pensionEq);
     const recu = pension * 12 * duree;
+    // dette LÉGUÉE : la part de la pension que les cotisations ne financent pas,
+    // sur toute la retraite (financée à crédit → transmise aux enfants)
+    const debtLeft = Math.max(0, (pension - pensionEq) * 12 * duree);
     const beAge = L.depart + verse / (pension * 12);
     const brutMoyAn = (L.s0 + L.s1) / 2 / P.NET2BRUT * 12;
-    return { L, anDepart, futur, ratio, cot, impots, verse, pension, duree, recu,
-             ratioMise: recu / verse, beAge: beAge <= L.deces ? beAge : null,
+    return { L, anDepart, futur, ratio, cot, verse, pension, pensionEq, pensionMaint,
+             duree, recu, debtLeft, ratioMise: recu / verse, beAge: beAge <= L.deces ? beAge : null,
              heures: verse / (brutMoyAn / P.heuresParAn), smicAns: recu / P.smicNetAnnuel,
              cumVerse, tauxDebut: interp(P.taux, L.naissance + L.entree),
              tauxFin: interp(P.taux, anDepart - 1), tauxMoyen: nAns > 0 ? tauxSum / nAns : 0 };
@@ -143,6 +151,10 @@
     $("gen-cards").innerHTML = GENS.map((g) => {
       const r = computeLife(lifeParams(g.naissance, g.depart));
       const win = r.ratioMise >= 1;
+      const dette = regime === "dette";
+      const gapMois = Math.max(0, r.pension - r.pensionEq);   // part non financée /mois
+      const modeLab = !r.futur ? "règles réelles"
+        : (dette ? "pension maintenue, à crédit" : "équilibre de sa génération");
       return '<button type="button" class="gen-card' + (selGen === g.naissance && !custom ? " on" : "") +
         '" data-annee="' + g.naissance + '">' +
         '<span class="gc-year">Né en ' + g.naissance + "</span>" +
@@ -152,14 +164,19 @@
         '<span class="gc-facts">départ à <b>' + g.depart + "</b> ans · pension <b>" +
         fmt0(r.pension) + "</b> €/mois net<br>" +
         (r.beAge ? "mise récupérée à <b>" + Math.round(r.beAge) + " ans</b>"
-                 : "<b>mise jamais récupérée</b>") + "</span>" +
-        '<span class="gc-mode ' + (r.futur ? "futur" : "passe") + '">' +
-        (r.futur ? "équilibre de sa génération" : "règles réelles") + "</span></button>";
+                 : "<b>mise jamais récupérée</b>") +
+        (dette && r.futur && gapMois > 10
+          ? '<br><span class="gc-dette">🧾 dont <b>' + fmt0(gapMois) +
+            " €/mois</b> non financés — laissés en dette aux enfants</span>"
+          : "") + "</span>" +
+        '<span class="gc-mode ' + (r.futur ? "futur" : "passe") + '">' + modeLab + "</span></button>";
     }).join("");
     $("gen-caption").textContent =
-      "Même carrière de " + profil.nom.toLowerCase() + " (" + fmt0(profil.s0) + " → " +
+      "Même carrière " + profil.carr + " (" + fmt0(profil.s0) + " → " +
       fmt0(profil.s1) + " € nets/mois), mêmes euros constants — seule l'année de naissance change." +
-      (detteOn ? " Dette incluse pour les années travaillées après 2025." : "");
+      (regime === "dette"
+        ? " Pensions maintenues au niveau d'aujourd'hui, financées à crédit : la dette léguée grandit à chaque génération."
+        : "");
   }
   $("gen-cards").addEventListener("click", (e) => {
     const c = e.target.closest(".gen-card"); if (!c) return;
@@ -180,7 +197,9 @@
     });
     profBox.appendChild(b);
   });
-  $("sw-dette").addEventListener("change", (e) => { detteOn = e.target.checked; renderAll(); });
+  $("sw-dette").addEventListener("change", (e) => {
+    regime = e.target.checked ? "dette" : "equilibre"; renderAll();
+  });
 
   /* ---------- détail « Et vous, précisément ? » ---------- */
   const ADV = [
@@ -246,9 +265,11 @@
     $("detail").classList.toggle("custom", !!custom);
 
     $("mode-tag").className = "mode-tag " + (r.futur ? "futur" : "passe");
-    $("mode-tag").textContent = r.futur
-      ? "⚖ Génération future — équilibre strict : " + fmt2(r.ratio) + " cotisant(s) par retraité à son départ (" + r.anDepart + ")"
-      : "Génération partie (départ " + r.anDepart + ") — règles réelles observées";
+    $("mode-tag").textContent = !r.futur
+      ? "Génération partie (départ " + r.anDepart + ") — règles réelles observées"
+      : (regime === "dette"
+        ? "⚖ Génération future — pension MAINTENUE à crédit : " + fmt2(r.ratio) + " cotisant(s)/retraité, le trou légué aux enfants"
+        : "⚖ Génération future — équilibre strict : " + fmt2(r.ratio) + " cotisant(s) par retraité à son départ (" + r.anDepart + ")");
 
     const phr = ["Né en " + r.L.naissance + ", parti à " + r.L.depart + " ans : <b>≈ " +
       fmtK(r.verse) + " €</b> versés au système, <b>≈ " + fmtK(r.recu) + " €</b> touchés (" +
@@ -259,10 +280,11 @@
       : "<b>La mise n'est jamais récupérée.</b>");
     $("res-phrase").innerHTML = phr.join(" ");
 
-    $("verse-detail").innerHTML = r.impots > 0
-      ? "Détail du versé : " + fmtK(r.cot) + " € de cotisations + <b>" + fmtK(r.impots) +
-        " € d'impôts</b> (quote-part des 136 Md€/an, années > 2025)."
-      : (r.futur && !detteOn ? "Hors quote-part du déficit actuel (interrupteur « dette » ci-dessus)." : "");
+    $("verse-detail").innerHTML = (r.futur && regime === "dette")
+      ? "Pension maintenue au niveau des règles d'aujourd'hui : les cotisations n'en financent que <b>" +
+        fmt0(r.pensionEq) + " €/mois</b> — le reste (≈ <b>" + fmtK(r.debtLeft) +
+        " €</b> sur la retraite) est de la dette léguée à la génération suivante."
+      : (r.futur ? "Pension à l'équilibre de la génération (sans dette nouvelle)." : "");
 
     $("mini-stats").innerHTML =
       '<div class="mini"><b>' + fmt0(r.pension) + " €/mois net</b><span>pension simulée" +
@@ -314,7 +336,10 @@
    * en 2025 la balance finance ≈ 1 120 € nets, alors que la pension moyenne
    * versée est ≈ 1 480 € : l'écart = impôts & dette (les 136 Md€). Le ROUGE
    * existe donc DÈS AUJOURD'HUI — c'est voulu (balance « cotisations pures »). */
-  const INV = { annee: 2050, cible: 1480, tauxPct: 28.1, age: 64, natal: false };
+  // objectif exprimé en % du revenu NET moyen (plus rigoureux : c'est le vrai
+  // « taux de remplacement » macro, indépendant du niveau de vie de l'époque) ;
+  // le montant en € est dérivé et affiché en clair.
+  const INV = { annee: 2050, ciblePct: 72, cible: 1480, tauxPct: 28.1, age: 64, natal: false };
   const ageHisto = (an) => an < 1983 ? 65 : an < 2011 ? 60 : an < 2023 ? 62 : 64;
   const estPasse = () => INV.annee <= 2025;
   const effTauxPct = () => estPasse() ? interp(P.taux, INV.annee) * 100 : INV.tauxPct;
@@ -341,13 +366,13 @@
 
   $("inv-controls").innerHTML =
     '<div class="cible-block"><span class="titre">🎯 VOTRE OBJECTIF — « je veux telle pension, telle année »</span>' +
-    '<div class="ctl"><label for="inv-cible">« Je veux une pension de… » ' +
+    '<div class="ctl"><label for="inv-cible">« Je veux une pension à… » ' +
     '<output id="out-inv-cible"></output></label>' +
-    '<input type="range" id="inv-cible" min="500" max="4000" step="10">' +
-    '<div class="reperes" style="display:flex;gap:4px 10px;flex-wrap:wrap;font-size:11px;color:var(--ink-soft);margin-top:3px">Repères : ' +
-    '<span class="repere" data-cible="1426" style="cursor:pointer;border-bottom:1px dotted #B9AE97">SMIC 1 426</span> · ' +
-    '<span class="repere" data-cible="1480" style="cursor:pointer;border-bottom:1px dotted #B9AE97">pension moyenne 1 480</span> · ' +
-    '<span class="repere" data-cible="2000" style="cursor:pointer;border-bottom:1px dotted #B9AE97">confortable 2 000</span></div></div>' +
+    '<input type="range" id="inv-cible" min="30" max="110" step="1">' +
+    '<div class="reperes" style="display:flex;gap:4px 10px;flex-wrap:wrap;font-size:11px;color:var(--ink-soft);margin-top:3px">Repères (% du revenu net moyen) : ' +
+    '<span class="repere" data-pct="50" style="cursor:pointer;border-bottom:1px dotted #B9AE97">modeste 50 %</span> · ' +
+    '<span class="repere" data-pct="72" style="cursor:pointer;border-bottom:1px dotted #B9AE97">pension moyenne 72 %</span> · ' +
+    '<span class="repere" data-pct="100" style="cursor:pointer;border-bottom:1px dotted #B9AE97">= le salaire 100 %</span></div></div>' +
     '<div class="ctl" id="ctl-inv-annee" style="margin-top:12px"><label for="inv-annee">« …en quelle année ? » ' +
     '<output id="out-inv-annee"></output></label>' +
     '<input type="range" id="inv-annee" min="1975" max="2070" step="1">' +
@@ -374,7 +399,7 @@
     fmt0(SAL_NET_MOYEN) + ' € nets), calé pour retrouver les <b>269 Md€</b> de cotisations ' +
     'réellement encaissées. Pas un levier : on isole démographie et taux.</div>';
 
-  $("inv-cible").addEventListener("input", (e) => { INV.cible = +e.target.value; renderInverse(); });
+  $("inv-cible").addEventListener("input", (e) => { INV.ciblePct = +e.target.value; renderInverse(); });
   $("inv-annee").addEventListener("input", (e) => { INV.annee = +e.target.value; renderInverse(); });
   $("inv-taux").addEventListener("input", (e) => {
     if (estPasse()) return;
@@ -386,7 +411,7 @@
   });
   $("inv-controls").addEventListener("click", (e) => {
     const r = e.target.closest(".repere"); if (!r) return;
-    if (r.dataset.cible) INV.cible = +r.dataset.cible;
+    if (r.dataset.pct) INV.ciblePct = +r.dataset.pct;
     if (r.dataset.an) INV.annee = +r.dataset.an;
     if (r.dataset.taux && !estPasse()) INV.tauxPct = +r.dataset.taux;
     if (r.dataset.age && !estPasse()) INV.age = +r.dataset.age;
@@ -484,18 +509,19 @@
 
   function renderInverse() {
     const passe = estPasse();
+    INV.cible = Math.round(INV.ciblePct / 100 * SAL_NET_MOYEN / 10) * 10;   // € dérivé du %
     const R = ratioEff(), finance = financeOut(), txt = effTauxPct(), age = effAge();
     const gap = INV.cible - finance;
     const atteint = Math.abs(gap) <= INV.cible * 0.01 || finance > INV.cible;
 
-    $("inv-cible").value = Math.round(INV.cible / 10) * 10;
+    $("inv-cible").value = INV.ciblePct;
     $("inv-annee").value = INV.annee;
     $("inv-taux").value = Math.round(txt * 10) / 10;
     $("inv-age").value = age;
     $("inv-taux").disabled = passe; $("inv-age").disabled = passe;
     $("ctl-inv-taux").classList.toggle("locked", passe);
     $("ctl-inv-age").classList.toggle("locked", passe);
-    $("out-inv-cible").textContent = fmt0(INV.cible) + " € nets";
+    $("out-inv-cible").textContent = INV.ciblePct + " % du revenu moyen ≈ " + fmt0(INV.cible) + " € nets";
     $("out-inv-annee").textContent = INV.annee + (passe ? " (figé)" : "");
     const dT = txt - 28.1;
     $("out-inv-taux").textContent = pct1(txt / 100) + " %" + (passe ? " 🔒"
@@ -519,7 +545,8 @@
         " est payée : taux " + pct1(txt / 100) + " %, départ à " + age + " ans</span>" +
         '<div class="jauge"><div class="fill ok" style="width:100%"></div></div>'
       : '<span class="big">' + fmt0(finance) + " € financés</span>" +
-        '<span class="delta neg">manque ' + fmt0(gap) + " €/mois</span>" +
+        '<span class="delta neg">manque ' + fmt0(gap) + " €/mois (" +
+        Math.round(finance / SAL_NET_MOYEN * 100) + " % du revenu, objectif " + INV.ciblePct + " %)</span>" +
         '<span class="lab">pour VOTRE objectif de ' + fmt0(INV.cible) + " € en " + INV.annee +
         (passe ? " — c\u2019est la part des cotisations ; le reste est pris aux impôts et à la dette"
                : " — fermez l\u2019écart avec les leviers") + "</span>" +
