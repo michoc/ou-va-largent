@@ -35,7 +35,9 @@
   const P = {
     taux: [[1970, 0.155], [1980, 0.19], [1990, 0.225], [2000, 0.25],
            [2010, 0.267], [2017, 0.279], [2025, 0.281], [2110, 0.281]],
-    ratio: [[2005, 2.0], [2010, 1.85], [2020, 1.71], [2025, 1.67],
+    // cotisants/retraité : RÉTROSPECTIVE estimée (≈ 3,0 en 1970) puis COR
+    ratio: [[1970, 3.0], [1980, 2.6], [1990, 2.3], [2000, 2.05],
+            [2005, 2.0], [2010, 1.85], [2020, 1.71], [2025, 1.67],
             [2040, 1.5], [2055, 1.35], [2070, 1.2], [2120, 1.2]],
     NET2BRUT: 0.78, PNET: 0.909,
     subvParActif: 4470, salaireMoyenBrut: 3466,
@@ -294,77 +296,91 @@
     return r;
   }
 
-  /* ---------- ACTE ② : la balance aux silhouettes ---------- */
-  // pension nette = taux × ratioEffectif × (salaire net ÷ 0,78) × 0,909
-  // ratioEffectif = démographie (année de départ) + effet ÂGE (+0,06/an vs 64)
-  //                 + effet NATALITÉ (+0,1, seulement si départ ≥ 2050)
-  const INV = { pension: 1500, tauxPct: 28.1, salNet: 2700, age: 64, natal: false, actif: false };
+  /* ---------- ACTE ② : la balance dans le temps ----------
+   * La PENSION est le RÉSULTAT de l'équation (demande commanditaire) :
+   *   pension nette = taux × ratio(année) × salaire moyen brut France × 0,909
+   * · SALAIRE des cotisants : FIGÉ au salaire moyen France (on isole
+   *   démographie et taux — le modifier n'avait pas de sens).
+   * · CURSEUR ANNÉE 1975 → 2070 : dans le PASSÉ tout est figé (taux et âge
+   *   légal de l'époque, démographie historique) ; dans le FUTUR, démographie
+   *   projetée et deux seuls leviers — taux et âge (≈ +0,06 ratio/an de
+   *   report ; natalité +0,1 mais seulement après 2050).
+   * Contrôle de cohérence : 2025 → ≈ 1 480 € nets ≈ pension moyenne réelle. */
+  const INV = { annee: 2050, tauxPct: 28.1, age: 64, natal: false };
+  const ageHisto = (an) => an < 1983 ? 65 : an < 2011 ? 60 : an < 2023 ? 62 : 64;
+  const estPasse = () => INV.annee <= 2025;
+  const effTauxPct = () => estPasse() ? interp(P.taux, INV.annee) * 100 : INV.tauxPct;
+  const effAge = () => estPasse() ? ageHisto(INV.annee) : INV.age;
+  function ratioEff() {
+    const base = interp(P.ratio, INV.annee);
+    if (estPasse()) return base;               // l'histoire intègre déjà les âges réels
+    return clamp(base + 0.06 * (INV.age - 64) +
+                 (INV.natal && INV.annee >= 2050 ? 0.1 : 0), 0.5, 3.2);
+  }
+  const pensionOut = () => (effTauxPct() / 100) * ratioEff() * P.salaireMoyenBrut * P.PNET;
+  // la référence : ce que l'équation finance AUJOURD'HUI (≈ pension moyenne)
+  const BASELINE = 0.281 * interp(P.ratio, 2025) * P.salaireMoyenBrut * P.PNET;
+  const SAL_NET_MOYEN = Math.round(P.salaireMoyenBrut * P.NET2BRUT);
 
-  const INVC = [
-    { id: "inv-pension", lab: "La pension à financer (€/mois net)", min: 400, max: 6000, step: 10,
-      fmt: (v) => fmt0(v) + " €" },
-    { id: "inv-taux", lab: "Taux de cotisation vieillesse des actifs (%)", min: 8, max: 60, step: 0.1,
-      fmt: (v) => pct1(v / 100) + " %" },
-    { id: "inv-sal", lab: "Salaire net moyen des cotisants (€/mois)", min: 1200, max: 8000, step: 50,
-      fmt: (v) => fmt0(v) + " €" },
-    { id: "inv-age", lab: "Âge de départ (le levier qui bouge la démographie)", min: 60, max: 70, step: 1,
-      fmt: (v) => v + " ans" },
-  ];
-  $("inv-controls").innerHTML = INVC.map((c) =>
-    '<div class="ctl"><label for="' + c.id + '">' + c.lab +
-    ' <output id="out-' + c.id + '"></output></label>' +
-    '<input type="range" id="' + c.id + '" min="' + c.min + '" max="' + c.max +
-    '" step="' + c.step + '"></div>').join("");
+  $("inv-controls").innerHTML =
+    '<div class="ctl" id="ctl-inv-annee"><label for="inv-annee">Financer une pension en… ' +
+    '<output id="out-inv-annee"></output></label>' +
+    '<input type="range" id="inv-annee" min="1975" max="2070" step="1">' +
+    '<div class="reperes" style="display:flex;gap:4px 10px;flex-wrap:wrap;font-size:11px;color:var(--ink-soft);margin-top:3px">Repères : ' +
+    '<span class="repere" data-an="1980" style="cursor:pointer;border-bottom:1px dotted #B9AE97">1980</span> · ' +
+    '<span class="repere" data-an="2000" style="cursor:pointer;border-bottom:1px dotted #B9AE97">2000</span> · ' +
+    '<span class="repere" data-an="2025" style="cursor:pointer;border-bottom:1px dotted #B9AE97">aujourd\u2019hui</span> · ' +
+    '<span class="repere" data-an="2050" style="cursor:pointer;border-bottom:1px dotted #B9AE97">2050</span> · ' +
+    '<span class="repere" data-an="2070" style="cursor:pointer;border-bottom:1px dotted #B9AE97">2070</span></div></div>' +
+    '<div class="ctl" id="ctl-inv-taux"><label for="inv-taux">Taux de cotisation vieillesse ' +
+    '<output id="out-inv-taux"></output></label>' +
+    '<input type="range" id="inv-taux" min="8" max="60" step="0.1"></div>' +
+    '<div class="ctl" id="ctl-inv-age"><label for="inv-age">Âge de départ (durée de cotisation) ' +
+    '<output id="out-inv-age"></output></label>' +
+    '<input type="range" id="inv-age" min="60" max="70" step="1"></div>' +
+    '<div class="sal-fixe">💶 Salaire des cotisants : <b>figé</b> au salaire moyen France — ' +
+    fmt0(SAL_NET_MOYEN) + ' € nets (' + fmt0(P.salaireMoyenBrut) +
+    ' € bruts, INSEE). Le curseur n\u2019existe pas : on isole démographie et taux.</div>';
+
+  $("inv-annee").addEventListener("input", (e) => { INV.annee = +e.target.value; renderInverse(); });
+  $("inv-taux").addEventListener("input", (e) => {
+    if (estPasse()) return;
+    INV.tauxPct = +e.target.value; renderInverse();
+  });
+  $("inv-age").addEventListener("input", (e) => {
+    if (estPasse()) return;
+    INV.age = +e.target.value; renderInverse();
+  });
+  $("ctl-inv-annee").addEventListener("click", (e) => {
+    const r = e.target.closest(".repere"); if (!r) return;
+    INV.annee = +r.dataset.an; renderInverse();
+  });
 
   const SCENARIOS = [
-    { lab: "Réforme de l'âge : 64 → 66", run: () => { INV.age = 66; } },
-    { lab: "+4 points de cotisation", run: () => { INV.tauxPct = clamp(INV.tauxPct + 4, 8, 60); } },
-    { lab: "Pensions −15 %", run: () => { INV.pension *= 0.85; return "pension"; } },
+    { lab: "→ Maintenir la pension d\u2019aujourd\u2019hui (ajuste le taux)", run: () => {
+        if (estPasse()) return "passe";
+        INV.tauxPct = clamp(BASELINE / (ratioEff() * P.salaireMoyenBrut * P.PNET) * 100, 8, 60);
+      } },
+    { lab: "Réforme de l\u2019âge : 64 → 66", run: () => {
+        if (estPasse()) return "passe";
+        INV.age = 66;
+      } },
     { lab: "Natalité +0,2 enfant/femme", run: () => { INV.natal = !INV.natal; } },
-    { lab: "↺ Revenir à aujourd'hui", run: () => {
-        INV.tauxPct = 28.1; INV.age = 64; INV.natal = false; return "taux"; } },
+    { lab: "↺ Règles d\u2019aujourd\u2019hui", run: () => {
+        INV.tauxPct = 28.1; INV.age = 64; INV.natal = false;
+      } },
   ];
+  let scenNote = "";
   const scBox = $("scenarios");
   SCENARIOS.forEach((s) => {
     const b = document.createElement("button");
     b.type = "button"; b.className = "scenar"; b.textContent = s.lab;
     b.addEventListener("click", () => {
-      INV.actif = true;
-      const mode = s.run();
-      if (mode === "pension") {
-        // la pension est la cible → le taux s'ajuste
-        INV.tauxPct = clamp(INV.pension / (ratioEff() * (INV.salNet / P.NET2BRUT) * P.PNET) * 100, 8, 60);
-      }
-      INV.pension = pensionFrom();
+      scenNote = (s.run() === "passe")
+        ? "Le passé est figé : placez d\u2019abord le curseur après 2025." : "";
       renderInverse();
     });
     scBox.appendChild(b);
-  });
-
-  function anneeBalance() { return computeLife(currentLife()).anDepart; }
-  function ratioEff() {
-    const an = anneeBalance();
-    return clamp(interp(P.ratio, an) + 0.06 * (INV.age - 64) +
-                 (INV.natal && an >= 2050 ? 0.1 : 0), 0.5, 2.6);
-  }
-  function pensionFrom() {
-    return (INV.tauxPct / 100) * ratioEff() * (INV.salNet / P.NET2BRUT) * P.PNET;
-  }
-  $("inv-pension").addEventListener("input", (e) => {
-    INV.pension = +e.target.value; INV.actif = true;
-    INV.tauxPct = clamp(INV.pension / (ratioEff() * (INV.salNet / P.NET2BRUT) * P.PNET) * 100, 8, 60);
-    INV.pension = pensionFrom();
-    renderInverse();
-  });
-  ["inv-taux", "inv-sal", "inv-age"].forEach((id) => {
-    $(id).addEventListener("input", (e) => {
-      INV.actif = true;
-      if (id === "inv-taux") INV.tauxPct = +e.target.value;
-      if (id === "inv-sal") INV.salNet = +e.target.value;
-      if (id === "inv-age") INV.age = +e.target.value;
-      INV.pension = pensionFrom();
-      renderInverse();
-    });
   });
 
   // silhouette (tête + buste) dessinée dans un viewBox 60×110
@@ -385,25 +401,22 @@
     }
     return s + "</g>";
   }
-  function renderBalance() {
+  function renderBalance(pension) {
     const R = ratioEff();
     const full = Math.floor(R + 1e-9), frac = R - full;
     const nSil = full + (frac > 0.01 ? 1 : 0);
-    const parCot = (INV.pension / P.PNET) / R;      // €/mois versés par cotisant (sa cotisation entière)
-    const SW = 78;                                   // largeur par silhouette
+    const parCot = (pension / P.PNET) / R;
+    const SW = 78;
     const W = 210 + 70 + Math.max(nSil, 1) * SW + 10, H = 190;
     let s = '<svg id="balance-svg" width="' + W + '" height="' + H + '" viewBox="0 0 ' + W + " " + H + '">';
-    // — le retraité : bloc pension proportionnel —
-    const ph = clamp(INV.pension / 6000 * 150, 14, 150);
+    const ph = clamp(pension / 6000 * 150, 14, 150);
     s += '<rect x="30" y="' + (128 - ph) + '" width="150" height="' + ph +
          '" rx="4" fill="#C94A6E"></rect>' +
          '<text x="105" y="' + (128 - ph / 2 + 5) + '" text-anchor="middle" style="font:800 17px Helvetica" fill="#fff">' +
-         fmt0(INV.pension) + " €</text>" +
+         fmt0(pension) + " €</text>" +
          '<text x="105" y="148" text-anchor="middle" style="font:700 12px Helvetica" fill="#1E2430">LE RETRAITÉ</text>' +
-         '<text x="105" y="163" text-anchor="middle" style="font:600 10.5px Helvetica" fill="#4A5265">pension nette / mois</text>';
-    // — la balance —
+         '<text x="105" y="163" text-anchor="middle" style="font:600 10.5px Helvetica" fill="#4A5265">pension nette / mois — RÉSULTAT</text>';
     s += '<text x="' + (210 + 20) + '" y="86" style="font:800 26px Georgia" fill="#1E2430">⚖</text>';
-    // — les cotisants : silhouettes (la dernière TRONQUÉE = le cotisant manquant) —
     const x0 = 210 + 70;
     for (let i = 0; i < full; i++)
       s += '<g transform="translate(' + (x0 + i * SW) + ',18)">' + silhouette(0, 1, "#8C79C0", false) + "</g>";
@@ -417,53 +430,79 @@
         s += '<text x="' + (x0 + i * SW + 30) + '" y="162" text-anchor="middle" style="font:600 9.5px Helvetica" fill="#4A5265">/mois</text>';
     }
     s += "</svg>";
-    const holder = $("balance-svg");
-    holder.outerHTML = s;                            // remplace le svg (garde l'id)
+    $("balance-svg").outerHTML = s;              // remplace le svg (garde l'id)
   }
 
-  function renderInverse(simPension) {
-    if (!INV.actif && simPension != null) {
-      INV.pension = simPension;
-      INV.tauxPct = clamp(INV.pension / (ratioEff() * (INV.salNet / P.NET2BRUT) * P.PNET) * 100, 8, 60);
-      INV.pension = pensionFrom();
-    }
-    const R = ratioEff(), an = anneeBalance();
-    $("inv-pension").value = Math.round(INV.pension / 10) * 10;
-    $("inv-taux").value = Math.round(INV.tauxPct * 10) / 10;
-    $("inv-sal").value = INV.salNet;
-    $("inv-age").value = INV.age;
-    $("out-inv-pension").textContent = fmt0(INV.pension) + " €";
-    $("out-inv-taux").textContent = pct1(INV.tauxPct / 100) + " %";
-    $("out-inv-sal").textContent = fmt0(INV.salNet) + " €";
-    $("out-inv-age").textContent = INV.age + " ans";
-    $("inv-verrou").textContent = "🔒 Démographie " + an + " : " + fmt2(interp(P.ratio, an)) +
-      " cotisant/retraité — ne se négocie pas (seuls l'âge de départ et la natalité, 25 ans plus tard, la font bouger)";
-    renderBalance();
-    const parCot = (INV.pension / P.PNET) / R;
+  function renderInverse() {
+    const passe = estPasse();
+    const R = ratioEff(), p = pensionOut(), txt = effTauxPct(), age = effAge();
+
+    // curseurs : valeurs effectives + verrouillage dans le passé
+    $("inv-annee").value = INV.annee;
+    $("inv-taux").value = Math.round(txt * 10) / 10;
+    $("inv-age").value = age;
+    $("inv-taux").disabled = passe; $("inv-age").disabled = passe;
+    $("ctl-inv-taux").classList.toggle("locked", passe);
+    $("ctl-inv-age").classList.toggle("locked", passe);
+    $("out-inv-annee").textContent = INV.annee + (passe ? " (figé)" : "");
+    $("out-inv-taux").textContent = pct1(txt / 100) + " %" + (passe ? " 🔒" : "");
+    $("out-inv-age").textContent = age + " ans" + (passe ? " 🔒" : "");
+
+    $("inv-verrou").textContent = "🔒 Démographie " + INV.annee + " : " +
+      fmt2(interp(P.ratio, INV.annee)) + " cotisant(s) par retraité — " +
+      (passe ? "historique (le passé ne se refait pas)" : "projection COR (seuls l\u2019âge et la natalité, 25 ans plus tard, la font bouger)");
+
+    // — LE RÉSULTAT : la pension finançable, comparée à aujourd\u2019hui —
+    const delta = (p / BASELINE - 1) * 100;
+    $("inv-result").innerHTML = '<span class="big">' + fmt0(p) + " € nets/mois</span>" +
+      (Math.abs(delta) >= 1
+        ? '<span class="delta ' + (delta < 0 ? "neg" : "pos") + '">' +
+          (delta > 0 ? "+" : "−") + Math.abs(Math.round(delta)) + " % vs aujourd\u2019hui</span>"
+        : '<span class="delta pos">≈ la pension moyenne d\u2019aujourd\u2019hui</span>') +
+      '<span class="lab">pension finançable en ' + INV.annee + " — le RÉSULTAT de l\u2019équation, pas un réglage</span>";
+
+    renderBalance(p);
+    const parCot = (p / P.PNET) / R;
     $("bal-caption").innerHTML = "<b>" + fmt2(R) + " cotisant" + (R >= 2 ? "s" : "") +
-      "</b> — pas un de plus — financent cette pension" +
-      (R % 1 > 0.01 ? " (la silhouette en pointillé, c'est le cotisant qui manque)" : "") + ".";
-    const haussePts = INV.tauxPct - 28.1;
-    $("inv-phrase").innerHTML =
-      "Pour verser <b>" + fmt0(INV.pension) + " € nets/mois</b>, chacun des " + fmt2(R) +
-      " cotisants (salaire net " + fmt0(INV.salNet) + " €) y consacre <b>" + fmt0(parCot) +
-      " €/mois</b> — l'intégralité de sa cotisation vieillesse, soit <b>" +
-      pct1(INV.tauxPct / 100) + " % de son salaire brut</b>" +
-      (Math.abs(haussePts) >= 0.3
-        ? (haussePts > 0 ? ", contre <b>28,1 %</b> aujourd'hui (+" + pct1(haussePts / 100) + " pt" +
-           (haussePts >= 2 ? "s" : "") + ")." : ", contre 28,1 % aujourd'hui.")
-        : " (le taux actuel).");
-    $("inv-note").textContent =
-      (INV.tauxPct >= 59.9 ? "⚠ Taux saturé à 60 % : cette pension n'est pas finançable ainsi. " : "") +
-      (INV.natal && an < 2050 ? "⚠ Natalité : aucun effet avant ~2050 (les bébés de 2026 cotisent en 2050)." :
-       INV.natal ? "Natalité +0,2 : ratio +0,1 à partir de 2050 — le levier le plus lent." : "");
+      "</b> au salaire moyen — pas un de plus — financent cette pension" +
+      (R % 1 > 0.01 ? " (en pointillé : le cotisant qui manque)" : "") + ".";
+
+    let phr;
+    if (passe) {
+      phr = "En <b>" + INV.annee + "</b>, chaque retraité était porté par <b>" + fmt2(R) +
+        " cotisants</b> : <b>" + pct1(txt / 100) + " %</b> de cotisation (départ à " + age +
+        " ans) suffisaient à financer <b>≈ " + fmt0(p) + " € nets</b>. Le passé est figé — rien à régler.";
+    } else {
+      phr = "En <b>" + INV.annee + "</b>, " + fmt2(R) + " cotisant(s) × " + pct1(txt / 100) +
+        " % du salaire moyen → <b>≈ " + fmt0(p) + " € nets</b> (chacun y consacre " +
+        fmt0(parCot) + " €/mois).";
+      if (p < BASELINE * 0.99) {
+        const tauxN = BASELINE / (ratioEff() * P.salaireMoyenBrut * P.PNET) * 100;
+        const needRatio = BASELINE / ((INV.tauxPct / 100) * P.salaireMoyenBrut * P.PNET);
+        const ageN = 64 + (needRatio - interp(P.ratio, INV.annee) -
+          (INV.natal && INV.annee >= 2050 ? 0.1 : 0)) / 0.06;
+        phr += " Pour <b>maintenir la pension d\u2019aujourd\u2019hui</b> (≈ " + fmt0(BASELINE) +
+          " €) : taux à <b>" + pct1(Math.min(tauxN, 60) / 100) + " %</b>" +
+          (tauxN > 60 ? " (insuffisant même à 60 %)" : "") +
+          " <b>OU</b> départ à <b>" +
+          (ageN > 70 ? "plus de 70 ans" : Math.ceil(ageN) + " ans") +
+          "</b> — ou accepter la baisse.";
+      }
+    }
+    $("inv-phrase").innerHTML = phr;
+
+    $("inv-note").textContent = scenNote ||
+      (INV.natal && INV.annee < 2050 && !passe
+        ? "⚠ Natalité : aucun effet avant ~2050 (les bébés d\u2019aujourd\u2019hui cotisent dans 25 ans)."
+        : (INV.natal && INV.annee >= 2050 ? "Natalité +0,2 : ratio +0,1 — le levier le plus lent." : ""));
+    scenNote = "";
   }
 
   /* ---------- orchestration ---------- */
   function renderAll() {
     renderCards();
     const r = renderDetail();
-    renderInverse(r.pension);
+    renderInverse();
   }
   window.addEventListener("resize", () => chart.resize());
   syncAdv();
