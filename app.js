@@ -603,15 +603,20 @@
     if (hasCas) {
       const dCas = cas[y1] - cas[y0];
       const part = dCp > 0 && dCas > 0 ? Math.round((dCas / dCp) * 100) : null;
+      // « part retraites » = ce qui finance les retraites, Y COMPRIS via les
+      // opérateurs (universités, CNRS, CNES…) — sans eux le chiffre serait
+      // trompeur pour les missions à opérateurs (cf. note_cas).
+      const CAS = "contributions retraites (CAS Pensions, <b>opérateurs compris</b>" +
+                  "&nbsp;: universités, CNRS, CNES…)";
       if (dCas >= 0.05) {
-        punch += " — dont <b>≈ " + fmt0(dCas) + " Md€</b> absorbés par la hausse des " +
-                 "contributions retraites (CAS Pensions)" + (part != null && part > 0 && part <= 100
+        punch += " — dont <b>≈ " + fmt0(dCas) + " Md€</b> absorbés par la hausse des " + CAS +
+                 (part != null && part > 0 && part <= 100
                  ? ", soit <b>" + part + " %</b> de la hausse" : "") + ".";
       } else if (dCas <= -0.05) {
-        punch += " — la part retraites (CAS Pensions) a, elle, baissé de <b>≈ " +
+        punch += " — la part retraites (opérateurs compris) a, elle, baissé de <b>≈ " +
                  fmt0(Math.abs(dCas)) + " Md€</b>.";
       } else {
-        punch += " — la part retraites (CAS Pensions) est restée stable.";
+        punch += " — la part retraites (opérateurs compris) est restée stable.";
       }
       // ⚠ le moment-clé : la dernière hausse du CAS dépasse celle du budget
       const yPrev = years[years.length - 2];
@@ -630,9 +635,10 @@
     let noteOp = "";
     if (serie.op25) {
       const surcout = serie.op25 * 4 / 78.28;
-      noteOp = " Opérateurs financés : ≈ " + fmt0(serie.op25) + " Md€ versés au CAS en 2025 " +
-               "(estimation, hachures) — le relèvement du taux leur coûte ≈ " + fmt0(surcout) +
-               " Md€ de plus, non compensés dans l'enseignement supérieur (Sénat, PLF 2025).";
+      noteOp = " Dont opérateurs (universités, CNRS, CNES…) : ≈ " + fmt0(serie.op25) +
+               " Md€ versés au CAS en 2025 (estimation, hachures) — le relèvement du taux à " +
+               "78,28 % leur coûte ≈ " + fmt0(surcout) + " Md€ de plus, non compensés dans le " +
+               "budget de la mission (Sénat, PLF 2025).";
     }
     histoEl.innerHTML =
       '<div class="histo-text"><h3>Évolution du budget ' + y0 + " → " + y1 + "</h3>" +
