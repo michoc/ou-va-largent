@@ -111,7 +111,10 @@
     .jauge .fill { height: 100%; background: #C94A6E; transition: width .2s; }
     .jauge .fill.ok { background: #3E7A4E; }
     #inv-result .big.ok { color: #3E7A4E; }
-    #inv-result { text-align: center; margin: 2px 0 6px; }
+    #inv-result { text-align: center; margin: 2px 0 16px; padding: 14px 16px;
+      border-radius: 10px; }
+    #inv-result.ko { background: #FDE8ED; border: 1.5px solid #E8ADBA; }
+    #inv-result.ok { background: #E7F2E9; border: 1.5px solid #BFDCC6; }
     #inv-result .big { font: 800 34px/1.1 Georgia, serif; color: #8E1B38; }
     #inv-result .delta { display: inline-block; font: 700 13px/1 inherit; border-radius: 999px;
       padding: 4px 10px; margin-left: 8px; vertical-align: middle; }
@@ -189,6 +192,7 @@
       le fermer. Hier, 3 cotisants suffisaient ; demain, il en manquera.</p>
     <section class="sim-card" id="inverse-card" aria-live="polite">
       <span class="verrou" id="inv-verrou"></span>
+      <div id="inv-result"></div>
       <div class="inv-grid">
         <div>
           <div id="inv-controls"></div>
@@ -196,7 +200,6 @@
           <p class="inv-note" id="inv-note"></p>
         </div>
         <div>
-          <div id="inv-result"></div>
           <svg id="balance-svg"></svg>
           <p class="bal-caption" id="bal-caption"></p>
           <p class="inv-phrase" id="inv-phrase"></p>
@@ -224,6 +227,6 @@
   </footer>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/echarts/5.5.0/echarts.min.js"></script>
-  <script src="simulateur.js?v=labo8"></script>
+  <script src="simulateur.js?v=labo9"></script>
 </body>
 </html>

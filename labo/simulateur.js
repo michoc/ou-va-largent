@@ -485,8 +485,9 @@
       fmt2(interp(P.ratio, INV.annee)) + " cotisant(s) par retraité — " +
       (passe ? "historique (le passé ne se refait pas)" : "projection COR (seuls l\u2019âge et la natalité, 25 ans plus tard, la font bouger)");
 
-    // — LE TABLEAU DE BORD DE L'ÉCART —
+    // — LE TABLEAU DE BORD DE L'ÉCART (bandeau d'état pleine largeur) —
     const pctFill = clamp(finance / INV.cible * 100, 0, 100);
+    $("inv-result").className = atteint ? "ok" : "ko";
     $("inv-result").innerHTML = atteint
       ? '<span class="big ok">✓ objectif financé</span>' +
         '<span class="lab">votre pension de ' + fmt0(INV.cible) + " € en " + INV.annee +
