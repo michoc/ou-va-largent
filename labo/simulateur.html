@@ -53,6 +53,10 @@
     .gc-dette { display: inline-block; margin-top: 6px; font-size: 11px; line-height: 1.5;
       color: #8E1B38; background: #FDE8ED; border-radius: 6px; padding: 4px 7px; }
     .gc-dette b { font-variant-numeric: tabular-nums; }
+    .gc-leg { display: flex; gap: 7px; align-items: flex-start; margin-top: 9px;
+      padding-top: 8px; border-top: 1px dashed var(--rule); font-size: 11px; font-weight: 700;
+      color: #8E1B38; cursor: pointer; line-height: 1.45; }
+    .gc-leg input { accent-color: #8E1B38; margin-top: 1px; transform: scale(1.15); cursor: pointer; }
     .gen-caption { text-align: center; font-style: italic; color: var(--ink-soft);
       font-size: 13px; margin: 10px 0 0; }
 
@@ -160,14 +164,13 @@
       seule l'année de naissance (et les règles qu'elle subit) change.</p>
     <div class="bar">
       <span id="profils"></span>
-      <label class="sw-inline"><input type="checkbox" id="sw-dette">
-        garder les pensions d'aujourd'hui et endetter les enfants&nbsp;?</label>
+
     </div>
     <div class="gen-cards" id="gen-cards"></div>
     <p class="gen-caption" id="gen-caption"></p>
 
     <section class="sim-card" id="detail" aria-live="polite">
-      <h3 style="margin:0 0 4px">Et vous, précisément&nbsp;? <span class="custom-tag">— réglage personnalisé</span></h3>
+      <h3 style="margin:0 0 4px">La vie en détail <span class="custom-tag">— situation personnalisée</span></h3>
       <span class="mode-tag" id="mode-tag"></span>
       <div class="det-grid">
         <div>
@@ -179,7 +182,7 @@
         <div>
           <div class="cohr" id="coherence"></div>
           <details class="avance" id="avance">
-            <summary>Réglages avancés — année précise, âges, salaires début/fin</summary>
+            <summary>Personnaliser — tester une autre situation (année, âges, salaires)</summary>
             <div id="controls-adv"></div>
           </details>
         </div>
@@ -189,10 +192,11 @@
     <!-- ═══════════ ACTE 2 ═══════════ -->
     <h2 class="acte-titre"><span class="n">②</span> Qui paie une pension&nbsp;?</h2>
     <p class="acte-sous">Une pension n'est pas de l'argent mis de côté : elle est prélevée
-      <b>chaque mois</b> sur le salaire des cotisants d'alors. Fixez <b>votre objectif</b>
-      (« je veux telle pension, telle année ») : le simulateur montre ce que les règles
-      financent et <b>l'écart à combler</b> — à somme nulle, seuls le taux et l'âge peuvent
-      le fermer. Hier, 3 cotisants suffisaient ; demain, il en manquera.</p>
+      <b>chaque mois</b> sur le salaire des cotisants du moment. Fixez l'objectif — une pension
+      de tant, pour un départ telle année — et le simulateur montre ce que les cotisations
+      financent et <b>l'écart à combler</b>. À somme nulle, seuls deux leviers peuvent fermer
+      cet écart : le taux de cotisation et l'âge de départ. Hier, 3 cotisants portaient chaque
+      retraité ; demain, à peine plus d'un.</p>
     <section class="sim-card" id="inverse-card" aria-live="polite">
       <span class="verrou" id="inv-verrou"></span>
       <div id="inv-result"></div>
@@ -213,12 +217,14 @@
     <details class="metho sim-card">
       <summary>Méthodologie, hypothèses &amp; sources (prototype)</summary>
       <ul>
-        <li><b>Euros constants 2025</b>, sans actualisation. <b>Salaires saisis en NET</b> (÷ 0,78 → brut pour les cotisations, approximation privé) ; <b>pensions affichées nettes</b> (−9,1 % CSG-CRDS-Casa). <span class="flag">Ratios à consolider.</span></li>
+        <li><b>Tous les montants sont en euros d'aujourd'hui</b> (« euros constants 2025 », corrigés de l'inflation), sans actualisation financière. <b>Salaires saisis en NET</b> (÷ 0,78 → brut pour les cotisations, approximation privé) ; <b>pensions affichées nettes</b> (−9,1 % CSG-CRDS-Casa). <span class="flag">Ratios à consolider.</span></li>
         <li><b>Les 4 cartes</b> : même carrière (salaires constants 2025), âge de départ RÉALISTE par génération (61 · 64 · 65 · 66 — règles vécues/prévisibles), fin de vie = espérance de vie projetée de la cohorte (à 65 ans, +≈1 mois/an plafonné +5 ans, variantes cadre/ouvrier). <span class="flag">À consolider.</span></li>
+        <li><b>Heures de travail pour cotiser</b> : pour chaque année de carrière, taux de cotisation × durée annuelle du travail de l'époque (≈ 1 850 h/an vers 1970 → ≈ 1 610 h après les 35 heures) — méthode S. Catherine ; c'est la part du temps de travail qui part aux retraites. <span class="flag">Série des heures : estimation.</span></li>
         <li><b>Ce que chacun verse</b> = salaire brut × taux de cotisation vieillesse DE CHAQUE ANNÉE (série ≈ 15,5 % en 1970 → 28,1 % en 2025, calée sur les moyennes générationnelles 22 % / 28 %, estimation S. Catherine).</li>
         <li><b>Départs ≤ 2025</b> : règles réelles (taux de remplacement observé, dégressif). <b>Départs &gt; 2025 : jeu à somme nulle</b> — pension = taux × ratio cotisants/retraité de la génération (COR : 1,67 → 1,5 en 2040 → 1,2 en 2070) × salaire brut fin.</li>
-        <li><b>Régime « garder les pensions et endetter »</b> (acte ①) : au lieu de couper la pension au niveau que la démographie finance (équilibre), on la maintient au niveau des règles d'aujourd'hui ; chaque pension future affiche alors sa part <b>non financée par les cotisations</b> (pension maintenue − pension d'équilibre, en €/mois), <b>laissée en dette aux enfants</b> — d'autant plus grosse que la démographie se dégrade. Chaque génération « gagne » individuellement (×&nbsp;mise &gt; 1) tout en léguant la note : c'est le mécanisme même des 136 Md€/an d'aujourd'hui, en plus lourd demain. <span class="flag">Montants par tête, ordres de grandeur.</span></li>
-        <li><b>La balance (acte ②)</b> : la pension est un <b>OBJECTIF</b> que l'utilisateur fixe (« je veux telle pension en telle année ») ; le simulateur montre ce qui est FINANCÉ par les réglages courants et <b>l'écart à combler</b> — à somme nulle, seuls le taux et l'âge peuvent le fermer. Équation : pension financée = pension nette = taux × ratio cotisants/retraité × salaire moyen brut France × 0,909. Le <b>salaire des cotisants est figé</b> au salaire brut moyen PAR TÊTE des ~30,4 M de cotisants : <b>2 620 € bruts</b> (≈ 2 040 € nets), CALÉ pour que taux × masse salariale retrouve les <b>269 Md€ de cotisations réellement encaissées</b> (COR 2025). ⚠ Ne pas utiliser le salaire EQTP privé (3 466 €) : il gonfle les cotisations de ~30 % et masque le déficit actuel. Le <b>curseur ANNÉE</b> voyage de 1975 à 2070 : dans le PASSÉ tout est figé (taux et âge légal de l'époque, démographie historique ≈ 3,0 cotisants en 1970 → 2,0 en 2005 — <span class="flag">série rétrospective à consolider</span>) ; dans le FUTUR, la démographie est projetée (COR) et seuls bougent le taux et l'âge (≈ +0,06 cotisant/retraité par année de report, estimation ; natalité +0,1 seulement après 2050). <b>Objectif en % du revenu net moyen</b> (acte ②) : la cible se règle en part du revenu moyen (le vrai « taux de remplacement » macro), le montant en € est dérivé (× 2 044 € nets). Plus rigoureux : la valeur d'une pension dépend du niveau de vie de l'époque ; à revenu moyen tenu constant (pas de gain de productivité modélisé), % et € sont ici équivalents, mais le cadrage en % est le bon. La balance est donc « <b>cotisations pures</b> » (l'équivalent des 269 Md€, PAS des 405) : en 2025, réglages réels (28,1 %, 64 ans, 1,67 cotisant), elle finance ≈ <b>1 120 € nets</b> par retraité, alors que la pension moyenne versée est ≈ 1 480-1 500 € — <b>le rouge existe déjà aujourd'hui</b>, et l'écart est comblé en vrai par impôts &amp; dette (les 136 Md€ du Mondrian ; cohérence macro : 269/405 ≈ 2/3 ≈ la part financée). Pensions par tête toutes composantes (réversion incluse) ≈ 1 800 € nets : la référence 1 480 € est la pension de droit direct (DREES). <span class="flag">Ordres de grandeur à consolider.</span></li>
+        <li><b>La cascade de la dette (acte ①)</b> : chaque carte peut cocher « maintenir sa pension et léguer le trou ». La part non financée de sa pension (pension maintenue − pension d'équilibre, cumulée sur sa retraite, rapportée à un actif de la génération suivante via le ratio démographique) devient une <b>ardoise</b> : la génération suivante la rembourse en impôts tout au long de sa carrière — sauf si elle coche à son tour, auquel cas l'ardoise s'ajoute à la sienne et glisse d'une génération (cumulable jusqu'aux enfants nés vers 2050). La carte 1950 est cochée par défaut : <b>c'est ce qui s'est réellement passé</b> — aujourd'hui ce trou est comblé en prenant ailleurs dans le budget, 136 Md€/an, près de 2 fois le budget de l'Éducation nationale (1er + 2nd degré, 70,9 Md€). <span class="flag">Ardoises par tête, hors intérêts — ordres de grandeur.</span></li>
+        <li><b>La balance (acte ②)</b> : la pension est un <b>OBJECTIF</b> que l'utilisateur fixe (« je veux telle pension en telle année ») ; le simulateur montre ce qui est FINANCÉ par les réglages courants et <b>l'écart à combler</b> — à somme nulle, seuls le taux et l'âge peuvent le fermer. Équation : pension financée = pension nette = taux × ratio cotisants/retraité × salaire moyen brut France × 0,909. Le <b>salaire des cotisants est figé</b> au salaire brut moyen PAR TÊTE des ~30,4 M de cotisants : <b>2 620 € bruts</b> (≈ 2 040 € nets), CALÉ pour que taux × masse salariale retrouve les <b>269 Md€ de cotisations réellement encaissées</b> (COR 2025). ⚠ Ne pas utiliser le salaire EQTP privé (3 466 €) : il gonfle les cotisations de ~30 % et masque le déficit actuel. Le <b>curseur ANNÉE</b> voyage de 1975 à 2070 : dans le PASSÉ tout est figé (taux et âge légal de l'époque, démographie historique ≈ 3,0 cotisants en 1970 → 2,0 en 2005 — <span class="flag">série rétrospective à consolider</span>) ; dans le FUTUR, la démographie est projetée (COR) et seuls bougent le taux et l'âge (≈ +0,06 cotisant/retraité par année de report, estimation ; natalité +0,1 seulement après 2050). <b>Objectif en % du revenu net de référence</b> (acte ②) — salaire <b>moyen</b> par défaut, salaire <b>médian</b> au choix (plus représentatif du cotisant type ; médian ≈ 81 % du moyen, estimation) : la cible se règle en part du revenu moyen (le vrai « taux de remplacement » macro), le montant en € est dérivé (× 2 044 € nets). Plus rigoureux : la valeur d'une pension dépend du niveau de vie de l'époque ; à revenu moyen tenu constant (pas de gain de productivité modélisé), % et € sont ici équivalents, mais le cadrage en % est le bon. La balance est donc « <b>cotisations pures</b> » (l'équivalent des 269 Md€, PAS des 405) : en 2025, réglages réels (28,1 %, 64 ans, 1,67 cotisant), elle finance ≈ <b>1 120 € nets</b> par retraité, alors que la pension moyenne versée est ≈ 1 480-1 500 € — <b>le rouge existe déjà aujourd'hui</b>, et l'écart est comblé en vrai par impôts &amp; dette (les 136 Md€ du Mondrian ; cohérence macro : 269/405 ≈ 2/3 ≈ la part financée). Pensions par tête toutes composantes (réversion incluse) ≈ 1 800 € nets : la référence 1 480 € est la pension de droit direct (DREES). <span class="flag">Ordres de grandeur à consolider.</span></li>
+        <li><b>72 % du revenu moyen ≠ pauvreté</b> : la pension moyenne vaut ≈ 72 % du salaire net moyen, mais le <b>niveau de vie</b> des retraités égale celui de l'ensemble de la population (≈ 97 %, et ≈ 105 % en comptant le logement possédé — COR juin 2025) : ménages à deux pensions, propriété du logement, fiscalité plus douce, pas de frais professionnels ni d'enfants à charge. Le % mesure un flux de revenu, pas une vie.</li>
         <li>Non modélisés : plafonds, minimum contributif, redistribution, carrières hachées, fonction publique et régimes spéciaux, réversion. <b>Ordres de grandeur pédagogiques, pas un droit à pension.</b></li>
         <li>Sources : <a href="https://www.cor-retraites.fr/sites/default/files/2025-06/Synthèse_Def_.pdf">COR juin 2025</a> · <a href="https://www.insee.fr/fr/statistiques/2416631">INSEE espérance de vie</a> · <a href="https://x.com/sc_cath/status/1955025559919980629">S. Catherine</a> · <a href="https://docs.google.com/spreadsheets/d/1VMvwlbG37IsAkWsQ--E-q1GeYnc1FvwKW2ew6dn0abU/">tableur de travail</a>.</li>
       </ul>
@@ -230,6 +236,6 @@
   </footer>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/echarts/5.5.0/echarts.min.js"></script>
-  <script src="simulateur.js?v=labo14"></script>
+  <script src="simulateur.js?v=labo15"></script>
 </body>
 </html>
