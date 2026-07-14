@@ -35,7 +35,11 @@
 
   /* ---------- paramètres sourcés (prototype — « à consolider ») ---------- */
   const P = {
-    taux: [[1970, 0.155], [1980, 0.19], [1990, 0.225], [2000, 0.25],
+    // taux de cotisation vieillesse GLOBAL (salarié + employeur, complémentaires
+    // comprises) : ≈ 13 % en 1970 (RG 8,5 % + ARRCO naissante) → 28,1 % en 2025 ;
+    // série calée sur les 2 ancres solides : moyenne de carrière 22 % pour les
+    // générations 65+ (S. Catherine) et taux actuel 28,1 %
+    taux: [[1970, 0.13], [1980, 0.185], [1990, 0.23], [2000, 0.255],
            [2010, 0.267], [2017, 0.279], [2025, 0.281], [2110, 0.281]],
     ratio: [[1970, 3.0], [1980, 2.6], [1990, 2.3], [2000, 2.05],
             [2005, 2.0], [2010, 1.85], [2020, 1.71], [2025, 1.67],
@@ -106,17 +110,23 @@
     const netM = (a) => L.s0 + (L.s1 - L.s0) * (nAns <= 1 ? 1 : (a - L.entree) / (nAns - 1));
     const brutM = (a) => netM(a) / P.NET2BRUT;
 
-    let cot = 0, impotsSys = 0, tauxSum = 0, heures = 0;
+    let cot = 0, impotsSys = 0, impAcc = 0, tauxSum = 0, heures = 0;
     const impotArdoiseAn = nAns > 0 ? ardoise / nAns : 0;
-    const cumVerse = [];
+    const cumVerse = [], cumCot = [], cumImp = [];
     for (let a = L.entree; a < L.depart; a++) {
       const an = L.naissance + a, tx = interp(P.taux, an);
       tauxSum += tx;
       cot += brutM(a) * 12 * tx;
       heures += tx * interp(P.heuresAn, an);
-      if (opts.detteSysteme && an > 2025)
-        impotsSys += P.subvParActif * (brutM(a) / P.salBase.moyen);
-      cumVerse.push([a + 1, cot + impotsSys + impotArdoiseAn * (a - L.entree + 1)]);
+      let impAnnee = impotArdoiseAn;
+      if (opts.detteSysteme && an > 2025) {
+        const x = P.subvParActif * (brutM(a) / P.salBase.moyen);
+        impotsSys += x; impAnnee += x;
+      }
+      impAcc += impAnnee;
+      cumCot.push([a + 1, cot]);
+      cumImp.push([a + 1, impAcc]);
+      cumVerse.push([a + 1, cot + impAcc]);
     }
     const verse = cot + ardoise + impotsSys;
     const ratio = interp(P.ratio, anDepart);
@@ -133,7 +143,7 @@
     return { L, anDepart, futur, ratio, cot, ardoise, impotsSys, verse, pension, pensionEq,
              pensionMaint, gapMois, detteLeguee, duree, recu, ratioMise: recu / verse,
              beAge: beAge <= L.deces ? beAge : null, heures, smicAns: recu / P.smicNetAnnuel,
-             cumVerse, tauxDebut: interp(P.taux, L.naissance + L.entree),
+             cumVerse, cumCot, cumImp, tauxDebut: interp(P.taux, L.naissance + L.entree),
              tauxFin: interp(P.taux, anDepart - 1), tauxMoyen: nAns > 0 ? tauxSum / nAns : 0 };
   }
   function computeChain() {
@@ -293,6 +303,17 @@
   });
 
   const chart = echarts.init($("sim-chart"), null, { renderer: "canvas" });
+  // hachures OCRE = la part « dette » (couleur dédiée, distincte du versé violet
+  // et du reçu cramoisi ; motif canvas comme les hachures du poster Sankey)
+  const DETTE_COL = "#B07E1F";
+  const HATCH_DETTE = (function () {
+    const c = document.createElement("canvas"); c.width = c.height = 8;
+    const g = c.getContext("2d");
+    g.fillStyle = "rgba(217,164,65,.30)"; g.fillRect(0, 0, 8, 8);
+    g.strokeStyle = "#D9A441"; g.lineWidth = 2.2;
+    g.beginPath(); g.moveTo(-2, 10); g.lineTo(10, -2); g.stroke();
+    return { image: c, repeat: "repeat" };
+  })();
 
   function renderCoherence(r) {
     const L = r.L, ev = evGen(L.naissance);
@@ -360,34 +381,63 @@
 
     renderCoherence(r);
 
-    const ages = [], vSer = [], rSer = [], dSer = [];
-    let vFin = 0;
+    const ages = [], vSer = [], cSer = [], iSer = [], rSer = [], rEqSer = [], rDetteSer = [];
+    let vFin = 0, cFin = 0, iFin = 0;
     for (let a = r.L.entree; a <= r.L.deces; a++) {
       ages.push(a);
       const cv = r.cumVerse.filter((p) => p[0] <= a);
       if (cv.length) vFin = cv[cv.length - 1][1];
+      const cc = r.cumCot.filter((p) => p[0] <= a);
+      if (cc.length) cFin = cc[cc.length - 1][1];
+      const ci = r.cumImp.filter((p) => p[0] <= a);
+      if (ci.length) iFin = ci[ci.length - 1][1];
       vSer.push(Math.round(vFin));
-      rSer.push(a >= r.L.depart ? Math.round(r.pension * 12 * (a - r.L.depart)) : 0);
-      dSer.push(a >= r.L.depart ? Math.round(r.gapMois * 12 * (a - r.L.depart)) : 0);
+      cSer.push(Math.round(cFin));
+      iSer.push(Math.round(iFin));
+      const dep = a >= r.L.depart ? (a - r.L.depart) : 0;
+      rSer.push(a >= r.L.depart ? Math.round(r.pension * 12 * dep) : 0);
+      rEqSer.push(a >= r.L.depart ? Math.round(r.pensionEq * 12 * dep) : 0);
+      rDetteSer.push(a >= r.L.depart ? Math.round(r.gapMois * 12 * dep) : 0);
     }
-    const verseName = (r.ardoise > 0 || r.impotsSys > 0) ? "Cumul versé (cotisations + impôts)" : "Cumul versé";
-    const series = [
-      { name: verseName, type: "line", data: vSer, symbol: "none",
+    const hasImp = (r.ardoise > 0 || r.impotsSys > 0);
+    const impName = r.ardoise > 0 ? "Remboursement de la dette héritée" : "Impôts — dette du système";
+    const recuDette = r.futur && coche && r.gapMois > 10;
+    const series = [], legend = [];
+    // — le VERSÉ : la dette en BASE (hachures ocre), les cotisations empilées dessus —
+    if (hasImp) {
+      series.push({ name: impName, type: "line", stack: "verse", data: iSer, symbol: "none",
+        lineStyle: { color: DETTE_COL, width: 2 }, color: DETTE_COL,
+        areaStyle: { color: HATCH_DETTE } });
+      series.push({ name: "Cotisations versées", type: "line", stack: "verse", data: cSer, symbol: "none",
         lineStyle: { color: "#8C79C0", width: 3 }, color: "#8C79C0",
-        areaStyle: { color: "rgba(140,121,192,.14)" } },
-      { name: "Cumul reçu (net)", type: "line", data: rSer, symbol: "none",
+        areaStyle: { color: "rgba(140,121,192,.14)" } });
+      legend.push(impName, "Cotisations versées");
+    } else {
+      series.push({ name: "Cumul versé", type: "line", data: vSer, symbol: "none",
+        lineStyle: { color: "#8C79C0", width: 3 }, color: "#8C79C0",
+        areaStyle: { color: "rgba(140,121,192,.14)" } });
+      legend.push("Cumul versé");
+    }
+    // — le REÇU : part à l'équilibre (cramoisi plein) + part financée par la dette (hachures) —
+    if (recuDette) {
+      series.push({ name: "Pension financée par les cotisations", type: "line", stack: "recu",
+        data: rEqSer, symbol: "none",
         lineStyle: { color: "#8E1B38", width: 3 }, color: "#8E1B38",
-        areaStyle: { color: "rgba(142,27,56,.12)" } },
-    ];
-    const legend = [verseName, "Cumul reçu (net)"];
-    if (r.futur && coche && r.gapMois > 10) {
-      series.push({ name: "Dont financé par la dette", type: "line", data: dSer, symbol: "none",
-        lineStyle: { color: "#8E1B38", width: 2, type: "dashed" }, color: "#C98596" });
-      legend.push("Dont financé par la dette");
+        areaStyle: { color: "rgba(142,27,56,.12)" } });
+      series.push({ name: "Pension financée par la dette", type: "line", stack: "recu",
+        data: rDetteSer, symbol: "none",
+        lineStyle: { color: DETTE_COL, width: 2, type: "dashed" }, color: "#D9A441",
+        areaStyle: { color: HATCH_DETTE } });
+      legend.push("Pension financée par les cotisations", "Pension financée par la dette");
+    } else {
+      series.push({ name: "Cumul reçu (net)", type: "line", data: rSer, symbol: "none",
+        lineStyle: { color: "#8E1B38", width: 3 }, color: "#8E1B38",
+        areaStyle: { color: "rgba(142,27,56,.12)" } });
+      legend.push("Cumul reçu (net)");
     }
     chart.setOption({
-      grid: { left: 64, right: 14, top: 32, bottom: 26 },
-      legend: { data: legend, top: 0, textStyle: { fontSize: 11 } },
+      grid: { left: 64, right: 14, top: 40, bottom: 26 },
+      legend: { data: legend, top: 0, textStyle: { fontSize: 10.5 } },
       tooltip: { trigger: "axis", valueFormatter: (v) => fmtK(v) + " €" },
       xAxis: { type: "category", data: ages, name: "âge", nameGap: 4, axisLabel: { fontSize: 10 } },
       yAxis: { type: "value", axisLabel: { fontSize: 10, formatter: (v) => group(String(v / 1000)) + " k€" } },
@@ -399,7 +449,10 @@
   /* ---------- ACTE ② : la balance dans le temps ---------- */
   const INV = { annee: 2050, ciblePct: 72, cible: 1470, tauxPct: 28.1, age: 64,
                 natal: false, base: "moyen" };
-  const ageHisto = (an) => an < 1983 ? 65 : an < 2011 ? 60 : an < 2023 ? 62 : 64;
+  // âge légal : 65 → 60 (réforme 1982, effective 1983) → montée 60→62
+  // (réforme 2010, effective 2017) → montée 62→64 (réforme 2023, effective 2030)
+  const ageHisto = (an) => an < 1983 ? 65 : an < 2011 ? 60 : an < 2017 ? 61
+    : an < 2023 ? 62 : an < 2030 ? 63 : 64;
   const estPasse = () => INV.annee <= 2025;
   const effTauxPct = () => estPasse() ? interp(P.taux, INV.annee) * 100 : INV.tauxPct;
   const effAge = () => estPasse() ? ageHisto(INV.annee) : INV.age;
@@ -445,11 +498,11 @@
     '<div class="ctl" id="ctl-inv-taux"><label for="inv-taux">LEVIER 1 — taux de cotisation retraite (en % du salaire brut) ' +
     '<output id="out-inv-taux"></output></label>' +
     '<input type="range" id="inv-taux" min="8" max="60" step="0.1">' +
-    REP + "Situation actuelle : " + rep("data-taux", 28.1, "<b>28,1 %</b>") + " · 1980 : 19 %</div></div>" +
+    REP + "Situation actuelle : " + rep("data-taux", 28.1, "<b>28,1 %</b>") + " · 1980 : ≈ 18,5 %</div></div>" +
     '<div class="ctl" id="ctl-inv-age"><label for="inv-age">LEVIER 2 — âge de départ à la retraite ' +
     '<output id="out-inv-age"></output></label>' +
     '<input type="range" id="inv-age" min="60" max="95" step="1">' +
-    REP + "Situation actuelle : " + rep("data-age", 64, "<b>64 ans</b> (âge légal)") +
+    REP + "Situation actuelle : " + rep("data-age", 64, "<b>64 ans</b> (âge légal, réforme 2023 — pleinement effective en 2030)") +
     " · départ moyen constaté ≈ 62,8 ans</div></div>" +
     '<div class="sal-fixe" id="sal-fixe"></div>';
 
