@@ -51,7 +51,9 @@
     nbCotisants: 30.4e6,
     loyersMdAn: 95,                           // loyers versés en France (Md€/an)
     smicNetAnnuel: 17900,
-    evBase: 86.5, evPente: 0.09, evMin: -1.5, evMax: 5, evCadre: 2.5, evOuvrier: -3,
+    // fin de vie (à 65 ans) : 86,5 en 2025, pente ≈ +1 mois/an ; plancher −6
+    // pour l'HISTORIQUE (≈ 81-82 ans vers 1975-80), plafond +5 pour le futur
+    evBase: 86.5, evPente: 0.09, evMin: -6, evMax: 5, evCadre: 2.5, evOuvrier: -3,
   };
   const interp = (T, x) => {
     if (x <= T[0][0]) return T[0][1];
@@ -630,20 +632,23 @@
     const SW = 78;
     const W = 210 + 70 + Math.max(slots.length, 1) * SW + 10, H = 196;
     let s = '<svg id="balance-svg" width="' + W + '" height="' + H + '" viewBox="0 0 ' + W + " " + H + '">';
+    const ok = finance >= cible * 0.99;              // objectif financé → tout passe au vert
     const hC = clamp(cible / 4000 * 150, 16, 150);
     const hF = hC * clamp(finance / cible, 0, 1);
     const y0 = 132;
     s += '<rect x="30" y="' + (y0 - hC) + '" width="150" height="' + hC +
-         '" rx="4" fill="none" stroke="#8E1B38" stroke-width="2" stroke-dasharray="6 4"></rect>' +
+         '" rx="4" fill="none" stroke="' + (ok ? "#3E7A4E" : "#8E1B38") +
+         '" stroke-width="2"' + (ok ? "" : ' stroke-dasharray="6 4"') + "></rect>" +
          '<rect x="30" y="' + (y0 - hF) + '" width="150" height="' + hF +
-         '" rx="3" fill="#C94A6E"></rect>';
+         '" rx="3" fill="' + (ok ? "#3E7A4E" : "#C94A6E") + '"></rect>';
     if (hF > 24)
       s += '<text x="105" y="' + (y0 - hF / 2 + 5) + '" text-anchor="middle" style="font:800 15px Helvetica" fill="#fff">' +
-           fmt0(finance) + " €</text>";
-    if (finance < cible * 0.99 && hC - hF > 15)
+           (ok ? "✓ " : "") + fmt0(finance) + " €</text>";
+    if (!ok && hC - hF > 15)
       s += '<text x="105" y="' + (y0 - hF - (hC - hF) / 2 + 4) + '" text-anchor="middle" style="font:700 11px Helvetica" fill="#8E1B38">manque ' +
            fmt0(cible - finance) + " €</text>";
-    s += '<text x="105" y="152" text-anchor="middle" style="font:700 12px Helvetica" fill="#1E2430">L’OBJECTIF : ' +
+    s += '<text x="105" y="152" text-anchor="middle" style="font:700 12px Helvetica" fill="' +
+         (ok ? "#3E7A4E" : "#1E2430") + '">' + (ok ? "✓ OBJECTIF FINANCÉ : " : "L’OBJECTIF : ") +
          fmt0(cible) + " €</text>" +
          '<text x="105" y="167" text-anchor="middle" style="font:600 10.5px Helvetica" fill="#4A5265">rempli = financé par les cotisations</text>';
     s += '<text x="' + (210 + 20) + '" y="88" style="font:800 26px Georgia" fill="#1E2430">⚖</text>';
@@ -693,9 +698,9 @@
       : (Math.abs(dT) >= 0.3 ? " (" + (dT > 0 ? "+" : "−") + pct1(Math.abs(dT) / 100) +
          " pt" + (Math.abs(dT) >= 2 ? "s" : "") + ")" : ""));
     const durRet = Math.max(0, evGen(INV.annee - age).mixte - age);
-    $("out-inv-age").textContent = age + " ans" + (passe ? " 🔒"
-      : (age !== 64 ? " (" + (age > 64 ? "+" : "−") + Math.abs(age - 64) + ")" : "") +
-        " · retraite ≈ " + durRet + " an" + (durRet > 1 ? "s" : ""));
+    $("out-inv-age").textContent = age + " ans" + (passe ? " 🔒" :
+      (age !== 64 ? " (" + (age > 64 ? "+" : "−") + Math.abs(age - 64) + ")" : "")) +
+      " · retraite ≈ " + durRet + " an" + (durRet > 1 ? "s" : "");
 
     $("inv-verrou").textContent = "🔒 Démographie " + INV.annee + " : " +
       fmt2(interp(P.ratio, INV.annee)) + " cotisant(s) par retraité — " +
