@@ -257,14 +257,16 @@
   const ADV = [
     { id: "naissance", lab: "Année de naissance", min: 1940, max: 2026, step: 1, fmt: (v) => v },
     { id: "entree", lab: "Âge d'entrée dans la vie active", min: 16, max: 30, step: 1, fmt: (v) => v + " ans" },
-    { id: "depart", lab: "Âge de départ", min: 52, max: 75, step: 1, fmt: (v) => v + " ans" },
+    { id: "depart", lab: "Âge de départ", min: 52, max: 85, step: 1, fmt: (v) => v + " ans" },
     { id: "deces", lab: "Fin de vie", min: 72, max: 105, step: 1, fmt: (v) => v + " ans" },
     { id: "s0", lab: "Salaire net — début de carrière", min: 1200, max: 12000, step: 50, fmt: (v) => fmt0(v) + " €" },
     { id: "s1", lab: "Salaire net — fin de carrière", min: 1200, max: 12000, step: 50, fmt: (v) => fmt0(v) + " €" },
   ];
   $("controls-adv").innerHTML =
-    '<label class="adv-dette"><input type="checkbox" id="in-dette"> intégrer les dettes du ' +
-    "système de retraites (part des 136 Md€/an payée en impôts, années travaillées après 2025)</label>" +
+    '<label class="adv-dette" id="lbl-maintenir"><input type="checkbox" id="in-maintenir"> ' +
+    "maintenir la pension au niveau actuel — la différence est financée par la dette (léguée)</label>" +
+    '<label class="adv-dette" id="lbl-dette"><input type="checkbox" id="in-dette"> ' +
+    "rembourser la dette actuelle du système — part des 136 Md€/an, en impôts, années travaillées après 2025</label>" +
     ADV.map((c) =>
       '<div class="ctl"><label for="in-' + c.id + '">' + c.lab +
       ' <output id="out-' + c.id + '"></output></label>' +
@@ -275,30 +277,51 @@
     const g = GENS.find((x) => x.naissance === selGen) || GENS[2];
     return lifeParams(g.naissance, g.depart);
   }
+  // premier réglage personnalisé : on HÉRITE de l'état de la carte sélectionnée
+  // (pension maintenue ou non) — pas de bascule silencieuse de financement
+  function spawnCustom(mods) {
+    const base = custom ? Object.assign({}, custom)
+      : Object.assign({ maintenir: !!legs[selGen], dette: false }, currentLife());
+    return Object.assign(base, mods);
+  }
   function currentResult() {
-    if (custom) return computeLife(custom, { detteSysteme: !!custom.dette });
+    if (custom) return computeLife(custom,
+      { maintenir: !!custom.maintenir, detteSysteme: !!custom.dette });
     return chain[selGen] || computeLife(currentLife(), {});
   }
   function syncAdv() {
     const L = currentLife();
     ADV.forEach((c) => { $("in-" + c.id).value = L[c.id]; $("out-" + c.id).textContent = c.fmt(L[c.id]); });
+    const anDep = L.naissance + L.depart;
+    const passe = anDep <= 2025;
+    $("in-maintenir").checked = custom ? !!custom.maintenir : !!legs[selGen];
     $("in-dette").checked = !!(custom && custom.dette);
+    // sans effet pour une vie déjà partie : le passé a eu les règles réelles,
+    // et la part des 136 Md€ ne concerne que les années travaillées après 2025
+    $("in-maintenir").disabled = passe;
+    $("in-dette").disabled = passe;
+    $("lbl-maintenir").classList.toggle("off", passe);
+    $("lbl-dette").classList.toggle("off", passe);
+    $("lbl-maintenir").title = passe ? "Départ avant 2026 : les pensions ont été servies aux règles réelles." : "";
+    $("lbl-dette").title = passe ? "Aucune année travaillée après 2025 : pas de part des 136 Md€/an." : "";
   }
   ADV.forEach((c) => {
     $("in-" + c.id).addEventListener("input", (e) => {
-      const L = Object.assign({}, currentLife());
+      const L = spawnCustom({});
       L[c.id] = +e.target.value;
-      L.depart = clamp(L.depart, L.entree + 1, 75);
+      L.depart = clamp(L.depart, L.entree + 1, 85);
       L.deces = Math.max(L.deces, L.depart + 1);
       if (L.s1 < L.s0) (c.id === "s0") ? L.s1 = L.s0 : L.s0 = L.s1;
       custom = L;
       syncAdv(); renderAll();
     });
   });
+  $("in-maintenir").addEventListener("change", (e) => {
+    custom = spawnCustom({ maintenir: e.target.checked });
+    syncAdv(); renderAll();
+  });
   $("in-dette").addEventListener("change", (e) => {
-    const L = Object.assign({}, currentLife());
-    L.dette = e.target.checked;
-    custom = L;
+    custom = spawnCustom({ dette: e.target.checked });
     syncAdv(); renderAll();
   });
 
@@ -330,9 +353,8 @@
   }
   $("coherence").addEventListener("click", (e) => {
     const u = e.target.closest(".use"); if (!u) return;
-    const L = Object.assign({}, currentLife());
-    L.deces = Math.max(+u.dataset.set, L.depart + 1);
-    custom = L;
+    custom = spawnCustom({});
+    custom.deces = Math.max(+u.dataset.set, custom.depart + 1);
     syncAdv(); renderAll();
   });
 
@@ -340,7 +362,7 @@
     const r = currentResult();
     $("detail").classList.toggle("custom", !!custom);
 
-    const coche = !custom && legs[r.L.naissance];
+    const coche = custom ? !!custom.maintenir : !!legs[r.L.naissance];
     $("mode-tag").className = "mode-tag " + (r.futur ? "futur" : "passe");
     $("mode-tag").textContent = !r.futur
       ? "Départ en " + r.anDepart + " — règles réellement appliquées"
@@ -750,6 +772,10 @@
     renderDetail();
     renderInverse();
   }
+  $("custom-reset").addEventListener("click", () => {
+    custom = null;
+    syncAdv(); renderAll();
+  });
   window.addEventListener("resize", () => chart.resize());
   syncAdv();
   renderAll();

@@ -99,6 +99,7 @@
     .adv-dette { display: flex; gap: 7px; align-items: flex-start; margin: 4px 0 10px;
       font-size: 12px; font-weight: 700; color: #8E1B38; cursor: pointer; line-height: 1.45; }
     .adv-dette input { accent-color: #8E1B38; margin-top: 1px; transform: scale(1.15); cursor: pointer; }
+    .adv-dette.off { opacity: .45; cursor: default; }
     .custom-tag { display: none; font: 700 11px/1 inherit; color: #A2683A; margin-left: 8px; }
     .custom .custom-tag { display: inline; }
 
@@ -177,7 +178,7 @@
     <p class="gen-caption" id="gen-caption"></p>
 
     <section class="sim-card" id="detail" aria-live="polite">
-      <h3 style="margin:0 0 4px">La vie en détail <span class="custom-tag">— situation personnalisée</span></h3>
+      <h3 style="margin:0 0 4px">La vie en détail <span class="custom-tag">— situation personnalisée · <span id="custom-reset" style="cursor:pointer;border-bottom:1px dotted currentColor">revenir aux cartes</span></span></h3>
       <span class="mode-tag" id="mode-tag"></span>
       <div class="det-grid">
         <div>
@@ -242,6 +243,6 @@
   </footer>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/echarts/5.5.0/echarts.min.js"></script>
-  <script src="simulateur.js?v=labo17"></script>
+  <script src="simulateur.js?v=labo18"></script>
 </body>
 </html>
