@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Le labo — la même vie née quatre fois, et l'équilibre de 2050</title>
   <meta name="description" content="Deux questions sur les retraites : que rend le système à chaque génération, pour la même vie ? Et comment équilibrer les pensions en 2050 — qui paie ?">
-  <link rel="stylesheet" href="../style.css?v=20260921f">
+  <link rel="stylesheet" href="../style.css?v=20260921h">
   <style>
     /* ---- styles propres au labo ---- */
     .sim-wrap { max-width: 1240px; margin: 0 auto; padding: 0 16px 60px; }
@@ -63,11 +63,22 @@
     #detail { margin-top: 18px; }
     .det-grid { display: grid; grid-template-columns: 1fr minmax(280px, 380px); gap: 20px; align-items: start; }
     @media (max-width: 900px) { .det-grid { grid-template-columns: 1fr; } }
-    .res-phrase { font-size: 15px; line-height: 1.55; margin: 10px 0 4px; }
-    .res-phrase b { color: #8E1B38; }
-    .mode-tag { display: inline-block; font: 700 11px/1 var(--sans); padding: 4px 9px; border-radius: 999px; margin-bottom: 6px; }
-    .mode-tag.passe { background: #EFE8F7; color: #5C4580; }
-    .mode-tag.futur { background: #FDE8ED; color: #8E1B38; }
+    .vie-titre { font-size: 13px; color: var(--ink-soft); margin: 0 0 12px; }
+    .vie-cols { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+    @media (max-width: 640px) { .vie-cols { grid-template-columns: 1fr; } }
+    .vie-col { border-radius: 10px; padding: 12px 14px; border: 1px solid var(--rule); background: #FBF7EE; display: flex; flex-direction: column; gap: 4px; }
+    .vie-col .lab { font: 700 11px/1 var(--sans); letter-spacing: .1em; text-transform: uppercase; color: var(--ink-soft); }
+    .vie-col b { font-variant-numeric: tabular-nums; }
+    .vie-col > b { font: 800 26px/1.1 var(--serif); color: var(--ink); }
+    .vie-col small { font-size: 12px; line-height: 1.45; color: var(--ink-soft); }
+    .vie-col small b { color: var(--ink); }
+    .vie-col.verse { border-top: 4px solid #6E5BAE; }
+    .vie-col.recu { border-top: 4px solid #8E1B38; }
+    .vie-col.ecart { border-top: 4px solid var(--ink); }
+    .vie-col.ecart.pos > b { color: #3E7A4E; }
+    .vie-col.ecart.neg > b { color: #8E1B38; }
+    .vie-regle { font-size: 13px; line-height: 1.5; color: var(--ink-soft); margin: 12px 0 4px; }
+    .vie-regle b { color: var(--ink); }
     .mini-stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 10px; margin-top: 12px; }
     .mini { background: #FBF7EE; border: 1px solid var(--rule); border-radius: 9px; padding: 10px 12px; }
     .mini b { display: block; font-size: 16px; color: var(--ink); font-variant-numeric: tabular-nums; }
@@ -185,7 +196,8 @@
       <p class="standfirst">
         <strong>①</strong> Même métier, même salaire, même carrière&nbsp;: que rend le système à chacune des générations&nbsp;?
         <strong>②</strong> En 2050, il y aura <span data-ch="ratio_2050">1,46</span> cotisant par retraité au lieu de
-        <span data-ch="ratio_2025">1,8</span>&nbsp;: comment équilibrer les pensions — et qui paie&nbsp;?
+        <span data-ch="ratio_2025">1,8</span>, et les cotisations ne financent déjà que <span data-ch="part_cot">66</span>&nbsp;% des
+        pensions&nbsp;: comment équilibrer — et qui paie&nbsp;?
       </p>
     </div>
   </header>
@@ -202,7 +214,8 @@
     <h2 class="acte-titre" id="vies-h"><span class="n">①</span> La même vie, née quatre fois</h2>
     <p class="acte-question">Pour la même carrière, combien chaque génération reçoit-elle en retraite pour un euro versé&nbsp;?</p>
     <p class="acte-sous">Choisir un métier. Les quatre cartes vivent la <b>même carrière</b> — seule l'année de naissance,
-      et les règles qu'elle subit, change. Montants en euros d'aujourd'hui, sans actualisation.</p>
+      et les règles qu'elle subit, change. Chaque euro est compté relativement au salaire moyen de son année, comme
+      le fait l'INSEE&nbsp;: pour la génération 1950, on retrouve son <b>1,75&nbsp;€ reçu pour 1&nbsp;€ cotisé</b>.</p>
     <div class="bar">
       <span id="profils"></span>
     </div>
@@ -210,14 +223,14 @@
     <p class="gen-caption" id="gen-caption"></p>
 
     <section class="sim-card" id="detail" aria-live="polite">
-      <h3 style="margin:0 0 4px">La vie en détail <span class="custom-tag">— situation personnalisée · <span id="custom-reset" style="cursor:pointer;border-bottom:1px dotted currentColor">revenir aux cartes</span></span></h3>
-      <span class="mode-tag" id="mode-tag"></span>
+      <h3 style="margin:0 0 2px">La vie en détail <span class="custom-tag">— <span id="custom-reset" style="cursor:pointer;border-bottom:1px dotted currentColor">revenir aux cartes</span></span></h3>
+      <p class="vie-titre" id="vie-titre"></p>
       <div class="det-grid">
         <div>
-          <p class="res-phrase" id="res-phrase"></p>
-          <p id="verse-detail" style="font-size:12px;color:var(--ink-soft)"></p>
-          <div class="mini-stats" id="mini-stats"></div>
+          <div class="vie-cols" id="vie-cols"></div>
+          <p class="vie-regle" id="vie-regle"></p>
           <div id="sim-chart"></div>
+          <div class="mini-stats" id="mini-stats"></div>
         </div>
         <div>
           <div class="cohr" id="coherence"></div>
@@ -266,13 +279,13 @@
       <summary>Méthodologie, hypothèses &amp; sources</summary>
       <ul>
         <li><b>Tous les montants sont en euros d'aujourd'hui</b> (euros constants 2025), sans actualisation financière. <b>Salaires saisis en net</b> (÷ 0,78 → brut pour les cotisations, approximation privé)&nbsp;; <b>pensions affichées nettes</b> (−9,1 % CSG-CRDS-Casa).</li>
-        <li><b>Les quatre cartes (①)</b> : même carrière (salaires constants 2025), âge de départ réaliste par génération (61 · 64 · 65 · 66), fin de vie = espérance de vie de la cohorte (à 65 ans : ≈ 81-82 ans vers 1980, 86,5 en 2025, +≈ 1 mois par an ensuite, plafonné à +5 ans&nbsp;; variantes cadre/ouvrier). Le ratio « reçu / versé » est calculé <b>sans actualisation</b> : il est donc plus élevé que le <b>taux de récupération</b> de l'INSEE (Dubois &amp; Marino, <em>Retraite et société</em> n°&nbsp;73, 2016 — Destinie&nbsp;2, actualisation sur les salaires), qui passe de 1,59 pour la génération 1950 à 1,17 pour la génération 1980 (salariés du privé, règles de 2014) — la <b>tendance</b> est la même. <span class="flag">Ordres de grandeur.</span></li>
+        <li><b>Les quatre cartes (①)</b> : même carrière (salaires constants 2025), âge de départ réaliste par génération (61 · 64 · 65 · 66), fin de vie = espérance de vie de la cohorte (à 65 ans : ≈ 81-82 ans vers 1980, 86,5 en 2025, +≈ 1 mois par an ensuite, plafonné à +5 ans&nbsp;; variantes cadre/ouvrier). Le ratio « reçu / versé » est un <b>taux de récupération</b> au sens de l'INSEE (Dubois &amp; Marino, <em>Retraite et société</em> n°&nbsp;73, 2016 — Destinie&nbsp;2) : chaque flux est compté relativement au salaire moyen de son année (actualisation « SMPT ») ; la pension, indexée sur les prix, perd donc ≈ 1 % par an face aux salaires (0,7 % en projection, COR). La part du dernier brut servie en pension est calée pour que la génération 1950 au salaire médian récupère <b>1,75&nbsp;€ par euro cotisé</b>, comme l'INSEE (cotisations seules ; 1,59 en comptant aussi les impôts affectés). Pour les générations parties après 2025, l'INSEE applique la pension promise par la loi, financée par n'importe quoi ; le labo applique la pension que les cotisations seules financent — d'où des ratios plus bas (0,9 au lieu de 1,27 pour la génération 1980). <span class="flag">Ordres de grandeur.</span></li>
         <li><b>Heures de travail pour cotiser</b> : pour chaque année de carrière, taux de cotisation × durée annuelle du travail de l'époque (≈ 1 850 h/an vers 1970 → ≈ 1 610 h après les 35 heures) — méthode S. Catherine. <span class="flag">Série des heures : estimation.</span></li>
         <li><b>Ce que chacun verse</b> = salaire brut × taux de cotisation vieillesse de chaque année (série ≈ 13 % en 1970 — régime général 8,5 % + complémentaires naissantes — → 28,1 % en 2025, calée sur les moyennes générationnelles 22 % / 28 %, estimation S. Catherine). Âges légaux historiques : 65 ans → 60 (réforme 1982, effective 1983) → 62 (réforme 2010, montée achevée en 2017) → 62 ans 9 mois en 2025 (réforme 2023 en montée) — <b>montée suspendue par la LFSS 2026</b> (art. 105) : 62 ans 9 mois et 170 trimestres gelés jusqu'au 1er janvier 2028&nbsp;; 64 ans atteints vers 2032 si la réforme reprend (hypothèse de référence du COR, retenue ici pour le futur).</li>
         <li><b>Départs ≤ 2025</b> : règles réelles (taux de remplacement observé, dégressif). <b>Départs &gt; 2025 : jeu à somme nulle</b> — pension = taux × ratio cotisants/retraité de la génération (COR juin 2026 : 1,8 en 2025 → ≈ 1,55 en 2040 → 1,3 en 2070) × salaire brut fin.</li>
         <li><b>La cascade de la dette (①)</b> : chaque carte peut cocher « maintenir la pension et léguer la dette ». La part non financée de la pension (pension maintenue − pension d'équilibre, cumulée sur sa retraite, rapportée à un actif de la génération suivante via le ratio démographique) devient une <b>dette</b> : la génération suivante la rembourse en impôts tout au long de sa carrière — sauf si elle coche à son tour, auquel cas la dette s'ajoute à la sienne et glisse d'une génération. La carte 1950 est cochée par défaut : <b>c'est ce qui s'est réellement passé</b> — aujourd'hui cette dette est comblée en prenant ailleurs dans le budget, <span data-ch="non_contributif">145</span> Md€ en 2025 (COR juin 2026). <span class="flag">Dettes par tête, hors intérêts — ordres de grandeur.</span></li>
-        <li><b>Le jeu « Équilibrer 2050 » (②)</b> : la pension est une <b>promesse</b> (par défaut, 70 % du salaire net moyen par tête, ≈ 1 470 € nets — l'ordre de grandeur de la pension de droit direct moyenne aujourd'hui, DREES) pour une année donnée&nbsp;; le simulateur montre ce que les <b>cotisations seules</b> financent et <b>l'écart</b>. Équation : pension financée = taux × ratio cotisants/retraité × salaire brut moyen par tête × 0,909. Le salaire des cotisants est figé au salaire brut moyen <b>par tête</b> des ≈ 30,6 M de cotisants (COR) : <b>2 685 € bruts</b>, calé pour que taux × masse salariale retrouve les <b>277 Md€ de cotisations réellement encaissées</b> en 2025 (COR juin 2026). Levier âge : ≈ +0,06 cotisant par retraité par année de report (estimation)&nbsp;; natalité +0,2 enfant par femme : +0,1 seulement après 2050. <b>Les quatre parts</b> du résultat sont calculées par rapport à la situation de référence (taux 28,1 %, départ à 64 ans, pension promise) : part « cotisants » = supplément de pension financé par la hausse du taux, part « futurs retraités » = supplément financé par le report d'âge, part « retraités » = baisse de la promesse, part « pris ailleurs » = l'écart restant, comblé comme aujourd'hui par les impôts, la dette et les budgets des ministères. Le montant en Md€ de cette dernière part (écart × nombre de retraités × 12) est un <b>ordre de grandeur en « cotisations pures »</b> : en 2025 le même calcul donne ≈ 55 Md€ alors que le non contributif réel est de 145 Md€, car toutes les pensions (réversion, minimum vieillesse, majorations) et tous les régimes sont alors comptés.</li>
-        <li><b>70 % du revenu ne veut pas dire 70 % du niveau de vie</b> : en moyenne, les retraités vivent au niveau des actifs, ou mieux — très majoritairement propriétaires de leur logement, moins de dettes et de frais (COR : niveau de vie relatif ≈ 97 %, ≈ 105 % en comptant le logement possédé). Le pourcentage mesure un flux de revenu, pas un niveau de vie.</li>
+        <li><b>Le jeu « Équilibrer 2050 » (②)</b> — <b>les mêmes chiffres que le site</b> (COR juin 2026) : la promesse est la pension moyenne réelle par retraité, toutes pensions et tous régimes compris — <span data-ch="pensions">422,2</span> Md€ pour <span data-ch="retraites_m">17,4</span> millions de retraités, soit ≈ 2 020 € bruts, ≈ 1 840 € nets par mois — et les cotisations seules (<span data-ch="cotisations">277</span> Md€) en financent 66 %, ≈ 1 210 € nets. L'écart 2025 (≈ 630 € nets par retraité) multiplié par le nombre de retraités redonne exactement les <span data-ch="non_contributif">145</span> Md€ non contributifs du Mondrian. Équation : pension financée = taux × ratio cotisants/retraité × salaire brut moyen par tête × 0,909, avec un salaire brut moyen <b>par tête</b> de <b>2 685 €</b> (assiette moyenne des ≈ 30,6 M de cotisants, calée pour que 28,1 % × masse salariale = 277 Md€). Le nombre de retraités d'une année = cotisants (≈ stables) ÷ ratio cotisants/retraité (COR). Levier âge : ≈ +0,06 cotisant par retraité par année de report (estimation)&nbsp;; natalité +0,2 enfant par femme : +0,1 seulement après 2050. Le niveau « scénario COR » applique la baisse de la pension relative que le COR projette avec l'indexation sur les prix (54,6 % du revenu d'activité moyen en 2025 → ≈ 49,7 % en 2050, 45,3 % en 2070) : −9 % en 2050. <b>Les quatre parts</b> du résultat sont calculées par rapport à la situation de référence (28,1 %, 64 ans, pension d'aujourd'hui) : part « cotisants » = supplément financé par la hausse du taux, « futurs retraités » = supplément financé par le report d'âge, « retraités » = baisse de la pension, « pris ailleurs » = l'écart restant, comblé comme aujourd'hui par les impôts, la dette et les budgets des ministères. Tout est en euros d'aujourd'hui, sans gain de productivité : la mission « la même pension qu'aujourd'hui » suppose que les pensions suivent les salaires, ce que l'indexation sur les prix ne fait pas — d'où le niveau COR.</li>
+        <li><b>Une pension relative plus basse ne veut pas dire un niveau de vie plus bas</b> : en moyenne, les retraités vivent au niveau des actifs, ou mieux — très majoritairement propriétaires de leur logement, moins de dettes et de frais (COR : niveau de vie relatif ≈ 97 %, ≈ 105 % en comptant le logement possédé). Le pourcentage mesure un flux de revenu, pas un niveau de vie.</li>
         <li>Non modélisés : plafonds, minimum contributif, redistribution, carrières hachées, fonction publique et régimes spéciaux, réversion. <b>Ordres de grandeur pédagogiques, pas un droit à pension.</b></li>
         <li>Sources : <a href="https://www.cor-retraites.fr/">COR, rapport annuel juin 2026</a> · <a href="https://www.insee.fr/fr/statistiques/2416631">INSEE, espérance de vie</a> · <a href="https://www.cor-retraites.fr/sites/default/files/2019-06/doc-3731.pdf">Dubois &amp; Marino (INSEE), taux de récupération par génération, 2016</a> · <a href="https://x.com/sc_cath/status/1955025559919980629">S. Catherine</a> · <a href="https://docs.google.com/spreadsheets/d/1VMvwlbG37IsAkWsQ--E-q1GeYnc1FvwKW2ew6dn0abU/">tableur de travail</a>.</li>
       </ul>
@@ -286,7 +299,7 @@
   </footer>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/echarts/5.5.0/echarts.min.js"></script>
-  <script src="simulateur.js?v=20260921f"></script>
-  <script src="../lexique.js?v=20260921f"></script>
+  <script src="simulateur.js?v=20260921h"></script>
+  <script src="../lexique.js?v=20260921h"></script>
 </body>
 </html>

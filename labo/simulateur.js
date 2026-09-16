@@ -9,9 +9,9 @@
  * héritée = cotisations supplémentaires chiffrées en €/mois, converties en
  * Md€/an et en « fois les loyers versés en France » (95 Md€/an).
  *
- * ACTE ② : le jeu « Équilibrer 2050 ». La pension est une PROMESSE (70 % du
- * salaire net moyen par tête ≈ 1 470 €) ; les cotisations seules en financent
- * une part ; l'écart est « pris ailleurs » (impôts, dette, budgets des
+ * ACTE ② : le jeu « Équilibrer 2050 ». La pension est une PROMESSE (la pension
+ * moyenne réelle par retraité : 422,2 Md€ ÷ 17,4 M ≈ 1 840 € nets) ; les cotisations
+ * seules en financent 66 % ; l'écart est « pris ailleurs » (impôts, dette, budgets des
  * ministères), le levier réellement utilisé aujourd'hui. Trois leviers le
  * réduisent (taux → cotisants, âge → futurs retraités, promesse → retraités) ;
  * chaque levier affiche son coût humain ; des niveaux = scénarios réels ; une
@@ -54,6 +54,13 @@
     salBase: { moyen: 2685, median: 2175 },   // bruts PAR TÊTE ; moyen calé sur 277 Md€ de cotisations (COR 2025)
     subvParActif: 4750,                       // 145,2 Md€/an (non contributif, COR 2025) ÷ 30,6 M cotisants
     nbCotisants: 30.6e6,
+    nbRetraites: 17.4e6,                      // retraités de droit direct (COR 2025) — remplacé par la donnée du site si joignable
+    pensionsMd: 422.2, cotisationsMd: 277.0,  // COR juin 2026, tableau 2.2 — idem
+    // croissance réelle du salaire moyen (SMPT) : ≈ 1 %/an observé jusqu'en 2025, 0,7 % en
+    // projection (COR, scénario de référence). Les pensions sont indexées sur les PRIX :
+    // relativement au salaire moyen, une pension perd g par an — c'est l'actualisation
+    // « SMPT » de l'INSEE, qui rend les ratios des cartes comparables à ses taux de récupération.
+    gSmpt: (an) => (an <= 2025 ? 0.010 : 0.007),
     loyersMdAn: 95,                           // loyers versés en France (Md€/an)
     smicNetAnnuel: 17900,
     // fin de vie (à 65 ans) : 86,5 en 2025, pente ≈ +1 mois/an ; plancher −6
@@ -75,8 +82,11 @@
              cadre: Math.round(P.evBase + drift + P.evCadre),
              ouvrier: Math.round(P.evBase + drift + P.evOuvrier) };
   }
+  // part du dernier BRUT servie en pension (règles réelles), dégressive avec le salaire ;
+  // calée pour que la génération 1950 au salaire médian récupère ≈ 1,75 € par € cotisé
+  // (INSEE, Dubois & Marino 2016, actualisation SMPT) — soit ≈ 77 % du dernier net.
   const tauxRemplacement = (brutFin) =>
-    clamp(0.80 - (brutFin - 1800) * (0.15 / 3700), 0.50, 0.85);
+    clamp(0.72 - (brutFin - 1800) * (0.135 / 3700), 0.45, 0.765);
 
   /* ---------- profils ---------- */
   const PROFILS = [
@@ -143,14 +153,24 @@
     const pensionMaint = tauxRemplacement(brutFin) * brutFin * P.PNET;
     const pension = opts.forceEq ? pensionEq
       : (!futur ? pensionMaint : (opts.maintenir ? pensionMaint : pensionEq));
-    const recu = pension * 12 * duree;
+    // le REÇU, année par année, relativement au salaire moyen de l'année (la pension,
+    // indexée sur les prix, perd gSmpt par an face aux salaires) ; cumuls pour le graphique
     const gapMois = Math.max(0, pension - pensionEq);
+    let recu = 0, recuEq = 0, f = 1, beAge = null;
+    const cumRecu = [], cumRecuEq = [];
+    for (let a = L.depart; a < L.deces; a++) {
+      f /= (1 + P.gSmpt(L.naissance + a));
+      const prev = recu;
+      recu += pension * 12 * f;
+      recuEq += Math.min(pension, pensionEq) * 12 * f;
+      if (beAge == null && recu >= verse && verse > 0) beAge = a + (recu - prev > 0 ? (verse - prev) / (recu - prev) : 0);
+      cumRecu.push([a + 1, recu]); cumRecuEq.push([a + 1, recuEq]);
+    }
     const detteLeguee = gapMois * 12 * duree / ratio;    // par actif de la génération suivante
-    const beAge = L.depart + verse / (pension * 12);
     return { L, anDepart, futur, ratio, cot, ardoise, impotsSys, verse, pension, pensionEq,
              pensionMaint, gapMois, detteLeguee, duree, recu, ratioMise: recu / verse,
-             beAge: beAge <= L.deces ? beAge : null, heures, smicAns: recu / P.smicNetAnnuel,
-             cumVerse, cumCot, cumImp, tauxDebut: interp(P.taux, L.naissance + L.entree),
+             beAge, heures, smicAns: recu / P.smicNetAnnuel,
+             cumVerse, cumCot, cumImp, cumRecu, cumRecuEq, tauxDebut: interp(P.taux, L.naissance + L.entree),
              tauxFin: interp(P.taux, anDepart - 1), tauxMoyen: nAns > 0 ? tauxSum / nAns : 0 };
   }
   function computeChain() {
@@ -225,7 +245,7 @@
     }).join("");
     $("gen-caption").innerHTML =
       "Même carrière " + profil.carr + " (" + fmt0(profil.s0) + " → " + fmt0(profil.s1) +
-      " € nets par mois), montants en euros d’aujourd’hui — seule l’année de naissance change." +
+      " € nets par mois), chaque euro compté relativement au salaire moyen de son année — seule l’année de naissance change." +
       (legs[1950]
         ? " <b>La dette léguée se paie en impôts</b> — aujourd’hui, elle est comblée en prenant " +
           "ailleurs dans le budget : 145 Md€ par an (2025), 1,6 fois le budget de l’Éducation nationale."
@@ -365,110 +385,109 @@
     syncAdv(); renderAll();
   });
 
+  /* « La vie en détail » : TROIS colonnes — VERSÉ pendant la carrière · REÇU
+   * pendant la retraite · L'ÉCART — puis la règle appliquée, puis le graphique
+   * des cumuls (versé en violet, reçu en cramoisi, la part payée ou reçue au
+   * titre de la dette en hachures ocre). */
   function renderDetail() {
     const r = currentResult();
+    const L = r.L;
     $("detail").classList.toggle("custom", !!custom);
+    const coche = custom ? !!custom.maintenir : !!legs[L.naissance];
+    const nAns = L.depart - L.entree;
+    const hasImp = r.ardoise > 0 || r.impotsSys > 0;
+    const impName = r.ardoise > 0 ? "impôts pour la dette laissée par les aînés" : "impôts pour la dette du système (part des 145 Md€/an)";
+    const recuDette = r.futur && coche && r.gapMois > 10;
+    const ecart = r.recu - r.verse;
 
-    const coche = custom ? !!custom.maintenir : !!legs[r.L.naissance];
-    $("mode-tag").className = "mode-tag " + (r.futur ? "futur" : "passe");
-    $("mode-tag").textContent = !r.futur
-      ? "Départ en " + r.anDepart + " — règles réellement appliquées"
-      : (coche
-        ? "Pension maintenue au niveau actuel — la dette est léguée (" + fmt2(r.ratio) + " cotisant(s) par retraité)"
-        : (r.herite > 0
-          ? "Pension à l'équilibre + remboursement de la dette héritée"
-          : "Pension à l'équilibre (" + fmt2(r.ratio) + " cotisant(s) par retraité en " + r.anDepart + ")"));
+    $("vie-titre").textContent = "Né en " + L.naissance + " · carrière " + profil.carr +
+      (custom ? " (situation personnalisée)" : "") + " · " + fmt0(L.s0) + " → " + fmt0(L.s1) + " € nets par mois";
 
-    const verseNote = (r.ardoise > 0 || r.impotsSys > 0) ? " (cotisations + impôts)" : "";
-    const phr = ["Né en " + r.L.naissance + ", parti à " + r.L.depart + " ans : <b>≈ " +
-      fmtK(r.verse) + " €</b> versés au système" + verseNote + ", <b>≈ " + fmtK(r.recu) +
-      " €</b> touchés (" + fmt0(r.pension) + " €/mois nets pendant " + r.duree + " ans) — <b>" +
-      fmt2(r.ratioMise) + " fois la somme versée</b>."];
-    phr.push(r.beAge
-      ? "Les versements sont remboursés à <b>" + Math.round(r.beAge) + " ans</b> ; au-delà, ce sont les cotisants du moment qui paient."
-      : "<b>Les versements ne sont jamais remboursés.</b>");
-    $("res-phrase").innerHTML = phr.join(" ");
+    $("vie-cols").innerHTML =
+      '<div class="vie-col verse"><span class="lab">Versé pendant la carrière</span>' +
+        "<b>≈ " + fmtK(r.verse) + " €</b>" +
+        "<small>de " + L.entree + " à " + L.depart + " ans (" + nAns + " ans) · cotisations retraite " +
+        pct1(r.tauxMoyen) + " % du brut en moyenne (" + pct1(r.tauxDebut) + " % → " + pct1(r.tauxFin) + " %)" +
+        (hasImp ? " · dont ≈ <b>" + fmtK(r.ardoise + r.impotsSys) + " €</b> d'" + impName : "") + "</small></div>" +
+      '<div class="vie-col recu"><span class="lab">Reçu pendant la retraite</span>' +
+        "<b>≈ " + fmtK(r.recu) + " €</b>" +
+        "<small>de " + L.depart + " à " + L.deces + " ans (" + r.duree + " ans) · <b>" + fmt0(r.pension) +
+        " € nets par mois</b> au départ" +
+        (recuDette ? " · dont ≈ <b>" + fmtK(r.recu - r.cumRecuEq[r.cumRecuEq.length - 1][1]) + " €</b> financés par la dette léguée" : "") +
+        "</small></div>" +
+      '<div class="vie-col ecart ' + (ecart >= 0 ? "pos" : "neg") + '"><span class="lab">L\'écart</span>' +
+        "<b>" + (ecart >= 0 ? "+" : "−") + " " + fmtK(Math.abs(ecart)) + " €</b>" +
+        "<small><b>" + fmt2(r.ratioMise) + " € reçu pour 1 € versé</b> · " +
+        (r.beAge ? "versements remboursés à " + Math.round(r.beAge) + " ans, le reste est payé par les cotisants du moment"
+                 : "versements jamais remboursés") + "</small></div>";
 
-    $("verse-detail").innerHTML = !r.futur ? "" :
-      (coche
-        ? "Pension maintenue : les cotisations n'en financent que <b>" + fmt0(r.pensionEq) +
-          " €/mois</b> — la différence est une dette laissée à la génération suivante."
-        : (r.ardoise > 0
-          ? "Dont ≈ <b>" + fmt0(enImpotsMois(r.ardoise, r.L.depart - r.L.entree)) +
-            " €/mois</b> de cotisations supplémentaires, toute la carrière, pour compenser la dette laissée par les aînés."
-          : (r.impotsSys > 0
-            ? "Dont ≈ <b>" + fmtK(r.impotsSys) + " €</b> d'impôts (années après 2025) — la part des 145 Md€/an de dettes du système."
-            : "Pension ajustée au niveau que la démographie finance — aucune dette laissée.")));
+    // la règle appliquée à cette vie, en une phrase
+    let regle;
+    if (!r.futur) regle = "Départ en " + r.anDepart + " : règles réellement appliquées — pension ≈ " +
+      Math.round(r.pension / L.s1 * 100) + " % du dernier salaire net, indexée sur les prix.";
+    else if (coche) regle = "Pension maintenue aux règles d'aujourd'hui (" + fmt0(r.pension) + " €) alors que " +
+      fmt2(r.ratio) + " cotisant(s) par retraité n'en financent que " + fmt0(r.pensionEq) + " € : la différence est une dette léguée à la génération suivante.";
+    else if (r.herite > 0) regle = "Pension à l'équilibre (ce que " + fmt2(r.ratio) + " cotisant(s) par retraité financent en " + r.anDepart +
+      ") + remboursement de la dette laissée par les aînés : ≈ " + fmt0(enImpotsMois(r.ardoise, nAns)) + " € par mois toute la carrière.";
+    else regle = "Pension à l'équilibre : ce que " + fmt2(r.ratio) + " cotisant(s) par retraité financent en " + r.anDepart +
+      (r.impotsSys > 0 ? ", plus la part des 145 Md€/an de dette du système, en impôts, sur les années travaillées après 2025." : " — aucune dette laissée.");
+    $("vie-regle").innerHTML = "<b>Règle appliquée :</b> " + regle +
+      " Montants relatifs au salaire moyen de chaque année (actualisation « SMPT », comme l'INSEE).";
 
     $("mini-stats").innerHTML =
-      '<div class="mini"><b>' + fmt0(r.pension) + " €/mois net</b><span>pension" +
-      (r.futur ? (coche ? " (maintenue)" : " (à l'équilibre)") : " (règles réelles)") + "</span></div>" +
-      '<div class="mini"><b>' + (r.beAge ? Math.round(r.beAge) + " ans" : "jamais") +
-      "</b><span>versements remboursés à</span></div>" +
       '<div class="mini"><b>' + fmt0(r.heures) + " h</b><span>de travail pour payer ses cotisations</span></div>" +
-      '<div class="mini"><b>' + fmt0(r.smicAns) + "</b><span>années de SMIC net reçues</span></div>";
+      '<div class="mini"><b>' + fmt0(r.smicAns) + " an" + (r.smicAns >= 2 ? "s" : "") + "</b><span>de SMIC net reçus en pension</span></div>" +
+      '<div class="mini"><b>' + fmt2(r.ratio) + "</b><span>cotisant(s) par retraité à son départ (" + r.anDepart + ")</span></div>";
 
     renderCoherence(r);
 
+    // — le graphique des cumuls —
     const ages = [], vSer = [], cSer = [], iSer = [], rSer = [], rEqSer = [], rDetteSer = [];
-    let vFin = 0, cFin = 0, iFin = 0;
-    for (let a = r.L.entree; a <= r.L.deces; a++) {
+    let vFin = 0, cFin = 0, iFin = 0, rFin = 0, reFin = 0;
+    const last = (arr, a) => { const f = arr.filter((p) => p[0] <= a); return f.length ? f[f.length - 1][1] : null; };
+    for (let a = L.entree; a <= L.deces; a++) {
       ages.push(a);
-      const cv = r.cumVerse.filter((p) => p[0] <= a);
-      if (cv.length) vFin = cv[cv.length - 1][1];
-      const cc = r.cumCot.filter((p) => p[0] <= a);
-      if (cc.length) cFin = cc[cc.length - 1][1];
-      const ci = r.cumImp.filter((p) => p[0] <= a);
-      if (ci.length) iFin = ci[ci.length - 1][1];
-      vSer.push(Math.round(vFin));
-      cSer.push(Math.round(cFin));
-      iSer.push(Math.round(iFin));
-      const dep = a >= r.L.depart ? (a - r.L.depart) : 0;
-      rSer.push(a >= r.L.depart ? Math.round(r.pension * 12 * dep) : 0);
-      rEqSer.push(a >= r.L.depart ? Math.round(r.pensionEq * 12 * dep) : 0);
-      rDetteSer.push(a >= r.L.depart ? Math.round(r.gapMois * 12 * dep) : 0);
+      let v; if ((v = last(r.cumVerse, a)) != null) vFin = v;
+      if ((v = last(r.cumCot, a)) != null) cFin = v;
+      if ((v = last(r.cumImp, a)) != null) iFin = v;
+      if ((v = last(r.cumRecu, a)) != null) rFin = v;
+      if ((v = last(r.cumRecuEq, a)) != null) reFin = v;
+      vSer.push(Math.round(vFin)); cSer.push(Math.round(cFin)); iSer.push(Math.round(iFin));
+      rSer.push(a >= L.depart ? Math.round(rFin) : 0);
+      rEqSer.push(a >= L.depart ? Math.round(reFin) : 0);
+      rDetteSer.push(a >= L.depart ? Math.round(rFin - reFin) : 0);
     }
-    const hasImp = (r.ardoise > 0 || r.impotsSys > 0);
-    const impName = r.ardoise > 0 ? "Remboursement de la dette héritée" : "Impôts — dette du système";
-    const recuDette = r.futur && coche && r.gapMois > 10;
     const series = [], legend = [];
-    // — le VERSÉ : la dette en BASE (hachures ocre), les cotisations empilées dessus —
     if (hasImp) {
-      series.push({ name: impName, type: "line", stack: "verse", data: iSer, symbol: "none",
-        lineStyle: { color: DETTE_COL, width: 2 }, color: DETTE_COL,
-        areaStyle: { color: HATCH_DETTE } });
-      series.push({ name: "Cotisations versées", type: "line", stack: "verse", data: cSer, symbol: "none",
-        lineStyle: { color: "#6E5BAE", width: 3 }, color: "#6E5BAE",
-        areaStyle: { color: "rgba(110,91,174,.14)" } });
-      legend.push(impName, "Cotisations versées");
+      series.push({ name: "Versé — " + (r.ardoise > 0 ? "impôts (dette des aînés)" : "impôts (dette du système)"), type: "line", stack: "verse", data: iSer, symbol: "none",
+        lineStyle: { color: DETTE_COL, width: 2 }, color: DETTE_COL, areaStyle: { color: HATCH_DETTE } });
+      series.push({ name: "Versé — cotisations", type: "line", stack: "verse", data: cSer, symbol: "none",
+        lineStyle: { color: "#6E5BAE", width: 3 }, color: "#6E5BAE", areaStyle: { color: "rgba(110,91,174,.14)" } });
+      legend.push(series[0].name, "Versé — cotisations");
     } else {
-      series.push({ name: "Cumul versé", type: "line", data: vSer, symbol: "none",
-        lineStyle: { color: "#6E5BAE", width: 3 }, color: "#6E5BAE",
-        areaStyle: { color: "rgba(110,91,174,.14)" } });
-      legend.push("Cumul versé");
+      series.push({ name: "Versé — cotisations", type: "line", data: vSer, symbol: "none",
+        lineStyle: { color: "#6E5BAE", width: 3 }, color: "#6E5BAE", areaStyle: { color: "rgba(110,91,174,.14)" } });
+      legend.push("Versé — cotisations");
     }
-    // — le REÇU : part à l'équilibre (cramoisi plein) + part financée par la dette (hachures) —
     if (recuDette) {
-      series.push({ name: "Pension financée par les cotisations", type: "line", stack: "recu",
-        data: rEqSer, symbol: "none",
-        lineStyle: { color: "#8E1B38", width: 3 }, color: "#8E1B38",
-        areaStyle: { color: "rgba(142,27,56,.12)" } });
-      series.push({ name: "Pension financée par la dette", type: "line", stack: "recu",
-        data: rDetteSer, symbol: "none",
-        lineStyle: { color: DETTE_COL, width: 2, type: "dashed" }, color: "#D9A441",
-        areaStyle: { color: HATCH_DETTE } });
-      legend.push("Pension financée par les cotisations", "Pension financée par la dette");
+      series.push({ name: "Reçu — financé par les cotisants", type: "line", stack: "recu", data: rEqSer, symbol: "none",
+        lineStyle: { color: "#8E1B38", width: 3 }, color: "#8E1B38", areaStyle: { color: "rgba(142,27,56,.12)" } });
+      series.push({ name: "Reçu — financé par la dette", type: "line", stack: "recu", data: rDetteSer, symbol: "none",
+        lineStyle: { color: DETTE_COL, width: 2, type: "dashed" }, color: "#D9A441", areaStyle: { color: HATCH_DETTE } });
+      legend.push("Reçu — financé par les cotisants", "Reçu — financé par la dette");
     } else {
-      series.push({ name: "Cumul reçu (net)", type: "line", data: rSer, symbol: "none",
-        lineStyle: { color: "#8E1B38", width: 3 }, color: "#8E1B38",
-        areaStyle: { color: "rgba(142,27,56,.12)" } });
-      legend.push("Cumul reçu (net)");
+      series.push({ name: "Reçu — pension", type: "line", data: rSer, symbol: "none",
+        lineStyle: { color: "#8E1B38", width: 3 }, color: "#8E1B38", areaStyle: { color: "rgba(142,27,56,.12)" } });
+      legend.push("Reçu — pension");
     }
+    const marks = [{ xAxis: String(L.depart), label: { formatter: "départ " + L.depart + " ans", fontSize: 10, color: "#4A5265" }, lineStyle: { color: "#B9AE97", type: "dashed" } }];
+    if (r.beAge) marks.push({ xAxis: String(Math.round(r.beAge)), label: { formatter: "remboursé", fontSize: 10, color: "#8E1B38" }, lineStyle: { color: "#8E1B38", type: "dotted" } });
+    series[series.length - 1].markLine = { symbol: "none", silent: true, data: marks };
     chart.setOption({
       grid: { left: 64, right: 14, top: 40, bottom: 26 },
       legend: { data: legend, top: 0, textStyle: { fontSize: 10.5 } },
       tooltip: { trigger: "axis", valueFormatter: (v) => fmtK(v) + " €" },
-      xAxis: { type: "category", data: ages, name: "âge", nameGap: 4, axisLabel: { fontSize: 10 } },
+      xAxis: { type: "category", data: ages.map(String), name: "âge", nameGap: 4, axisLabel: { fontSize: 10 } },
       yAxis: { type: "value", axisLabel: { fontSize: 10, formatter: (v) => group(String(v / 1000)) + " k€" } },
       series: series,
     }, { replaceMerge: ["series", "legend"] });
@@ -476,15 +495,17 @@
   }
 
   /* ---------- ACTE ② : le jeu « Équilibrer 2050 » ----------
-   * La pension est une PROMESSE (72 % du salaire net moyen, ≈ 1 470 € nets) ;
-   * les cotisations seules en financent une part ; l'écart est « pris ailleurs »
+   * La pension est une PROMESSE : la pension moyenne réelle par retraité, toutes
+   * pensions comprises (422,2 Md€ ÷ 17,4 M retraités = 2 022 € bruts ≈ 1 840 € nets
+   * par mois) ; les cotisations seules en financent 277 Md€, soit 66 % — l'écart
+   * (145,2 Md€ en 2025, exactement le non contributif du site) est « pris ailleurs »
    * (impôts, dette, budgets des ministères) — le levier réellement utilisé
    * aujourd'hui, à son maximum. Trois leviers le réduisent : le taux (payé par
    * les cotisants), l'âge (payé par les futurs retraités en années de retraite),
    * la promesse (payée par les retraités). Les quatre parts sont mesurées par
    * rapport à la RÉFÉRENCE (28,1 % · 64 ans · promesse intacte). */
-  const REF = { tauxPct: 28.1, age: 64, ciblePct: 70 };     // 70 % du net moyen ≈ 1 470 € (droit direct, DREES)
-  const INV = { annee: 2050, ciblePct: 70, cible: 1470, tauxPct: 28.1, age: 64,
+  const REF = { tauxPct: 28.1, age: 64, ciblePct: 100 };    // 100 % = la pension moyenne d'aujourd'hui
+  const INV = { annee: 2050, ciblePct: 100, cible: 1840, tauxPct: 28.1, age: 64,
                 natal: false, base: "moyen", niveau: null };
   // âge légal : 65 → 60 (réforme 1982, effective 1983) → montée 60→62
   // (réforme 2010, effective 2017) → montée 62→64 (réforme 2023) SUSPENDUE par la
@@ -507,7 +528,12 @@
   const ratioEff = () => ratioAt(effAge());
   const financeAt = (tauxPct, age) => (tauxPct / 100) * ratioAt(age) * salBrutRef() * P.PNET;
   const financeOut = () => financeAt(effTauxPct(), effAge());
-  const cibleDe = (pct) => Math.round(pct / 100 * salNetRef() / 10) * 10;
+  // la pension moyenne réelle par retraité (toutes pensions, tous régimes), en net
+  const pensionMoyBrut = () => P.pensionsMd * 1e9 / P.nbRetraites / 12;
+  const pensionMoyNet = () => pensionMoyBrut() * P.PNET;
+  const cibleDe = (pct) => Math.round(pct / 100 * pensionMoyNet() / 10) * 10;
+  // l'écart net par retraité → Md€ bruts par an (2025 : 145,2 par construction)
+  const enMdAnRetraites = (gapNet, nRet) => gapNet / P.PNET * nRet * 12 / 1e9;
   const tauxNecessaire = () => INV.cible / (ratioEff() * salBrutRef() * P.PNET) * 100;
   function ageNecessaire() {
     const needRatio = INV.cible / ((INV.tauxPct / 100) * salBrutRef() * P.PNET);
@@ -532,9 +558,9 @@
       fmt: (v) => ageTxt(v),
       reperes: [["suspension 2026 : 62 ans 9 mois", 62.75], ["réforme 2023 : 64 ans", 64], ["66 ans", 66]] },
     { id: "pens", nom: "Baisser les pensions", qui: "payé par les retraités, chaque mois",
-      col: "#D9A441", min: 40, max: 100, step: 0.5, key: "ciblePct",
-      fmt: (v) => fmt1(v) + " % du salaire net " + baseLabel(),
-      reperes: [["promesse d'aujourd'hui : 70 %", 70], ["−10 % : 63 %", 63], ["50 %", 50]] },
+      col: "#D9A441", min: 50, max: 110, step: 0.5, key: "ciblePct",
+      fmt: (v) => fmt0(cibleDe(v)) + " € nets" + (Math.abs(v - 100) < 0.25 ? " (comme aujourd'hui)" : " (" + (v > 100 ? "+" : "−") + fmt1(Math.abs(v - 100)) + " %)"),
+      reperes: [["la pension d'aujourd'hui", 100], ["scénario COR 2050 : −9 % (indexation sur les prix)", 91], ["−20 %", 80]] },
   ];
   const LIMITES = { taux: 40, age: 70, pensMin: Math.round(REF.ciblePct * 0.7) };
   $("leviers").innerHTML = LEVIERS.map((l) =>
@@ -601,8 +627,9 @@
     { id: "r2023", lab: "Réforme 2023 : 64 ans", set: { tauxPct: 28.1, age: 64, ciblePct: 70 } },
     { id: "a66", lab: "66 ans", set: { tauxPct: 28.1, age: 66, ciblePct: 70 } },
     { id: "t4", lab: "+4 points de cotisation", set: { tauxPct: 32.1, age: 64, ciblePct: 70 } },
-    { id: "p10", lab: "Pensions −10 %", set: { tauxPct: 28.1, age: 64, ciblePct: 63 } },
-    { id: "mix", lab: "Un peu de tout : 65 ans, +2 pts, −5 %", set: { tauxPct: 30.1, age: 65, ciblePct: 66.5 } },
+    { id: "cor", lab: "Scénario COR : 64 ans, pension relative −9 %", set: { tauxPct: 28.1, age: 64, ciblePct: 91 } },
+    { id: "p10", lab: "Pensions −10 %", set: { tauxPct: 28.1, age: 64, ciblePct: 90 } },
+    { id: "mix", lab: "Un peu de tout : 65 ans, +2 pts, −5 %", set: { tauxPct: 30.1, age: 65, ciblePct: 95 } },
   ];
   let scenNote = "";
   const scBox = $("scenarios");
@@ -727,11 +754,13 @@
         (INV.cible <= finance ? "Une pension de " + fmt0(INV.cible) + " € était couverte."
           : "Pour " + fmt0(INV.cible) + " €, il manquait " + fmt0(gap) + " € — comblés par les impôts et la dette.") +
         " Les leviers s'utilisent à partir de 2026."
-      : '<span class="m-kicker">Mission</span>En <b>' + INV.annee + "</b>, verser à chaque retraité la pension promise aujourd'hui — " +
-        "<b>" + REF.ciblePct + " % du salaire net " + baseLabel() + "</b>, soit ≈ <b>" + fmt0(cible0) + " € nets</b> par mois — avec " +
-        "<b>" + fmt2(interp(P.ratio, INV.annee)) + " cotisant" + (interp(P.ratio, INV.annee) >= 2 ? "s" : "") + " par retraité</b> au lieu de 1,8 aujourd'hui. " +
-        "Aux règles de référence (28,1 %, 64 ans), les cotisations en financent <b>" + fmt0(finance0) + " €</b> : il manque <b>" +
-        fmt0(gap0) + " € par mois et par retraité</b>. Fermer l'écart, et choisir qui paie.";
+      : '<span class="m-kicker">Mission</span>En <b>' + INV.annee + "</b>, verser à chaque retraité la même pension qu'aujourd'hui : " +
+        "en moyenne <b>≈ " + fmt0(cible0) + " € nets</b> par mois, toutes pensions comprises (" + fmt1(P.pensionsMd) + " Md€ pour " +
+        fmt1(P.nbRetraites / 1e6) + " millions de retraités) — avec <b>" + fmt2(interp(P.ratio, INV.annee)) + " cotisant" +
+        (interp(P.ratio, INV.annee) >= 2 ? "s" : "") + " par retraité</b> au lieu de 1,8. Aujourd'hui, les cotisations en financent " +
+        "<b>" + Math.round(P.cotisationsMd / P.pensionsMd * 100) + " %</b> (" + fmt0(P.cotisationsMd) + " Md€ sur " + fmt0(P.pensionsMd) +
+        ") ; en " + INV.annee + ", aux règles de référence (28,1 %, 64 ans), <b>" + fmt0(finance0) + " €</b> par retraité, soit " +
+        Math.round(finance0 / cible0 * 100) + " % : il manque <b>" + fmt0(gap0) + " € par mois et par retraité</b>. Fermer l'écart, et choisir qui paie.";
 
     // ---- le verdict, en mots ----
     const v = $("verdict");
@@ -752,8 +781,8 @@
       '<span class="v-big">' + (atteint ? "✓ 0 €" : fmt0(gap) + " €") + "</span>" +
       '<span class="v-sub">' + (atteint
         ? "La pension de " + fmt0(INV.cible) + " € est financée : taux " + pct1(txt / 100) + " %, départ à " + ageTxt(age) + "."
-        : "par mois et par retraité — " + fmt0(finance) + " € financés pour " + fmt0(INV.cible) + " € promis (" +
-          Math.round(partFin * 100) + " %). Ce reste est pris ailleurs.") + "</span>" +
+        : "par mois et par retraité — les cotisations financent " + fmt0(finance) + " € sur " + fmt0(INV.cible) + " € (" +
+          Math.round(partFin * 100) + " %). Le reste est pris ailleurs.") + "</span>" +
       '<div class="jauge" title="La promesse de référence : part financée par les cotisations (violet), par la hausse du taux (bleu), par le report d\'âge (bleu clair), pris ailleurs (cramoisi), renoncé par les retraités (ocre)">' +
         '<div class="seg seg-fin" style="width:' + (Math.min(finance0, cible0) / cible0 * 100) + '%"></div>' +
         '<div class="seg seg-taux" style="width:' + (dTaux / cible0 * 100) + '%"></div>' +
@@ -786,8 +815,8 @@
         if (dur <= 5) alerte = "⚠ À cet âge, la retraite ne durerait plus que ≈ " + fmt0(dur) + " an" + (dur > 1 ? "s" : "") + ".";
       } else {
         const d = INV.cible - cible0;
-        cout = Math.abs(d) < 1 ? "La promesse d'aujourd'hui : ≈ " + fmt0(cible0) + " € nets par mois (pension de droit direct moyenne)."
-          : "<b>" + signe(d) + " €</b> par mois pour chaque retraité (" + signe(INV.ciblePct - REF.ciblePct) + " points de salaire)" +
+        cout = Math.abs(d) < 1 ? "La pension moyenne d'aujourd'hui : ≈ " + fmt0(cible0) + " € nets par mois par retraité, toutes pensions comprises."
+          : "<b>" + signe(d) + " €</b> par mois pour chaque retraité" +
             (d < 0 ? ', <span class="ok">' + fmt0(-d) + " € d'écart en moins</span>" : "") + ".";
         if (INV.ciblePct < LIMITES.pensMin) alerte = "⚠ Plus de 30 % de baisse : la pension passe sous le niveau de vie des actifs les plus modestes.";
       }
@@ -795,13 +824,13 @@
       $("al-" + l.id).textContent = alerte;
       $("lev-" + l.id).classList.toggle("hors", !!alerte);
     });
-    const mdReste = reste * nbRetraites() * 12 / 1e9, parCotReste = reste / R;
+    const mdReste = enMdAnRetraites(reste, nbRetraites()), parCotReste = reste / R;
     $("val-reste").textContent = (atteint ? "0 €" : fmt0(reste) + " €") + " / retraité / mois";
     $("cout-reste").innerHTML = atteint
       ? '<span class="ok">✓ Plus rien à prendre ailleurs.</span>'
       : "≈ <b>" + fmt0(parCotReste) + " €</b> par mois et par cotisant, en impôts ou en dette — ≈ <b>" + fmt0(mdReste) +
-        " Md€ par an</b> pris sur les budgets publics (ordre de grandeur, cotisations pures ; aujourd'hui : " +
-        "<a href=\"../treemap.html#realite\">145 Md€, le bloc cramoisi</a>).";
+        " Md€ par an</b> pris sur les budgets publics, en euros d'aujourd'hui (2025 : " +
+        "<a href=\"../treemap.html#realite\">" + fmt0(P.pensionsMd - P.cotisationsMd) + " Md€, le bloc cramoisi</a>).";
 
     // ---- niveaux : surligner celui en cours ----
     [].forEach.call(scBox.querySelectorAll(".scenar"), (b) => b.classList.toggle("on", b.dataset.id === INV.niveau));
@@ -889,5 +918,16 @@
     if (ratio["2025"]) set("ratio_2025", fmt1(ratio["2025"]));
     set("ratio_2050", fmt2(interp(P.ratio, 2050)));
     if (ch.non_contributif) set("non_contributif", fmt0(ch.non_contributif));
-  }).catch(() => { /* hors ligne : les valeurs écrites dans la page restent */ });
+    if (ch.pensions_versees) set("pensions", fmt1(ch.pensions_versees));
+    if (ch.cotisations) set("cotisations", fmt0(ch.cotisations));
+    if (ch.retraites_droit_direct_millions) set("retraites_m", fmt1(ch.retraites_droit_direct_millions));
+    if (ch.pensions_versees && ch.cotisations) set("part_cot", Math.round(ch.cotisations / ch.pensions_versees * 100));
+    // les mêmes chiffres que le site : 422,2 / 277 / 17,4 M / 30,6 M (COR)
+    let touche = false;
+    if (ch.pensions_versees) { P.pensionsMd = ch.pensions_versees; touche = true; }
+    if (ch.cotisations) { P.cotisationsMd = ch.cotisations; touche = true; }
+    if (ch.retraites_droit_direct_millions) { P.nbRetraites = ch.retraites_droit_direct_millions * 1e6; touche = true; }
+    if (ch.cotisants_millions) { P.nbCotisants = ch.cotisants_millions * 1e6; touche = true; }
+    if (touche) renderInverse();
+  }).catch(() => { /* hors ligne : les valeurs écrites dans le code restent */ });
 })();

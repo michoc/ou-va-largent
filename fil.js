@@ -79,9 +79,14 @@
     if (cotisants) { set("nc_cot", f0(round100(nc * 1000 / cotisants))); set("pens_cot", f0(round100(pens * 1000 / cotisants))); set("cotisants", f1(cotisants)); }
     if (ch.retraites_droit_direct_millions) set("retraites_m", f1(ch.retraites_droit_direct_millions));
     const ratio = ch.ratio_cotisants_retraites || {};
-    const recup = (ch.taux_recuperation || {}).tout_financement || {};
+    const recup = (ch.taux_recuperation || {}).cotisations_seules || {};
+    const recupTout = (ch.taux_recuperation || {}).tout_financement || {};
     if (recup["1950"]) set("rec_1950", f2(recup["1950"]));
     if (recup["1980"]) set("rec_1980", f2(recup["1980"]));
+    if (recupTout["1950"]) set("rect_1950", f2(recupTout["1950"]));
+    if (recupTout["1980"]) set("rect_1980", f2(recupTout["1980"]));
+    const rgHist = (ch.ratio_regime_general_historique || {}).serie || {};
+    if (rgHist["1965"]) set("rg_1965", f1(rgHist["1965"]));
     Object.keys(ratio).forEach((y) => set("ratio_" + y, f1(ratio[y])));
 
     // ---- temps 2 : les masses ----
@@ -143,7 +148,7 @@
     svgT3(pens, cot, nc, pop);
     svgT4(taux, tPriv);
     if (esrData) svgT5(esrData);
-    svgT6(ratio);
+    svgT6(ratio, rgHist);
     svgT6b(recup);
   }
 
@@ -229,23 +234,33 @@
     SVG("svg-t5", W, 130, s);
   }
 
-  /* ---------- 6a · cotisants pour un retraité : trois colonnes, un chiffre ---------- */
-  function svgT6(ratio) {
+  /* ---------- 6a · cotisants pour un retraité : le régime général à ses débuts (Cnav),
+   * puis tous régimes (COR). Deux séries, deux champs : séparées par un filet. ---------- */
+  function svgT6(ratio, rgHist) {
     const years = Object.keys(ratio).sort();
     if (!years.length) return;
-    const W = 300, H = 120, colW = W / years.length, vMax = Math.max.apply(null, years.map((y) => ratio[y]));
-    const base = 100, hMax = 56, sc = hMax / vMax, bw = 44;
+    const hist = ["1965", "1970"].filter((y) => rgHist && rgHist[y]).map((y) => ({ y: y, v: rgHist[y], rg: true }));
+    const cols = hist.concat(years.map((y, i) => ({ y: y, v: ratio[y], last: i === years.length - 1, now: i === 1 })));
+    const W = 300, H = 128, colW = W / cols.length, bw = Math.min(40, colW - 10);
+    const vMax = Math.max.apply(null, cols.map((c) => c.v)), base = 100, hMax = 62, sc = hMax / vMax;
     let s = "";
-    // la ligne du retraité : 1 pour 1
     const y1 = base - 1 * sc;
     s += '<line x1="6" y1="' + y1 + '" x2="' + (W - 6) + '" y2="' + y1 + '" stroke="' + C.pens + '" stroke-width="1" stroke-dasharray="3 3"/>';
-    years.forEach((y, i) => {
-      const v = ratio[y], x = i * colW + (colW - bw) / 2, h = v * sc;
-      s += R(x, base - h, bw, h, C.etat, ' rx="3"' + (i === years.length - 1 ? ' opacity=".55"' : ""));
-      s += T(x + bw / 2, base - h - 6, f1(v), { a: "middle", s: 16, c: C.ink, w: 700, f: "Georgia, serif" });
-      s += T(x + bw / 2, base + 12, y + (i === 1 ? " · aujourd'hui" : i === years.length - 1 ? " · projection" : ""), { a: "middle", s: 7.5, c: C.soft });
+    cols.forEach((c, i) => {
+      const x = i * colW + (colW - bw) / 2, h = c.v * sc;
+      s += R(x, base - h, bw, h, c.rg ? C.cas : C.etat, ' rx="3"' + (c.last ? ' opacity=".55"' : ""));
+      s += T(x + bw / 2, base - h - 5, f1(c.v), { a: "middle", s: c.rg ? 12 : 15, c: C.ink, w: 700, f: "Georgia, serif" });
+      s += T(x + bw / 2, base + 12, c.y, { a: "middle", s: 7.5, c: C.soft, w: c.now ? 700 : 400 });
+      if (c.now) s += T(x + bw / 2, base + 22, "aujourd'hui", { a: "middle", s: 6.5, c: C.soft });
+      if (c.last) s += T(x + bw / 2, base + 22, "projection", { a: "middle", s: 6.5, c: C.soft });
     });
-    s += TAG(W - 6, y1 - 1, "pour 1 retraité", C.pens, 7);
+    if (hist.length) {
+      const xs = hist.length * colW;
+      s += '<line x1="' + xs + '" y1="14" x2="' + xs + '" y2="' + (base + 24) + '" stroke="' + C.rule + '" stroke-width="1"/>';
+      s += T(xs - 6, 10, "régime général (Cnav)", { a: "end", s: 6.5, c: C.soft });
+      s += T(xs + 6, 10, "tous régimes (COR)", { s: 6.5, c: C.soft });
+    }
+    s += TAG(W - 6, y1 + 11, "pour 1 retraité", C.pens, 7);   // sous la ligne : la valeur 1,3 reste lisible au-dessus
     SVG("svg-t6", W, H, s);
   }
 
