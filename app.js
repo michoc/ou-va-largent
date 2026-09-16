@@ -42,6 +42,10 @@
   // cramoisi ; tout le reste est estompé. « Voir tout le poster » ou une plongée
   // rendent le poster complet.
   let THESE = true;
+  // mode « embed » (scène du fil, index.html) : chrome masqué, hauteur = la fenêtre,
+  // état piloté par le hash (#these, #poster, #dive=…, #retraites)
+  const EMBED = new URLSearchParams(location.search).has("embed");
+  if (EMBED) document.body.classList.add("embed");
   const REG_N = "Régimes de base & complémentaires";
   const SECU_N = "Sécurité sociale (hors retraites)";
   const isTheseLink = (l) => (l.target === PENS && l.source.indexOf("É · ") === 0) ||
@@ -409,9 +413,11 @@
     // Mobile : poster plus HAUT + vue AGRÉGÉE ; desktop : 0,52 × largeur (U9),
     // petites familles regroupées (U8), étiquettes 12,5 px.
     const narrow = window.innerWidth < 700;
-    const H = narrow
-      ? Math.max(900, Math.round(window.innerHeight * 1.15))
-      : Math.max(560, Math.min(760, Math.round(window.innerWidth * 0.52)));
+    const H = EMBED
+      ? Math.max(380, window.innerHeight - 20)
+      : narrow
+        ? Math.max(900, Math.round(window.innerHeight * 1.15))
+        : Math.max(560, Math.min(760, Math.round(window.innerWidth * 0.52)));
     chartEl.style.height = H + "px";
     chart.resize();
     let nodes = macroSorted(DATA.nodes), links = DATA.links;
@@ -421,7 +427,7 @@
     const theseNodes = new Set();
     links.forEach((l) => { if (isTheseLink(l)) { theseNodes.add(l.source); theseNodes.add(l.target); } });
     theseNodes.add(REG_N);
-    const top = narrow ? 168 : 138, bottom = narrow ? 60 : 56;
+    const top = EMBED && narrow ? 124 : narrow ? 168 : 138, bottom = EMBED ? 44 : narrow ? 60 : 56;
     chart.setOption(buildOption(nodes, links,
       { lastCol: lastCol(nodes), iterations: 0, top: top, bottom: bottom,
         wrapChars: narrow ? 11 : 15, labelMin: narrow ? 58 : 20,
@@ -503,6 +509,16 @@
     // carte historique : plongée dans une famille de dépenses de l'État
     renderHistoCard(key);
     renderBreadcrumb();
+    // en scène (embed) : tout doit tenir dans le cadre — la carte historique, le fil
+    // d'Ariane et le graphique se partagent la hauteur de la fenêtre, sans défilement
+    if (EMBED) {
+      const used = (histoEl.hidden ? 0 : histoEl.offsetHeight + 10) +
+                   (document.getElementById("breadcrumb").offsetHeight || 0) +
+                   (casLegendEl.hidden ? 0 : casLegendEl.offsetHeight + 8) + 30;
+      chartEl.style.height = Math.max(300, window.innerHeight - used) + "px";
+      chart.resize();
+      window.scrollTo(0, 0);
+    }
   }
 
   function currentRender() {
@@ -957,6 +973,8 @@
       return;
     }
     if (h === "#signaler") { document.getElementById("report-btn").click(); return; }
+    if (h === "#these") { THESE = true; renderMacro(); return; }
+    if (h === "#poster") { THESE = false; renderMacro(); return; }
     let target = null;
     if (h === "#retraites") target = PENS;
     else if (h.indexOf("#dive=") === 0) target = h.slice(6);
@@ -975,12 +993,12 @@
     viewStack = path.map((k) => ({ key: k, rect: null,
       label: DATA.drill[k].kind === "retraites" ? "Retraites" : shortLabel(k) }));
     renderDrill();
-    stageEl.scrollIntoView({ behavior: "smooth", block: "start" });
+    if (!EMBED) stageEl.scrollIntoView({ behavior: "smooth", block: "start" });
   }
   // même page, hash qui change (liens du fil ouverts depuis une page déjà chargée)
   window.addEventListener("hashchange", () => {
     if (!DATA) return;
-    if (!location.hash) { renderMacro(); return; }
+    if (!location.hash) { THESE = false; renderMacro(); return; }
     deepLink();
   });
 

@@ -31,10 +31,15 @@
 
   const el = document.getElementById("treemap");
   const isPhone = () => window.innerWidth < 640;
+  // mode « embed » (scène du fil) : chrome masqué, hauteur = la fenêtre, état piloté par le hash
+  const EMBED = new URLSearchParams(location.search).has("embed");
+  if (EMBED) document.body.classList.add("embed");
   // sur mobile : bloc plus haut (aires plus lisibles, moins d'étiquettes tronquées)
-  const stageH = () => isPhone()
-    ? Math.round(Math.min(760, Math.max(560, window.innerHeight * 0.92)))
-    : Math.max(560, Math.min(880, window.innerHeight * 0.80));
+  const stageH = () => EMBED
+    ? Math.max(320, window.innerHeight - 16)
+    : isPhone()
+      ? Math.round(Math.min(760, Math.max(560, window.innerHeight * 0.92)))
+      : Math.max(560, Math.min(880, window.innerHeight * 0.80));
   el.style.height = stageH() + "px";
   const chart = echarts.init(el, null, { renderer: "canvas" });
 
@@ -743,6 +748,24 @@
   }
 
   const HASHES = { officiel: "#officiel", revele: "#revele", realite: "#realite" };
+  // hash → { mode, path } : « #revele », « #realite:Retraites/Déséquilibre des retraites »
+  // (segments URL-encodés ou non ; chaque segment se résout par nom exact, sinon par préfixe)
+  function parseHash() {
+    let h = location.hash || "";
+    try { h = decodeURIComponent(h); } catch (e) { /* hash brut */ }
+    const m = h.match(/^#(officiel|revele|realite)(?::(.*))?$/);
+    if (!m) return { mode: "realite", path: [] };
+    return { mode: m[1], path: m[2] ? m[2].split("/").filter(Boolean) : [] };
+  }
+  function resolvePath(segs) {
+    let arr = topData(); const out = [];
+    for (const seg of segs) {
+      const n = arr.find((x) => x.name === seg) || arr.find((x) => x.name.indexOf(seg) === 0);
+      if (!n || !n.children || !n.children.length) break;
+      out.push(n.name); arr = n.children;
+    }
+    return out;
+  }
 
   /* ============ plongée PILOTÉE + fil d'Ariane HTML ============
    * Le zoom natif d'ECharts (nodeClick) plongeait aussi dans les FEUILLES →
@@ -849,7 +872,7 @@
       b.classList.toggle("active", on);
       b.setAttribute("aria-pressed", on ? "true" : "false");
     });
-    history.replaceState(null, "", HASHES[mode] || "#realite");
+    if (!EMBED) history.replaceState(null, "", HASHES[mode] || "#realite");   // en scène, le hash appartient au fil
     if (!DATA_G) return;
     navPath = [];   // un changement de phase repart de la vue d'ensemble
     clearPatches(); // efface un éventuel contour pointillé de plongée
@@ -899,7 +922,7 @@
     refsFromData(DATA);
     // le mode du hash est fixé AVANT le premier rendu (un double setOption au
     // boot laissait les tuiles à taille zéro) ; setMode ne fera que synchroniser
-    MODE = { "#officiel": "officiel", "#revele": "revele" }[location.hash] || "realite";
+    MODE = parseHash().mode;
     const c = (DATA.meta && DATA.meta.checks) || {};
     const pop = (((DATA.meta || {}).chiffres || {}).population_france || {}).millions;
     const hab = pop ? Math.round(c.depenses_totales * 1000 / pop / 10) * 10 : null;
@@ -998,7 +1021,16 @@
     // explicite — sans chorégraphie au chargement (animate: false)
     // synchronise l'UI (boutons, légende, patchs) — MODE déjà fixé avant le rendu
     setMode(MODE, false);
+    const p0 = parseHash().path;
+    if (p0.length) { navPath = resolvePath(p0); renderView(); }
     renderCompare();
+    // le hash change (scène du fil, lien profond) → mode + chemin de plongée
+    window.addEventListener("hashchange", () => {
+      const h = parseHash();
+      if (h.mode !== MODE) setMode(h.mode, true);
+      navPath = resolvePath(h.path);
+      renderView();
+    });
   }
 
   fetch("data/unified_finances.json", { cache: "no-cache" })

@@ -11,7 +11,7 @@
   <meta property="og:image" content="https://michoc.github.io/ou-va-largent/assets/og-card.png">
   <link rel="preconnect" href="https://cdnjs.cloudflare.com">
   <!-- ?v= : cache-busting — incrémenter à chaque déploiement de style/app -->
-  <link rel="stylesheet" href="style.css?v=20260919c">
+  <link rel="stylesheet" href="style.css?v=20260920i">
 </head>
 <body class="landing fil">
   <nav class="site-nav" aria-label="Navigation du site">
@@ -22,7 +22,7 @@
       <a href="treemap.html"><span class="art">Les </span>masses</a>
     </span>
   </nav>
-  <header class="masthead">
+  <header class="masthead" id="t0">
     <div class="masthead-inner">
       <p class="kicker">Les finances publiques françaises · exercice <span id="exercice">2025</span> · le récit en sept temps</p>
       <h1><span class="hl">Où va l'argent public&nbsp;?</span></h1>
@@ -49,6 +49,24 @@
   </nav>
 
   <main class="fil-main">
+   <div class="fil-layout">
+    <aside class="fil-stage" id="fil-stage" aria-label="Le graphique du temps en cours">
+      <div class="stage-head">
+        <span class="stage-title" id="stage-title">Les flux · ce qui finance les retraites sous un autre nom</span>
+        <a class="stage-open" id="stage-open" href="sankey.html#these">Explorer en grand →</a>
+      </div>
+      <div class="stage-body">
+        <iframe id="stage-sankey" class="stage-frame" title="Les flux" src="sankey.html?embed=1#these"></iframe>
+        <iframe id="stage-treemap" class="stage-frame" title="Les masses" src="treemap.html?embed=1#realite" hidden></iframe>
+        <div id="stage-svg" class="stage-svg" hidden>
+          <div class="fil-svg" id="svg-t6" role="img" aria-label="Cotisants pour un retraité : 2002, 2025, 2070"></div>
+          <p class="stage-cap"><b>Pour un retraité, le nombre d'actifs qui cotisent</b> — <span data-ch="cotisants">30,6</span>&nbsp;millions
+            de cotisants, <span data-ch="retraites_m">17,4</span>&nbsp;millions de retraités (COR, juin 2026). Le pointillé,
+            c'est le cotisant qui manque.</p>
+        </div>
+      </div>
+    </aside>
+    <div class="fil-text">
 
     <!-- ===== Temps 1 · l'échelle ===== -->
     <section class="temps" id="t1" aria-labelledby="t1-h">
@@ -66,12 +84,6 @@
           documents ne montrent pas&nbsp;: les sommes qui financent les retraites sous un autre nom.</p>
         <a class="temps-cta" href="sankey.html">Voir d'où vient l'argent et où il va →</a>
       </div>
-      <figure class="temps-fig">
-        <div class="fil-svg" id="svg-t1" role="img" aria-label="Recettes et emprunt, en proportion des dépenses"></div>
-        <figcaption><b><span data-ch="hab">18&nbsp;800</span>&nbsp;€ par habitant et par an</b> —
-          <span data-ch="depenses">1&nbsp;300,5</span>&nbsp;Md€ pour <span data-ch="pop">69,1</span>&nbsp;millions
-          d'habitants (INSEE, 1er&nbsp;janvier 2026). Le contour vide, c'est l'argent qu'on n'a pas.</figcaption>
-      </figure>
     </section>
 
     <!-- ===== Temps 2 · le premier poste ===== -->
@@ -91,12 +103,6 @@
           l'équilibre du système.</p>
         <a class="temps-cta" href="treemap.html#realite">Voir les masses côte à côte →</a>
       </div>
-      <figure class="temps-fig">
-        <div class="fil-svg" id="svg-t2" role="img" aria-label="Retraites comparées à l'assurance maladie et à cinq postes réunis"></div>
-        <figcaption><b><span data-ch="pensions_1">422,2</span>&nbsp;Md€</b> — <span data-ch="part_pib">14,1</span>&nbsp;%
-          du PIB, <span data-ch="part_dep">24,3</span>&nbsp;% de la dépense publique (COR, juin 2026). Missions de
-          l'État en crédits votés.</figcaption>
-      </figure>
     </section>
 
     <!-- ===== Temps 3 · la question ===== -->
@@ -111,21 +117,16 @@
           <strong><span data-ch="pensions">422</span></strong>.</p>
         <p class="temps-exergue">Il manque <span data-ch="non_contributif">145</span>&nbsp;milliards. Chaque année.</p>
         <p>Ils ne sont officiellement pas un «&nbsp;déficit&nbsp;». Ils doivent néanmoins être trouvés. Pour cela,
-          l'État puise dans quatre caisses&nbsp;: les budgets des ministères, les impôts affectés, la Sécurité
-          sociale et les collectivités — et, pour le solde, la dette.</p>
-        <a class="temps-cta" href="treemap.html#officiel">Décomposer les <span data-ch="non_contributif">145</span>&nbsp;milliards →</a>
-      </div>
-      <figure class="temps-fig">
-        <div class="fil-svg" id="svg-t3" role="img" aria-label="Pensions versées contre cotisations"></div>
+          l'État puise dans quatre caisses&nbsp;— <span data-ch="nc_hab">2&nbsp;100</span>&nbsp;€ par habitant,
+          <span data-ch="nc_cot">4&nbsp;700</span>&nbsp;€ par cotisant&nbsp;:</p>
         <ul class="fil-caisses" id="caisses">
           <li><b><span data-ch="etat_total">57</span></b><span>État — contribution d'équilibre pour ses fonctionnaires (<span data-ch="contribution_etat">49</span>) et subventions aux régimes spéciaux (<span data-ch="regimes_speciaux">8</span>)</span></li>
           <li><b><span data-ch="itaf">64,7</span></b><span>impôts et taxes affectés, dont la CSG</span></li>
           <li><b><span data-ch="transferts">16,5</span></b><span>Sécurité sociale et Unédic</span></li>
           <li><b><span data-ch="solde_pf">7</span></b><span>solde&nbsp;: dette et produits financiers</span></li>
         </ul>
-        <figcaption><span data-ch="nc_hab">2&nbsp;100</span>&nbsp;€ par habitant, <span data-ch="nc_cot">4&nbsp;700</span>&nbsp;€
-          par cotisant. Le solde officiel du système, lui, est de <span data-ch="solde">−5,1</span>&nbsp;Md€.</figcaption>
-      </figure>
+        <a class="temps-cta" href="treemap.html#officiel">Décomposer les <span data-ch="non_contributif">145</span>&nbsp;milliards →</a>
+      </div>
     </section>
 
     <!-- ===== Temps 4 · le mécanisme ===== -->
@@ -153,13 +154,6 @@
           la conclusion ne change pas&nbsp;: des dizaines de milliards de retraites sont comptés comme des dépenses de
           ministères.</p>
       </div>
-      <figure class="temps-fig">
-        <div class="fil-svg" id="svg-t4" role="img" aria-label="Taux de cotisation retraite à la charge de l'employeur : l'État contre un employeur privé"></div>
-        <figcaption><b><span data-ch="taux_2026">82,28</span>&nbsp;% contre <span data-ch="taux_prive">16,58</span>&nbsp;%</b> —
-          cotisation retraite à la charge de l'employeur&nbsp;: l'État pour ses fonctionnaires civils (en % du traitement
-          indiciaire, 2026) contre le droit commun du privé (en % du salaire brut). Décrets 2012-1507, 2025-61,
-          2025-1341&nbsp;; militaires&nbsp;: <span data-ch="taux_mil">126,07</span>&nbsp;%.</figcaption>
-      </figure>
     </section>
 
     <!-- ===== Temps 5 · la conséquence ===== -->
@@ -179,13 +173,6 @@
           hausse, <span data-ch="edu_dcas">1,6</span> partent dans les retraites.</p>
         <a class="temps-cta" href="sankey.html#dive=Enseignement%20sup.%20%26%20recherche%20(ESR)">Voir l'évolution mission par mission →</a>
       </div>
-      <figure class="temps-fig">
-        <div class="fil-svg" id="svg-t5" role="img" aria-label="Budget de l'enseignement supérieur et de la recherche de 2020 à 2025, part retraites en gris"></div>
-        <figcaption><b><span data-ch="esr_moyens_md">−0,7</span>&nbsp;Md€ de moyens réels</b> pour l'enseignement supérieur
-          et la recherche en <span data-ch="esr_y1">2025</span>&nbsp;: budget <span data-ch="esr_dcp_s">−0,5</span>,
-          charge de retraites <span data-ch="esr_dcas_s">+0,2</span> (opérateurs compris&nbsp;: universités, CNRS, CNES…).
-          Mission Recherche et enseignement supérieur, crédits votés&nbsp;; gris&nbsp;: la part qui finance les retraites.</figcaption>
-      </figure>
     </section>
 
     <!-- ===== Temps 6 · les générations ===== -->
@@ -206,12 +193,6 @@
         <p class="temps-soon">Deux outils en préparation&nbsp;: <em>comparer les quatre vies</em> et
           <em>équilibrer le système en 2050</em>.</p>
       </div>
-      <figure class="temps-fig">
-        <div class="fil-svg" id="svg-t6" role="img" aria-label="Cotisants pour un retraité : 2002, 2025, 2070"></div>
-        <figcaption><b>Pour un retraité, le nombre d'actifs qui cotisent</b> — <span data-ch="cotisants">30,6</span>&nbsp;millions
-          de cotisants, <span data-ch="retraites_m">17,4</span>&nbsp;millions de retraités (COR, juin 2026). Le pointillé,
-          c'est le cotisant qui manque.</figcaption>
-      </figure>
     </section>
 
     <!-- ===== Temps 7 · la sortie ===== -->
@@ -251,6 +232,8 @@
       </div>
     </section>
 
+    </div>
+   </div>
   </main>
 
   <footer class="metho">
@@ -263,7 +246,7 @@
     </p>
   </footer>
 
-  <script src="fil.js?v=20260919c"></script>
-  <script src="lexique.js?v=20260919c"></script>
+  <script src="fil.js?v=20260920i"></script>
+  <script src="lexique.js?v=20260920i"></script>
 </body>
 </html>

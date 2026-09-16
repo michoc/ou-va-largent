@@ -249,21 +249,69 @@
     SVG("svg-t6", W, 100, s);
   }
 
-  /* ---------- rail 1-7 : le temps courant ---------- */
+  /* ---------- la scène : le vrai graphique, dans l'état du temps en cours ----------
+   * Les deux outils sont embarqués (?embed=1) ; leur état est piloté par le hash
+   * (sankey : #these / #poster / #dive=… ; treemap : #mode ou #mode:chemin/chemin).
+   * Le temps 0 (la thèse) ouvre sur le Sankey en mode « thèse » — les flux cramoisis. */
+  const STAGES = {
+    0: { tool: "sankey",  hash: "#these",   title: "Les flux · ce qui finance les retraites sous un autre nom" },
+    1: { tool: "sankey",  hash: "#poster",  title: "Les flux · d'où vient l'argent, où il va" },
+    2: { tool: "treemap", hash: "#realite", title: "Les masses · ce que ça coûte vraiment" },
+    3: { tool: "treemap", hash: "#realite:Retraites/Déséquilibre des retraites", title: "Les masses · d'où viennent les 145 milliards" },
+    4: { tool: "treemap", hash: "#revele",  title: "Les masses · ce qui s'y cache" },
+    5: { tool: "sankey",  hash: "#dive=Enseignement sup. & recherche (ESR)", title: "Les flux · enseignement supérieur et recherche, 2020 → 2025" },
+    6: { tool: "svg",     hash: "",         title: "Pour un retraité, le nombre d'actifs qui cotisent" },
+    7: { tool: "treemap", hash: "#realite", title: "Les masses · ce que ça coûte vraiment" },
+  };
+  const PAGES = { sankey: "sankey.html", treemap: "treemap.html" };
+  const frames = { sankey: document.getElementById("stage-sankey"), treemap: document.getElementById("stage-treemap") };
+  const stageSvg = document.getElementById("stage-svg");
+  const stageTitle = document.getElementById("stage-title"), stageOpen = document.getElementById("stage-open");
+  let stageCur = null;
+  function setStage(t) {
+    const st = STAGES[t];
+    if (!st || stageCur === t) return;
+    stageCur = t;
+    if (stageTitle) stageTitle.textContent = st.title;
+    Object.keys(frames).forEach((k) => { if (frames[k]) frames[k].hidden = st.tool !== k; });
+    if (stageSvg) stageSvg.hidden = st.tool !== "svg";
+    if (st.tool === "svg") { if (stageOpen) stageOpen.hidden = true; return; }
+    const f = frames[st.tool];
+    if (stageOpen) { stageOpen.hidden = false; stageOpen.href = PAGES[st.tool] + st.hash; }
+    if (!f) return;
+    try {
+      const w = f.contentWindow;
+      if (w && w.location && w.location.href !== "about:blank") {
+        if (decodeURIComponent(w.location.hash || "") !== st.hash) w.location.hash = st.hash;
+        // le cadre vient d'être montré : l'outil se redimensionne à sa taille réelle
+        setTimeout(() => { try { w.dispatchEvent(new Event("resize")); } catch (e) { /* rien */ } }, 60);
+      } else {
+        f.src = PAGES[st.tool] + "?embed=1" + st.hash;
+      }
+    } catch (e) { f.src = PAGES[st.tool] + "?embed=1" + st.hash; }
+  }
+
+  /* ---------- rail 1-7 + scène : le temps courant ---------- */
   const rail = document.getElementById("fil-rail");
-  if (rail && "IntersectionObserver" in window) {
+  if ("IntersectionObserver" in window) {
     const links = {};
-    rail.querySelectorAll("a[data-t]").forEach((a) => (links[a.dataset.t] = a));
+    if (rail) rail.querySelectorAll("a[data-t]").forEach((a) => (links[a.dataset.t] = a));
+    let pending = null;
     const io = new IntersectionObserver((entries) => {
+      // tout en haut de la page, la scène reste sur la thèse (temps 0)
+      if (window.scrollY < 40) { Object.values(links).forEach((a) => a.classList.toggle("is-current", a.dataset.t === "1")); return; }
       entries.forEach((e) => {
         if (!e.isIntersecting) return;
         const t = e.target.id.replace("t", "");
         Object.values(links).forEach((a) => a.classList.toggle("is-current", a.dataset.t === t));
+        clearTimeout(pending);
+        pending = setTimeout(() => setStage(t), 120);   // un temps par geste de lecture, pas par pixel
       });
-    }, { rootMargin: "-40% 0px -50% 0px", threshold: 0 });
-    document.querySelectorAll(".temps[id]").forEach((sec) => io.observe(sec));
-    if (links["1"] && !rail.querySelector(".is-current")) links["1"].classList.add("is-current");
+    }, { rootMargin: "-35% 0px -45% 0px", threshold: 0 });
+    document.querySelectorAll(".temps[id], .masthead#t0").forEach((sec) => io.observe(sec));
+    if (links["1"] && rail && !rail.querySelector(".is-current")) links["1"].classList.add("is-current");
   }
+  setStage(0);
 
   /* ---------- partage ---------- */
   const shareBtn = document.getElementById("share-btn"), toast = document.getElementById("share-toast");
