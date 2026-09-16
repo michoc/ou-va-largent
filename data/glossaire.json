@@ -1,0 +1,269 @@
+{
+  "_comment": "Couche lexicale du site (F4). Chaque entrée : ce que c'est (court), combien ça pèse (poids, chiffres 2025 — COR juin 2026, LFI 2025, Cour des comptes), pourquoi ça compte ici (ici). `variantes` = formes reconnues dans le texte (la plus longue gagne) ; `sigle: true` = casse exacte, souligné à CHAQUE occurrence ; sinon première occurrence par zone. Rendu par lexique.js.",
+  "millesime": "chiffres 2025",
+  "entrees": [
+    {
+      "id": "mde",
+      "terme": "Md€",
+      "sigle": false,
+      "variantes": [
+        "Md€",
+        "Mds €"
+      ],
+      "court": "Milliard d'euros — mille millions. C'est l'unité de tout le site.",
+      "poids": "1 Md€ ≈ 14,50 € par habitant (69,1 millions d'habitants).",
+      "ici": "Les dépenses publiques du poster : 1 300 Md€ par an."
+    },
+    {
+      "id": "cotisation",
+      "terme": "Cotisation",
+      "variantes": [
+        "cotisations retraite",
+        "cotisations vieillesse",
+        "cotisations sociales",
+        "cotisations",
+        "cotisation"
+      ],
+      "court": "Prélèvement sur le salaire, payé par le salarié et par l'employeur, qui ouvre un droit — ici, une pension.",
+      "poids": "277 Md€ de cotisations retraite en 2025, deux tiers des ressources du système (COR).",
+      "ici": "Ce qui « revient » : la part contributive des pensions. Tout le reste est non contributif."
+    },
+    {
+      "id": "non-contributif",
+      "terme": "Non contributif",
+      "variantes": [
+        "non contributifs",
+        "non contributif",
+        "non contributive",
+        "non contributives"
+      ],
+      "court": "Ce qui finance les pensions sans venir d'une cotisation : contribution d'équilibre de l'État, impôts affectés, transferts, dette.",
+      "poids": "145 Md€ en 2025 — 2 100 € par habitant.",
+      "ici": "Le cramoisi du Mondrian, le bloc « Déséquilibre des retraites »."
+    },
+    {
+      "id": "contribution-employeur",
+      "terme": "Contribution employeur",
+      "variantes": [
+        "contribution « employeur »",
+        "contribution employeur",
+        "contributions employeur",
+        "contributions « employeur »",
+        "cotisation employeur",
+        "cotisation « employeur »"
+      ],
+      "court": "Ce que l'État se verse à lui-même pour la retraite de ses fonctionnaires, en pourcentage de leur traitement.",
+      "poids": "82,28 % du traitement en 2026 (78,28 % en 2025), contre 16,58 % pour un employeur privé : 49 Md€.",
+      "ici": "Inscrite dans les budgets des ministères comme une dépense de personnel. Elle n'augmente pas le salaire et n'ouvre aucun droit."
+    },
+    {
+      "id": "cas-pensions",
+      "terme": "CAS Pensions",
+      "sigle": true,
+      "variantes": [
+        "CAS Pensions",
+        "CAS « Pensions »",
+        "compte d'affectation spéciale « Pensions »",
+        "compte d'affectation spéciale Pensions"
+      ],
+      "court": "Compte d'affectation spéciale « Pensions » : la caisse par laquelle l'État paie les retraites de ses fonctionnaires.",
+      "poids": "69 Md€ de dépenses en 2025, 67 de recettes ; solde −2,0 (Cour des comptes).",
+      "ici": "La loi l'oblige à rester en excédent : quand il se creuse, on relève le taux de contribution — 49,9 % en 2006, 82,28 % en 2026."
+    },
+    {
+      "id": "contribution-equilibre",
+      "terme": "Contribution d'équilibre",
+      "variantes": [
+        "contribution d'équilibre",
+        "contributions d'équilibre",
+        "subvention d'équilibre",
+        "subventions d'équilibre"
+      ],
+      "court": "L'argent public versé pour combler ce que les cotisations d'un régime ne couvrent pas.",
+      "poids": "État pour ses fonctionnaires : 49,3 Md€ (COR) ; régimes spéciaux (SNCF, RATP, marins, mines) : 7,7 Md€.",
+      "ici": "Visible pour les régimes spéciaux ; dissoute dans la « contribution employeur » pour la fonction publique — de 21,5 à 41 Md€ selon la convention."
+    },
+    {
+      "id": "itaf",
+      "terme": "ITAF",
+      "sigle": true,
+      "variantes": [
+        "ITAF",
+        "impôts et taxes affectés",
+        "Impôts et taxes affectés",
+        "impôts & taxes affectés",
+        "Impôts & taxes affectés",
+        "impôts affectés",
+        "Impôts affectés",
+        "taxes affectées"
+      ],
+      "court": "Impôts et taxes affectés : de l'impôt fléché directement vers la Sécurité sociale ou les retraites, sans passer par le budget de l'État.",
+      "poids": "64,7 Md€ pour les retraites en 2025 (dont CSG 21,9, fractions de TVA, taxe sur les salaires, forfait social).",
+      "ici": "La deuxième source non contributive des pensions, après la contribution de l'État."
+    },
+    {
+      "id": "csg",
+      "terme": "CSG",
+      "sigle": true,
+      "variantes": [
+        "CSG · CRDS",
+        "CSG-CRDS",
+        "CSG-FSV",
+        "CSG"
+      ],
+      "court": "Contribution sociale généralisée : un impôt sur tous les revenus — salaires, pensions, capital — qui finance la Sécurité sociale (créé en 1991).",
+      "poids": "21,9 Md€ vont aux retraites en 2025, via le FSV.",
+      "ici": "Les retraités la paient aussi : une partie des pensions est financée par un impôt sur les pensions."
+    },
+    {
+      "id": "cnracl",
+      "terme": "CNRACL",
+      "sigle": true,
+      "variantes": [
+        "CNRACL"
+      ],
+      "court": "Caisse nationale de retraites des agents des collectivités locales : la retraite des agents des communes, départements, régions et hôpitaux.",
+      "poids": "Taux employeur 34,65 % en 2025, +3 points par an jusqu'à 43,65 % en 2028 ; besoin de financement −2,1 Md€ (COR).",
+      "ici": "Comptée en cotisation par le COR (convention du site) : ses employeurs cotisent, ils ne subventionnent pas."
+    },
+    {
+      "id": "fsv",
+      "terme": "FSV",
+      "sigle": true,
+      "variantes": [
+        "FSV",
+        "Fonds de solidarité vieillesse"
+      ],
+      "court": "Fonds de solidarité vieillesse : paie le minimum vieillesse et les cotisations des périodes de chômage ou de maladie.",
+      "poids": "22 Md€ de recettes en 2025, essentiellement de la CSG.",
+      "ici": "Le canal par lequel la CSG descend vers les retraites dans le poster."
+    },
+    {
+      "id": "cor",
+      "terme": "COR",
+      "sigle": true,
+      "variantes": [
+        "COR",
+        "Conseil d'orientation des retraites"
+      ],
+      "court": "Conseil d'orientation des retraites : l'organisme public qui tient les comptes du système de retraite, tous régimes, chaque mois de juin.",
+      "poids": "Rapport annuel de juin 2026 : dépenses 2025 = 422,2 Md€, cotisations 277, solde −5,1.",
+      "ici": "La source des 422, des 277 et des 145 — et de la convention retenue par le site."
+    },
+    {
+      "id": "agirc-arrco",
+      "terme": "Agirc-Arrco",
+      "sigle": true,
+      "variantes": [
+        "Agirc-Arrco",
+        "AGIRC-ARRCO"
+      ],
+      "court": "La retraite complémentaire des salariés du privé, gérée par les partenaires sociaux, hors Sécurité sociale.",
+      "poids": "≈ 100 Md€ par an, comptés dans les 422 — et dans aucun budget voté par le Parlement.",
+      "ici": "Une des raisons pour lesquelles le poste « retraites » n'apparaît nulle part en entier."
+    },
+    {
+      "id": "regimes-speciaux",
+      "terme": "Régimes spéciaux",
+      "variantes": [
+        "régimes spéciaux de retraite",
+        "régimes spéciaux",
+        "Régimes spéciaux"
+      ],
+      "court": "SNCF, RATP, marins, mines, Opéra, Comédie-Française… fermés aux nouveaux entrants, subventionnés par l'État.",
+      "poids": "7,7 Md€ de subventions d'équilibre en 2025 (mission « Régimes sociaux et de retraite »).",
+      "ici": "La seule subvention d'équilibre qui porte son nom dans le budget."
+    },
+    {
+      "id": "operateur",
+      "terme": "Opérateur de l'État",
+      "variantes": [
+        "opérateurs de l'État",
+        "opérateur de l'État",
+        "opérateurs",
+        "opérateur"
+      ],
+      "court": "Un organisme financé par l'État mais autonome : universités, CNRS, CNES, musées, France Travail…",
+      "poids": "Leurs cotisations au CAS Pensions : 7,1 Md€ en 2025 (COR), financées par les subventions des ministères.",
+      "ici": "Les hachures du poster. Quand le taux monte, l'université paie — et le ministère ne compense pas."
+    },
+    {
+      "id": "mission",
+      "terme": "Mission · programme · action",
+      "variantes": [
+        "missions",
+        "mission",
+        "programmes",
+        "programme"
+      ],
+      "court": "Les trois étages du budget de l'État : une mission (Enseignement scolaire) contient des programmes (Premier degré), qui contiennent des actions.",
+      "poids": "Enseignement scolaire : 88,8 Md€ de crédits votés en 2025, dont 25,5 de contribution au CAS Pensions.",
+      "ici": "Le site descend jusqu'à l'action ; la part retraites est grisée à chaque étage."
+    },
+    {
+      "id": "dette",
+      "terme": "Émission de dette",
+      "variantes": [
+        "émission de dette",
+        "Émission de dette",
+        "emprunté",
+        "emprunt"
+      ],
+      "court": "La différence entre ce qui est dépensé et ce qui est encaissé, empruntée sur les marchés.",
+      "poids": "156 Md€ en 2025 — un euro sur huit ; déficit de l'État exécuté : 124 Md€ (Cour des comptes).",
+      "ici": "Le contour vide du poster : « l'argent qu'on n'a pas »."
+    },
+    {
+      "id": "repartition",
+      "terme": "Répartition",
+      "variantes": [
+        "retraite par répartition",
+        "par répartition",
+        "répartition"
+      ],
+      "court": "Le système où les cotisations des actifs d'aujourd'hui paient les pensions des retraités d'aujourd'hui — il n'y a pas d'épargne.",
+      "poids": "30,6 millions de cotisants pour 17,4 millions de retraités : 1,8 cotisant par retraité (2,1 en 2002, 1,3 en 2070).",
+      "ici": "Pourquoi la démographie décide de tout, et pourquoi l'écart se paie chaque année."
+    },
+    {
+      "id": "lfi-lfss",
+      "terme": "LFI · LFSS",
+      "sigle": true,
+      "variantes": [
+        "LFSS",
+        "LFI",
+        "PLFSS",
+        "PLF",
+        "loi de finances",
+        "loi de financement de la Sécurité sociale"
+      ],
+      "court": "Loi de finances (le budget de l'État) et loi de financement de la Sécurité sociale, votées chaque automne. Le P de PLF = projet, avant le vote.",
+      "poids": "LFI 2025 : 445 Md€ de dépenses nettes du budget général ; LFSS 2026 : déficit 17,4 Md€, réforme des retraites suspendue.",
+      "ici": "Ni l'une ni l'autre ne vote les retraites en entier : les régimes complémentaires n'y sont pas."
+    },
+    {
+      "id": "titre2",
+      "terme": "Titre 2 · catégorie 22",
+      "sigle": true,
+      "variantes": [
+        "catégorie 22",
+        "cat. 22",
+        "titre 2",
+        "Titre 2"
+      ],
+      "court": "Dans le budget de l'État, le titre 2 = les dépenses de personnel ; la catégorie 22 = les cotisations et contributions sociales de l'employeur.",
+      "poids": "156 Md€ de titre 2 en 2025, dont 49 de contributions au CAS Pensions (Cour des comptes).",
+      "ici": "C'est là, ligne par ligne, que se lit la part retraites de chaque ministère — le grisé des plongées."
+    },
+    {
+      "id": "taux-remplacement",
+      "terme": "Taux de remplacement",
+      "variantes": [
+        "taux de remplacement"
+      ],
+      "court": "La pension rapportée au dernier salaire (ou au revenu moyen de carrière).",
+      "poids": "Pension moyenne ≈ 54,6 % du revenu d'activité moyen brut en 2025, 45,3 % projetés en 2070 (COR).",
+      "ici": "L'objectif que règle le simulateur : quelle pension, pour quel effort, à quelle date."
+    }
+  ]
+}

@@ -660,7 +660,7 @@ body[data-mode="realite"] .mode-lbl:first-of-type { opacity: .5; }
    Une section par temps : texte à gauche (question → réponse), figure à droite
    (le chiffre, la vignette SVG, la légende). Tout en tokens du site.
    ========================================================================== */
-.fil .masthead .standfirst.fil-these { max-width: 900px; font-size: 16.5px; line-height: 1.6; color: var(--ink); }
+.fil .masthead .standfirst.fil-these { max-width: 900px; font-size: 17.5px; line-height: 1.6; color: var(--ink); font-style: normal; }
 .fil .masthead .standfirst.fil-these strong { color: var(--accent); }
 .fil-main { max-width: 1180px; margin: 0 auto; padding: 8px 20px 20px; }
 
@@ -765,3 +765,47 @@ body[data-mode="realite"] .mode-lbl:first-of-type { opacity: .5; }
   .temps-text p { font-size: 15.5px; }
   .fil-tools .choice-thumb { height: 150px; }
 }
+
+/* ==========================================================================
+   LA COUCHE LEXICALE (lexique.js) — termes soulignés pointillés + fiche
+   ========================================================================== */
+abbr.lex {
+  text-decoration: none;
+  border-bottom: 1.5px dotted var(--accent);
+  cursor: help;
+  padding-bottom: 1px;
+}
+abbr.lex:hover, abbr.lex:focus-visible, abbr.lex[aria-expanded="true"] {
+  background: #FBF2A3;
+  outline: none;
+  border-bottom-style: solid;
+}
+.lex-pop {
+  position: absolute;
+  z-index: 60;
+  background: var(--paper);
+  color: var(--ink);
+  border: 1px solid var(--ink);
+  border-radius: 10px;
+  box-shadow: 0 10px 30px rgba(30, 36, 48, .18);
+  padding: 12px 14px 10px;
+  font: 13.5px/1.5 var(--sans);
+}
+.lex-pop::before {
+  content: ""; position: absolute; left: calc(50% - 6px); top: -7px;
+  width: 12px; height: 12px; background: var(--paper);
+  border-left: 1px solid var(--ink); border-top: 1px solid var(--ink);
+  transform: rotate(45deg);
+}
+.lex-pop.above::before { top: auto; bottom: -7px; transform: rotate(225deg); }
+.lex-pop p { margin: 0 0 6px; }
+.lex-pop p:last-child { margin-bottom: 0; }
+.lex-pop .lex-t { font-family: var(--serif); font-weight: 700; font-size: 15px; display: flex; justify-content: space-between; align-items: baseline; gap: 10px; }
+.lex-pop .lex-m { font: 700 10px/1 var(--sans); letter-spacing: .1em; text-transform: uppercase; color: var(--ink-soft); }
+.lex-pop .lex-d { color: var(--ink); }
+.lex-pop .lex-p, .lex-pop .lex-i { color: var(--ink-soft); font-size: 12.5px; padding-left: 64px; position: relative; }
+.lex-pop .lex-p span, .lex-pop .lex-i span {
+  position: absolute; left: 0; top: 2px;
+  font: 700 9.5px/1 var(--sans); letter-spacing: .1em; text-transform: uppercase; color: var(--accent);
+}
+@media (hover: none) { abbr.lex { cursor: pointer; } }

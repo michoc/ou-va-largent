@@ -9,9 +9,13 @@
 (function () {
   "use strict";
 
-  const f0 = (v) => Number(v).toLocaleString("fr-FR", { maximumFractionDigits: 0 });
-  const f1 = (v) => Number(v).toLocaleString("fr-FR", { maximumFractionDigits: 1 });
-  const f2 = (v) => Number(v).toLocaleString("fr-FR", { maximumFractionDigits: 2 });
+  // fr-FR ne groupe pas les nombres à 4 chiffres (« 1300 ») : on force « 1 300 » (espace fine insécable)
+  const group = (s) => s.replace(/\s/g, "").replace(/\B(?=(\d{3})+(?!\d))/g, "\u202F");
+  const loc = (v, d) => Number(v).toLocaleString("fr-FR", { maximumFractionDigits: d });
+  const fx = (v, d) => { const t = loc(v, d), i = t.search(/[,]/); return i < 0 ? group(t) : group(t.slice(0, i)) + t.slice(i); };
+  const f0 = (v) => fx(v, 0);
+  const f1 = (v) => fx(v, 1);
+  const f2 = (v) => fx(v, 2);
   const round100 = (v) => Math.round(v / 100) * 100;
   const signed = (v, d) => (v > 0 ? "+" : v < 0 ? "−" : "") + (d ? f1(Math.abs(v)) : f0(Math.abs(v)));
   const MOTS = { 2: "deux", 3: "trois", 4: "quatre", 5: "cinq", 6: "six", 7: "sept", 8: "huit", 9: "neuf", 10: "dix", 11: "onze", 12: "douze" };
@@ -161,10 +165,9 @@
     segs.forEach((sg) => { const ww = sg[1] * sc; s += R(x, 70, ww, 18, C.etat, ' opacity="' + sg[2] + '"'); x += ww; });
     s += R(x, 70, p.interets * sc, 18, "none", ' stroke="' + C.dette + '" stroke-width="1.2" stroke-dasharray="2 2"');
     s += T(10, 79, "École, armée, police,", {}) + T(10, 89, "justice, intérêts de la dette", {}) + T(x0 + cinq * sc + 5, 83, f0(cinq), { c: C.ink, w: 600 });
-    // légende des segments
-    let lx = x0; const lab = [["école " + f0(p.ecole), p.ecole], ["armée " + f0(p.armee), p.armee], ["police " + f0(p.police), p.police], ["justice " + f0(p.justice), p.justice], ["dette " + f0(p.interets), p.interets]];
-    lab.forEach((l, i) => { const ww = l[1] * sc; s += T(lx + ww / 2, 99 + (i % 2) * 9 + (i >= 3 ? 9 : 0), l[0], { a: "middle", s: 7.5, c: C.faint }); lx += ww; });
-    SVG("svg-t2", W, 126, s);
+    s += T(10, 108, "école " + f0(p.ecole) + " · armée " + f0(p.armee) + " · police " + f0(p.police) + " · justice " + f0(p.justice) +
+           " · intérêts de la dette " + f0(p.interets) + " (pointillé)", { s: 7.5, c: C.faint });
+    SVG("svg-t2", W, 118, s);
   }
 
   /* ---------- 3 · versé, cotisé, l'écart ---------- */
@@ -182,14 +185,14 @@
 
   /* ---------- 4 · le taux employeur ---------- */
   function svgT4(taux, tPriv) {
-    const W = 300, base = 112, hmax = 60;
+    const W = 300, base = 124, hmax = 54;
     const T2006 = 49.9;                       // taux à la création du CAS (LOLF, 2006)
     const bars = [["2006", T2006], ["2013-24", taux["2024"]], ["2025", taux["2025"]], ["2026", taux["2026"]]].filter((b) => b[1]);
     const top = Math.max.apply(null, bars.map((b) => b[1]).concat([tPriv || 0]));
     let s = T(12, 16, "Cotisation retraite payée par l'EMPLOYEUR", { s: 9, w: 600, c: C.ink }) +
             T(12, 27, "en % de la paie de l'agent (traitement indiciaire / salaire brut)", { s: 8 }) +
             '<line x1="12" y1="' + base + '" x2="288" y2="' + base + '" stroke="' + C.rule + '"/>' +
-            T(30, 46, "L'ÉTAT, pour ses fonctionnaires civils", { s: 8, c: C.cram, w: 600 });
+            T(34, 44, "L'ÉTAT, pour ses fonctionnaires civils", { s: 8, c: C.cram, w: 600 });
     bars.forEach((b, i) => {
       const h = hmax * b[1] / top, x = 34 + i * 32;
       s += R(x, base - h, 24, h, C.cram) + T(x + 12, base - h - 4, f1(b[1]) + " %", { a: "middle", s: 8.5, c: C.cram, w: 600 }) +
@@ -197,10 +200,10 @@
     });
     if (tPriv) {
       const h = hmax * tPriv / top;
-      s += T(212, 46, "UN EMPLOYEUR PRIVÉ", { s: 8, w: 600 }) + R(228, base - h, 24, h, C.dette) +
+      s += T(240, 44, "UN EMPLOYEUR PRIVÉ", { s: 8, w: 600, a: "middle" }) + R(228, base - h, 24, h, C.dette) +
            T(240, base - h - 4, f1(tPriv) + " %", { a: "middle", s: 8.5, c: C.ink, w: 600 }) + T(240, base + 12, "2026", { a: "middle", s: 8 });
     }
-    SVG("svg-t4", W, 130, s);
+    SVG("svg-t4", W, 140, s);
   }
 
   /* ---------- 5 · l'enseignement supérieur, six ans ---------- */
