@@ -56,6 +56,7 @@
     nbCotisants: 30.6e6,
     nbRetraites: 17.4e6,                      // retraités de droit direct (COR 2025) — remplacé par la donnée du site si joignable
     pensionsMd: 422.2, cotisationsMd: 277.0,  // COR juin 2026, tableau 2.2 — idem
+    dreesBrut: 1666, dreesNet: 1541,          // pension moyenne de droit direct, fin 2023 (DREES) — idem
     // croissance réelle du salaire moyen (SMPT) : ≈ 1 %/an observé jusqu'en 2025, 0,7 % en
     // projection (COR, scénario de référence). Les pensions sont indexées sur les PRIX :
     // relativement au salaire moyen, une pension perd g par an — c'est l'actualisation
@@ -186,6 +187,10 @@
       // contrefactuel : la même vie À L'ÉQUILIBRE, sans dette héritée ni léguée
       r.eq = (coche || r.herite > 0)
         ? computeLife(lifeParams(g.naissance, g.depart), { forceEq: true }) : null;
+      // et, pour une vie future à l'équilibre, l'autre lecture : la pension MAINTENUE
+      // aux règles d'aujourd'hui (celle que l'INSEE applique), dette léguée
+      r.alt = (r.futur && !coche)
+        ? computeLife(lifeParams(g.naissance, g.depart), { maintenir: true }) : null;
       chain[g.naissance] = r;
     });
     return dette;
@@ -215,7 +220,8 @@
       const nAns = g.depart - profil.entree;
       // contrefactuel « à l'équilibre, sans dette » quand la situation en diffère
       const eqLigne = r.eq
-        ? '<span class="gc-eq">à l’équilibre, sans dette : × ' + fmt2(r.eq.ratioMise) + "</span>" : "";
+        ? '<span class="gc-eq">à l’équilibre, sans dette : × ' + fmt2(r.eq.ratioMise) + "</span>"
+        : (r.alt ? '<span class="gc-eq">pension maintenue, dette léguée : × ' + fmt2(r.alt.ratioMise) + "</span>" : "");
       let lignes = "";
       if (r.herite > 0) {
         const parMois = enImpotsMois(r.herite, nAns);
@@ -233,8 +239,9 @@
         '" data-annee="' + g.naissance + '" role="button" tabindex="0">' +
         '<span class="gc-year">Né en ' + g.naissance + "</span>" + eqLigne +
         '<span class="gc-ratio ' + (win ? "gagnant" : "perdant") + '">× ' + fmt2(r.ratioMise) + "</span>" +
-        '<span class="gc-sub">' + (win ? "récupère " : "récupère ") + fmt2(r.ratioMise) +
-        " € par € versé</span>" + miniSquares(r.verse, r.recu) +
+        '<span class="gc-sub">récupère ' + fmt2(r.ratioMise) + " € par € versé" +
+        (r.futur ? (coche ? " · pension maintenue" : " · ce que les cotisations financent") : " · règles réelles") + "</span>" +
+        miniSquares(r.verse, r.recu) +
         '<span class="gc-facts">départ à <b>' + g.depart + "</b> ans · pension <b>" +
         fmt0(r.pension) + "</b> €/mois net<br>" +
         (r.beAge ? "versements remboursés à <b>" + Math.round(r.beAge) + " ans</b>"
@@ -505,7 +512,7 @@
    * la promesse (payée par les retraités). Les quatre parts sont mesurées par
    * rapport à la RÉFÉRENCE (28,1 % · 64 ans · promesse intacte). */
   const REF = { tauxPct: 28.1, age: 64, ciblePct: 100 };    // 100 % = la pension moyenne d'aujourd'hui
-  const INV = { annee: 2050, ciblePct: 100, cible: 1840, tauxPct: 28.1, age: 64,
+  const INV = { annee: 2050, ciblePct: 100, cible: 2020, tauxPct: 28.1, age: 64,
                 natal: false, base: "moyen", niveau: null };
   // âge légal : 65 → 60 (réforme 1982, effective 1983) → montée 60→62
   // (réforme 2010, effective 2017) → montée 62→64 (réforme 2023) SUSPENDUE par la
@@ -526,17 +533,18 @@
     return clamp(base + 0.06 * (age - 64) + natalBonus(), 0.5, 3.2);
   }
   const ratioEff = () => ratioAt(effAge());
-  const financeAt = (tauxPct, age) => (tauxPct / 100) * ratioAt(age) * salBrutRef() * P.PNET;
+  // le jeu compte en BRUT par retraité : ce que le système dépense (422,2 Md€ ÷ 17,4 M)
+  // face à ce que les cotisations encaissent (277 Md€ ÷ 17,4 M) — même base que le site
+  const financeAt = (tauxPct, age) => (tauxPct / 100) * ratioAt(age) * salBrutRef();
   const financeOut = () => financeAt(effTauxPct(), effAge());
-  // la pension moyenne réelle par retraité (toutes pensions, tous régimes), en net
+  // la DÉPENSE de retraite par retraité (toutes pensions, tous régimes, gestion comprise), en brut
   const pensionMoyBrut = () => P.pensionsMd * 1e9 / P.nbRetraites / 12;
-  const pensionMoyNet = () => pensionMoyBrut() * P.PNET;
-  const cibleDe = (pct) => Math.round(pct / 100 * pensionMoyNet() / 10) * 10;
-  // l'écart net par retraité → Md€ bruts par an (2025 : 145,2 par construction)
-  const enMdAnRetraites = (gapNet, nRet) => gapNet / P.PNET * nRet * 12 / 1e9;
-  const tauxNecessaire = () => INV.cible / (ratioEff() * salBrutRef() * P.PNET) * 100;
+  const cibleDe = (pct) => Math.round(pct / 100 * pensionMoyBrut() / 10) * 10;
+  // l'écart brut par retraité → Md€ par an (2025 : 145,2 par construction)
+  const enMdAnRetraites = (gapBrut, nRet) => gapBrut * nRet * 12 / 1e9;
+  const tauxNecessaire = () => INV.cible / (ratioEff() * salBrutRef()) * 100;
   function ageNecessaire() {
-    const needRatio = INV.cible / ((INV.tauxPct / 100) * salBrutRef() * P.PNET);
+    const needRatio = INV.cible / ((INV.tauxPct / 100) * salBrutRef());
     return 64 + (needRatio - interp(P.ratio, INV.annee) - natalBonus()) / 0.06;
   }
   // nombre de retraités de l'année : cotisants (≈ stables, COR) ÷ ratio
@@ -559,7 +567,7 @@
       reperes: [["suspension 2026 : 62 ans 9 mois", 62.75], ["réforme 2023 : 64 ans", 64], ["66 ans", 66]] },
     { id: "pens", nom: "Baisser les pensions", qui: "payé par les retraités, chaque mois",
       col: "#D9A441", min: 50, max: 110, step: 0.5, key: "ciblePct",
-      fmt: (v) => fmt0(cibleDe(v)) + " € nets" + (Math.abs(v - 100) < 0.25 ? " (comme aujourd'hui)" : " (" + (v > 100 ? "+" : "−") + fmt1(Math.abs(v - 100)) + " %)"),
+      fmt: (v) => fmt0(cibleDe(v)) + " € bruts" + (Math.abs(v - 100) < 0.25 ? " (comme aujourd'hui)" : " (" + (v > 100 ? "+" : "−") + fmt1(Math.abs(v - 100)) + " %)"),
       reperes: [["la pension d'aujourd'hui", 100], ["scénario COR 2050 : −9 % (indexation sur les prix)", 91], ["−20 %", 80]] },
   ];
   const LIMITES = { taux: 40, age: 70, pensMin: Math.round(REF.ciblePct * 0.7) };
@@ -670,9 +678,9 @@
   // DISPONIBLES (pleins) puis les cotisants MANQUANTS (pointillés), en nombre exact
   function renderBalance(cible, finance) {
     const R = ratioEff(), txt = effTauxPct();
-    const nNeed = (cible / P.PNET) / ((txt / 100) * salBrutRef());
+    const nNeed = cible / ((txt / 100) * salBrutRef());
     const manque = Math.max(0, nNeed - R);
-    const parCot = (finance / P.PNET) / R;
+    const parCot = finance / R;
     const slots = [];
     for (let i = 0; i < Math.floor(R + 1e-9); i++) slots.push({ t: "plein" });
     if (R % 1 > 0.01) slots.push({ t: "partiel", f: R % 1 });
@@ -750,17 +758,19 @@
     $("mission").innerHTML = passe
       ? '<span class="m-kicker">Année passée · ' + INV.annee + "</span>En <b>" + INV.annee + "</b>, " + fmt2(R) +
         " cotisants par retraité, " + pct1(txt / 100) + " % de cotisation, départ à " + ageTxt(age) +
-        " : les cotisations finançaient <b>" + fmt0(finance) + " € nets</b> par retraité. " +
+        " : les cotisations finançaient <b>" + fmt0(finance) + " € bruts</b> par retraité et par mois. " +
         (INV.cible <= finance ? "Une pension de " + fmt0(INV.cible) + " € était couverte."
           : "Pour " + fmt0(INV.cible) + " €, il manquait " + fmt0(gap) + " € — comblés par les impôts et la dette.") +
         " Les leviers s'utilisent à partir de 2026."
-      : '<span class="m-kicker">Mission</span>En <b>' + INV.annee + "</b>, verser à chaque retraité la même pension qu'aujourd'hui : " +
-        "en moyenne <b>≈ " + fmt0(cible0) + " € nets</b> par mois, toutes pensions comprises (" + fmt1(P.pensionsMd) + " Md€ pour " +
-        fmt1(P.nbRetraites / 1e6) + " millions de retraités) — avec <b>" + fmt2(interp(P.ratio, INV.annee)) + " cotisant" +
-        (interp(P.ratio, INV.annee) >= 2 ? "s" : "") + " par retraité</b> au lieu de 1,8. Aujourd'hui, les cotisations en financent " +
-        "<b>" + Math.round(P.cotisationsMd / P.pensionsMd * 100) + " %</b> (" + fmt0(P.cotisationsMd) + " Md€ sur " + fmt0(P.pensionsMd) +
-        ") ; en " + INV.annee + ", aux règles de référence (28,1 %, 64 ans), <b>" + fmt0(finance0) + " €</b> par retraité, soit " +
-        Math.round(finance0 / cible0 * 100) + " % : il manque <b>" + fmt0(gap0) + " € par mois et par retraité</b>. Fermer l'écart, et choisir qui paie.";
+      : '<span class="m-kicker">Mission</span>En <b>' + INV.annee + "</b>, dépenser pour chaque retraité la même somme qu'aujourd'hui : " +
+        "<b>≈ " + fmt0(cible0) + " € bruts</b> par mois (" + fmt1(P.pensionsMd) + " Md€ pour " + fmt1(P.nbRetraites / 1e6) +
+        " millions de retraités — la pension de droit direct, " + fmt0(P.dreesBrut) + " € bruts soit " + fmt0(P.dreesNet) +
+        " € nets en moyenne fin 2023 selon la DREES, plus la réversion, le minimum vieillesse et la gestion) — avec <b>" +
+        fmt2(interp(P.ratio, INV.annee)) + " cotisant" + (interp(P.ratio, INV.annee) >= 2 ? "s" : "") + " par retraité</b> au lieu de 1,8. " +
+        "Aujourd'hui, les cotisations en couvrent <b>" + Math.round(P.cotisationsMd / P.pensionsMd * 100) + " %</b> (" + fmt0(P.cotisationsMd) +
+        " Md€ sur " + fmt0(P.pensionsMd) + ") ; en " + INV.annee + ", aux règles de référence (28,1 %, 64 ans), <b>" + fmt0(finance0) +
+        " €</b> par retraité, soit " + Math.round(finance0 / cible0 * 100) + " % : il manque <b>" + fmt0(gap0) +
+        " € par mois et par retraité</b>. Fermer l'écart, et choisir qui paie.";
 
     // ---- le verdict, en mots ----
     const v = $("verdict");
@@ -781,7 +791,7 @@
       '<span class="v-big">' + (atteint ? "✓ 0 €" : fmt0(gap) + " €") + "</span>" +
       '<span class="v-sub">' + (atteint
         ? "La pension de " + fmt0(INV.cible) + " € est financée : taux " + pct1(txt / 100) + " %, départ à " + ageTxt(age) + "."
-        : "par mois et par retraité — les cotisations financent " + fmt0(finance) + " € sur " + fmt0(INV.cible) + " € (" +
+        : "bruts par mois et par retraité — les cotisations couvrent " + fmt0(finance) + " € sur " + fmt0(INV.cible) + " € (" +
           Math.round(partFin * 100) + " %). Le reste est pris ailleurs.") + "</span>" +
       '<div class="jauge" title="La promesse de référence : part financée par les cotisations (violet), par la hausse du taux (bleu), par le report d\'âge (bleu clair), pris ailleurs (cramoisi), renoncé par les retraités (ocre)">' +
         '<div class="seg seg-fin" style="width:' + (Math.min(finance0, cible0) / cible0 * 100) + '%"></div>' +
@@ -815,8 +825,8 @@
         if (dur <= 5) alerte = "⚠ À cet âge, la retraite ne durerait plus que ≈ " + fmt0(dur) + " an" + (dur > 1 ? "s" : "") + ".";
       } else {
         const d = INV.cible - cible0;
-        cout = Math.abs(d) < 1 ? "La pension moyenne d'aujourd'hui : ≈ " + fmt0(cible0) + " € nets par mois par retraité, toutes pensions comprises."
-          : "<b>" + signe(d) + " €</b> par mois pour chaque retraité" +
+        cout = Math.abs(d) < 1 ? "La dépense d'aujourd'hui : ≈ " + fmt0(cible0) + " € bruts par mois et par retraité, toutes pensions comprises."
+          : "<b>" + signe(d) + " € bruts</b> par mois pour chaque retraité" +
             (d < 0 ? ', <span class="ok">' + fmt0(-d) + " € d'écart en moins</span>" : "") + ".";
         if (INV.ciblePct < LIMITES.pensMin) alerte = "⚠ Plus de 30 % de baisse : la pension passe sous le niveau de vie des actifs les plus modestes.";
       }
@@ -837,7 +847,7 @@
 
     // ---- la balance ----
     const bal = renderBalance(INV.cible, finance);
-    const parCot = (finance / P.PNET) / R;
+    const parCot = finance / R;
     $("bal-caption").innerHTML = bal.manque > 0.05
       ? "Cette pension demande <b>" + fmt2(bal.nNeed) + " cotisants</b> au salaire " + baseLabel() +
         " ; la démographie n'en fournit que <b>" + fmt2(R) + "</b>. En pointillé : les cotisants manquants."
@@ -863,7 +873,7 @@
     }
     $("resultat").innerHTML =
       "<h3>Mon équilibre " + INV.annee + "</h3>" +
-      '<p class="r-sous">Qui paie l\'écart de ' + fmt0(passe ? gap : gap0) + " € par mois et par retraité (référence : 28,1 %, 64 ans, promesse intacte)</p>" +
+      '<p class="r-sous">Qui paie l\'écart de ' + fmt0(passe ? gap : gap0) + " € bruts par mois et par retraité (référence : 28,1 %, 64 ans, dépense d'aujourd'hui)</p>" +
       '<div class="parts">' + parts.map((p) =>
         '<div class="part"><i style="background:' + p.c + '"></i><span>' + p.k + "<small>" + p.s + "</small></span><b>" +
         (passe && p.k !== "Tout le monde, ailleurs" ? "—" : pctOf(p.v) + " %") + "</b></div>").join("") + "</div>" +
@@ -928,6 +938,8 @@
     if (ch.cotisations) { P.cotisationsMd = ch.cotisations; touche = true; }
     if (ch.retraites_droit_direct_millions) { P.nbRetraites = ch.retraites_droit_direct_millions * 1e6; touche = true; }
     if (ch.cotisants_millions) { P.nbCotisants = ch.cotisants_millions * 1e6; touche = true; }
+    const dr = ch.pension_moyenne_drees || {};
+    if (dr.brut_droit_direct) { P.dreesBrut = dr.brut_droit_direct; P.dreesNet = dr.net_droit_direct || P.dreesNet; touche = true; }
     if (touche) renderInverse();
   }).catch(() => { /* hors ligne : les valeurs écrites dans le code restent */ });
 })();
