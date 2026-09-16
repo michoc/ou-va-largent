@@ -1,17 +1,17 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 300" width="480" height="300" role="img" aria-label="Aperçu du Mondrian des dépenses">
   <rect width="480" height="300" fill="#FAF6EF"/>
   <g stroke="#FAF6EF" stroke-width="4">
-    <rect x="6"   y="6"   width="144" height="96"  fill="#5C7FB8"/>
-    <rect x="6"   y="106" width="144" height="66"  fill="#D94F26"/>
-    <rect x="6"   y="176" width="70"  height="60"  fill="#E88A54"/>
-    <rect x="80"  y="176" width="70"  height="60"  fill="#DB6A42"/>
-    <rect x="6"   y="240" width="144" height="54"  fill="#E5A07A"/>
-    <rect x="154" y="6"   width="176" height="288" fill="#C94A6E"/>
-    <rect x="334" y="6"   width="140" height="118" fill="#EE8FB4"/>
-    <rect x="334" y="128" width="86"  height="64"  fill="#E56BA0"/>
-    <rect x="424" y="128" width="50"  height="64"  fill="#F2A9C4"/>
+    <rect x="6"   y="6"   width="144" height="96"  fill="#3D6FB4"/>
+    <rect x="6"   y="106" width="144" height="66"  fill="#2B5189"/>
+    <rect x="6"   y="176" width="70"  height="60"  fill="#96B8E3"/>
+    <rect x="80"  y="176" width="70"  height="60"  fill="#C8D9F0"/>
+    <rect x="6"   y="240" width="144" height="54"  fill="#B2CAEB"/>
+    <rect x="154" y="6"   width="176" height="288" fill="#CFC6E6"/>
+    <rect x="334" y="6"   width="140" height="118" fill="#D95970"/>
+    <rect x="334" y="128" width="86"  height="64"  fill="#E8899B"/>
+    <rect x="424" y="128" width="50"  height="64"  fill="#F0AAB8"/>
     <rect x="334" y="196" width="140" height="64"  fill="#D9A441"/>
-    <rect x="334" y="264" width="140" height="30"  fill="#A79BC8"/>
+    <rect x="334" y="264" width="140" height="30"  fill="#E6C97F"/>
   </g>
   <!-- encart cramoisi (le non contributif, 145 en 2025) flottant dans le bloc Retraites -->
   <rect x="176" y="150" width="132" height="126" rx="4" fill="#8E1B38"/>

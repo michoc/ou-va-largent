@@ -1,7 +1,8 @@
 /* ==========================================================================
    Où va l'argent public ? — design system inspiré du poster (Le 1 hebdo)
    Fond crème, typographies éditoriales, palette : bleu État / rose Sécu /
-   ocre Collectivités / gris dette.
+   violet Retraites / ocre Collectivités / gris dette ; le cramoisi #8E1B38
+   est réservé à l'argent non contributif des retraites.
    ========================================================================== */
 
 :root {
@@ -11,7 +12,9 @@
   --paper: #FFFFFF;
   --etat: #3D6FB4;
   --secu: #D95970;
+  --retraites: #6E5BAE;
   --ct: #D9A441;
+  --cram: #8E1B38;
   --dette: #4B4F58;
   --rule: #E4DCCB;
   --accent: #C13B55;
@@ -39,7 +42,7 @@ html, body {
   background: var(--bg);
   border-bottom: 1px solid var(--rule);
   box-shadow: inset 0 4px 0 0 var(--etat);
-  background-image: linear-gradient(90deg, var(--etat) 0 25%, var(--secu) 25% 50%, var(--ct) 50% 75%, var(--dette) 75% 100%);
+  background-image: linear-gradient(90deg, var(--etat) 0 25%, var(--secu) 25% 50%, var(--retraites) 50% 75%, var(--ct) 75% 100%);
   background-size: 100% 4px; background-repeat: no-repeat; background-position: top;
 }
 .site-brand { font: 700 17px/1 var(--serif); color: var(--ink); text-decoration: none; letter-spacing: .01em; white-space: nowrap; }
@@ -215,8 +218,8 @@ h1 .hl {
   display: none;
   margin: 14px 0 0;
   padding: 16px 20px;
-  background: #FCEDF4;
-  border: 1.5px solid #D64A85;
+  background: #F3F0FA;
+  border: 1.5px solid #6E5BAE;
   border-radius: 10px;
   font-size: 14px;
   color: var(--ink);
@@ -225,7 +228,7 @@ h1 .hl {
 .panel-retraites h3 { font-family: var(--serif); margin: 0 0 8px; font-size: 18px; }
 .panel-retraites .ret-big { font-size: 15px; }
 .panel-retraites table { border-collapse: collapse; margin: 8px 0; }
-.panel-retraites td { border-bottom: 1px dashed #E5B8CD; padding: 4px 18px 4px 0; }
+.panel-retraites td { border-bottom: 1px dashed #CFC6E6; padding: 4px 18px 4px 0; }
 .panel-retraites td:last-child { font-weight: 700; text-align: right; }
 .panel-retraites .ret-src { font-size: 12px; color: var(--ink-soft); margin-bottom: 0; }
 
@@ -302,8 +305,10 @@ main { max-width: 1220px; margin: 0 auto; padding: 6px 12px 8px; }
   margin: 0 0 4px;
 }
 .histo-card .histo-text { flex: 1 1 320px; min-width: 260px; }
-.histo-card .histo-punch { font-size: 14px; margin: 0; }
-.histo-card .histo-punch b { color: var(--accent); }
+.histo-card .histo-verdict { font-family: var(--serif); font-size: 19px; line-height: 1.25; margin: 0 0 6px; }
+.histo-card .histo-verdict b { color: var(--accent); }
+.histo-card .histo-punch { font-size: 13.5px; line-height: 1.45; margin: 0 0 4px; color: var(--ink-soft); }
+.histo-card .histo-punch b { color: var(--ink); }
 .histo-card .histo-note {
   font-size: 11px;
   color: var(--ink-soft);
@@ -316,10 +321,12 @@ main { max-width: 1220px; margin: 0 auto; padding: 6px 12px 8px; }
   align-items: flex-end;
   flex-wrap: wrap;
 }
-.histo-card .bar-total { fill: #E8C9B8; }
+.histo-card .bar-total { fill: #C5D6EC; }
 .histo-card .bar-cas { fill: #9CA3B0; }
 .histo-card .bar-neg { fill: #C13B55; }          /* moyens hors retraites en recul */
-.histo-card .histo-alert { color: var(--accent); font-weight: 700; }
+.histo-card .histo-alert { color: var(--ink); }
+.histo-card .histo-alert b { color: var(--accent); }
+.histo-card .bar-cas-lbl { font-size: 9px; fill: #FFFFFF; }
 .histo-card text { font: 700 10px var(--sans); fill: var(--ink); }
 .histo-card .axis-year { font-weight: 400; fill: var(--ink-soft); }
 /* rail d'étages (U6) à gauche du canvas + scène */
@@ -796,7 +803,7 @@ body[data-mode="revele"] .calc-block { display: block; }
   font-size: 14px; line-height: 1.55; color: var(--ink-soft);
 }
 .temps-note b { color: var(--ink); }
-.temps-text p.temps-soon { font-size: 14px; color: var(--ink-soft); font-style: italic; font-family: var(--serif); }
+.temps-text p.temps-ctas { margin-top: 18px; }
 
 /* ---------- la scène : le vrai graphique, collant, piloté par le temps en cours ---------- */
 .fil-layout { display: grid; grid-template-columns: minmax(0, 1fr) minmax(400px, 1.15fr); gap: 0 44px; align-items: start; }
@@ -819,11 +826,13 @@ body[data-mode="revele"] .calc-block { display: block; }
 .stage-frame { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; background: var(--bg); }
 /* masqué mais dimensionné : ECharts s'initialise à la bonne taille dans le cadre caché */
 .stage-frame[hidden] { display: block; visibility: hidden; pointer-events: none; }
-.stage-svg { position: absolute; inset: 0; display: flex; flex-direction: column; justify-content: center; gap: 14px; padding: 24px 28px; }
+.stage-svg { position: absolute; inset: 0; display: flex; flex-direction: column; justify-content: center; gap: 16px; padding: 20px 26px; overflow: auto; }
 .stage-svg[hidden] { display: none; }
-.stage-svg .fil-svg { background: var(--paper); border: 1px solid var(--rule); border-radius: 10px; padding: 10px; }
-.stage-cap { margin: 0; font-size: 13.5px; color: var(--ink-soft); line-height: 1.5; }
-.stage-cap b { color: var(--ink); }
+.stage-panel { display: flex; flex-direction: column; gap: 8px; }
+.stage-svg .fil-svg { background: var(--paper); border: 1px solid var(--rule); border-radius: 10px; padding: 8px 10px; max-height: 44%; }
+.stage-svg .fil-svg svg { max-height: 200px; margin: 0 auto; }
+.stage-cap { margin: 0; font-size: 13px; color: var(--ink-soft); line-height: 1.45; }
+.stage-cap b { color: var(--ink); font-size: 14px; }
 .temps-fig { margin: 0; }
 .fil-svg {
   background: var(--paper);
@@ -839,23 +848,25 @@ body[data-mode="revele"] .calc-block { display: block; }
 .fil-caisses li { display: grid; grid-template-columns: 52px 1fr; gap: 10px; align-items: baseline; }
 .fil-caisses b { font-family: var(--serif); font-size: 18px; color: #8E1B38; text-align: right; font-variant-numeric: tabular-nums; }
 
-/* temps 7 — la sortie : une seule carte */
-.temps-fin { grid-template-columns: 1fr; padding-top: 44px; }
+/* temps 7 — la sortie : une seule carte, PLEINE LARGEUR (hors de la grille texte/scène) */
+.temps-fin { display: block; padding: 56px 0 30px; }
 .fil-exit {
-  display: grid; grid-template-columns: minmax(0, 1.4fr) minmax(260px, 1fr); gap: 28px 40px; align-items: start;
+  display: grid; grid-template-columns: minmax(0, 1.5fr) minmax(280px, 1fr); gap: 28px 48px; align-items: start;
   background: var(--paper); border: 1px solid var(--rule); border-top: 4px solid #8E1B38; border-radius: 14px;
-  padding: 28px 30px 26px; box-shadow: 0 2px 16px rgba(30,36,48,.07);
+  padding: 30px 36px 28px; box-shadow: 0 2px 16px rgba(30,36,48,.07);
 }
-.fil-exit h2 { font-size: clamp(24px, 3vw, 34px); }
-.fil-exit .fil-these { font: 400 17.5px/1.55 var(--serif); color: var(--ink); max-width: 62ch; margin: 0 0 14px; }
-.fil-exit-nums { font-size: 15px; color: var(--ink-soft); margin: 0 0 10px; }
-.fil-exit-nums b { color: var(--ink); font-variant-numeric: tabular-nums; }
+.fil-exit h2 { font-size: clamp(26px, 3.2vw, 38px); line-height: 1.12; margin: 6px 0 16px; max-width: 22ch; }
+.fil-exit .fil-these { font: 400 18px/1.55 var(--serif); color: var(--ink); max-width: 64ch; margin: 0 0 16px; }
+.fil-exit-nums { display: flex; flex-wrap: wrap; gap: 10px 28px; margin: 0 0 16px; }
+.fil-exit-nums > span { display: flex; flex-direction: column; gap: 2px; }
+.fil-exit-nums b { font: 700 24px/1.1 var(--serif); color: var(--ink); font-variant-numeric: tabular-nums; }
+.fil-exit-nums small { font-size: 12.5px; color: var(--ink-soft); }
 .fil-exit-src { font-size: 13.5px; color: var(--ink-soft); margin: 0 0 12px; }
 .fil-exit-links { font-size: 13.5px; color: var(--ink-soft); margin: 0; }
 .fil-exit-links a, .fil-exit-links .linklike { color: var(--accent); font-weight: 700; text-decoration: none; background: none; border: 0; padding: 0; font: inherit; cursor: pointer; }
 .fil-exit-links a:hover, .fil-exit-links .linklike:hover { text-decoration: underline; }
 .fil-toast { color: var(--ink-soft); }
-.fil-exit-tools { display: flex; flex-direction: column; gap: 12px; }
+.fil-exit-tools { display: flex; flex-direction: column; gap: 12px; padding-top: 34px; }
 .fil-tool {
   display: grid; grid-template-columns: 96px 1fr; gap: 14px; align-items: center;
   text-decoration: none; color: var(--ink); background: var(--bg); border: 1px solid var(--rule); border-radius: 12px; padding: 10px;
@@ -890,10 +901,18 @@ body[data-mode="revele"] .calc-block { display: block; }
   .fil-stage { top: 48px; height: 50vh; min-height: 340px; border-radius: 0 0 12px 12px; z-index: 25; margin: 0 -20px; }
   .stage-head { padding: 7px 12px; }
   .stage-title { font-size: 10.5px; }
+  .stage-svg { padding: 10px 12px; gap: 8px; justify-content: flex-start; }
+  .stage-panel { gap: 4px; }
+  .stage-cap .cap-more { display: none; }
+  .stage-cap b { font-size: 12.5px; }
+  .stage-svg .fil-svg { padding: 4px 6px; max-height: none; }
+  .stage-svg .fil-svg svg { max-height: 128px; }
   .temps { padding: 30px 0 34px; }
   .temps-text p { font-size: 15.5px; }
   .temps-text p.temps-exergue { font-size: 19px; }
   .fil-exit { grid-template-columns: 1fr; padding: 20px 18px; }
+  .fil-exit-tools { padding-top: 0; }
+  .temps-fin { padding-top: 30px; }
   .fil .masthead h1 { font-size: 26px; }
   .fil .masthead .standfirst.fil-these { font-size: 17px; }
 }
@@ -956,6 +975,7 @@ body.embed .stage-wrap { gap: 6px; }
 /* en scène, la carte historique se fait compacte : l'addition et les deux mini-graphiques, sans la note longue */
 body.embed .histo-card { margin: 0 0 8px; padding: 8px 12px; gap: 10px; }
 body.embed .histo-card h3 { font-size: 14px; margin: 0 0 2px; }
-body.embed .histo-card .histo-punch { font-size: 12.5px; line-height: 1.4; }
+body.embed .histo-card .histo-verdict { font-size: 16px; margin: 0 0 3px; }
+body.embed .histo-card .histo-punch { font-size: 12px; line-height: 1.35; margin: 0 0 2px; }
 body.embed .histo-card .histo-note { display: none; }
-body.embed .histo-card .histo-charts svg { max-height: 96px; width: auto; }
+body.embed .histo-card .histo-charts svg { max-height: 118px; width: auto; }

@@ -57,8 +57,10 @@
   const SECU_N = "Sécurité sociale (hors retraites)";
   const ACCENT = "#C13B55";
   const DEFICIT = "#8E1B38";                    // cramoisi = argent NON CONTRIBUTIF des retraites
-  const COL = { etat: "#F09D86", secu: "#EE8FB4", pens: "#C94A6E", ct: "#D9A441", ue: "#A79BC8",
-                cot: "#8C79C0", cotis: "#E9BBC8" };   // cotis = rose pâle : seul le cramoisi est saturé
+  // palette E : État bleu, Sécu rose, Retraites violet, Collectivités ocre ;
+  // cotis = violet pâle (l'argent cotisé) : seul le cramoisi est un rouge
+  const COL = { etat: "#3D6FB4", secu: "#D95970", pens: "#6E5BAE", ct: "#D9A441", ue: "#E6C97F",
+                cot: "#6E5BAE", cotis: "#CFC6E6" };
 
   // hachures ROUGES (déséquilibre des retraites) et GRISES (contributions
   // retraites logées dans les administrations, mode « tel que présenté »)
@@ -71,7 +73,7 @@
     g.beginPath(); g.moveTo(-2, 10); g.lineTo(10, -2); g.stroke();
     return { image: c, repeat: "repeat" };
   }
-  const HATCH_RED = hatch("#E8ADBA", ACCENT);
+  const HATCH_RED = hatch("#E8ADBA", DEFICIT);
   const HATCH_GREY = hatch("#D2D6DE", "#7E8494");
 
   // couleur d'étiquette LISIBLE sur n'importe quel bloc : on mélange la couleur

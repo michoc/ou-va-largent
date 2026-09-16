@@ -203,6 +203,12 @@
     const nodeMeta = {};
     nodes.forEach((n) => (nodeMeta[n.name] = n));
     const colOf = (n) => (n.col != null ? n.col : n.depth);
+    // encre des pastilles : blanche sur les teintes soutenues, sombre sur les
+    // nuances claires (Administration, Culture, Autonomie…) — palette E
+    const inkOn = (hex) => {
+      const c = [1, 3, 5].map((i) => parseInt((hex || "#888888").slice(i, i + 2), 16));
+      return 0.299 * c[0] + 0.587 * c[1] + 0.114 * c[2] > 150;
+    };
 
     // Quinconce : dans une même rangée, une pastille sur deux est décalée pour
     // éviter les chevauchements (l'intitulé complet reste au survol).
@@ -237,6 +243,7 @@
           offset = [offset[0] + opts.laneNudge * LANE_NODES[n.name], offset[1]];
         }
       }
+      const dark = isDette || inkOn(n.color);
       return {
         name: n.name,
         depth: col,
@@ -254,9 +261,9 @@
                      // la glose du nœud de dette (F7) : le contour vide = l'argent qu'on n'a pas
                      (isDette && col === 0 && !opts.noGlose ? "\n{g|l'argent qu'on n'a pas}" : ""),
           rich: {
-            t: { color: isDette ? "#1E2430" : "#FFFFFF", fontSize: isRoot ? 13.5 : (opts.fontSize || 12.5),
+            t: { color: dark ? "#1E2430" : "#FFFFFF", fontSize: isRoot ? 13.5 : (opts.fontSize || 12.5),
                  fontWeight: 700, lineHeight: isRoot ? 16 : 15, align: "center" },
-            v: { color: isDette ? "#1E2430" : "rgba(255,255,255,.92)", fontSize: isRoot ? 11.5 : (opts.fontSizeV || 11),
+            v: { color: dark ? "rgba(30,36,48,.88)" : "rgba(255,255,255,.92)", fontSize: isRoot ? 11.5 : (opts.fontSizeV || 11),
                  fontWeight: 700, align: "center" },
             g: { color: "#8E1B38", fontSize: 10, fontStyle: "italic", align: "center", lineHeight: 14 },
           },
@@ -346,13 +353,13 @@
     "Accidents du travail": "Autres branches Sécu",
   };
   const MOBILE_GROUP_NODES = [
-    { name: "Autres impôts & recettes", col: 0, color: "#7B68B5",
+    { name: "Autres impôts & recettes", col: 0, color: "#6B7386",
       tooltip: "Regroupé sur mobile : impôt sur les sociétés, autres impôts d'État (TICPE, successions…), recettes non fiscales." },
-    { name: "Taxes affectées & transferts", col: 0, color: "#7E6BB8",
+    { name: "Taxes affectées & transferts", col: 0, color: "#6B7386",
       tooltip: "Regroupé sur mobile : impôts et taxes affectés à la Sécu, autres recettes des régimes, transfert Unédic. Une part descend vers les retraites (taxes affectées à la vieillesse)." },
-    { name: "É · Autres missions", col: 2, color: "#E5A07A",
+    { name: "É · Autres missions", col: 2, color: "#96B8E3",
       tooltip: "Regroupé sur mobile : Écologie & territoires, Économie & investissements, Administration, Culture & sport. Détail sur grand écran." },
-    { name: "Autres branches Sécu", col: 2, color: "#F2A9C4",
+    { name: "Autres branches Sécu", col: 2, color: "#F0AAB8",
       tooltip: "Regroupé sur mobile : Famille, Autonomie, Accidents du travail. Détail sur grand écran." },
   ];
   /* Vue d'ensemble DESKTOP (U8) : les trois plus petites familles de l'État
@@ -365,7 +372,7 @@
     "Unédic (assurance chômage)": "Autres recettes Sécu",
   };
   const DESKTOP_GROUP_NODES = [
-    { name: "É · Autres missions", col: 2, color: "#E5A07A",
+    { name: "É · Autres missions", col: 2, color: "#96B8E3",
       tooltip: "Administration générale, Culture & médias, Économie & investissements d'avenir — " +
                "regroupées pour la lisibilité ; cliquer pour voir leurs missions." },
   ];
@@ -626,11 +633,14 @@
   }
 
   /* ---------------- carte « évolution du budget » ----------------
-   * Affichée en tête de la plongée dans une famille de dépenses de l'État :
-   * barres 2020→2025 (crédits votés), segment GRIS = part retraites estimée
-   * (CAS Pensions), et l'addition qui résume la période. Données :
-   * DATA.historique (build_historique.py + scraper.py).
+   * Affichée en tête de la plongée dans une famille ou une mission de l'État.
+   * UN verdict en mots, UNE phrase de chiffres, UN graphique (barres
+   * empilées 2020→2025 : bleu = moyens, gris = part retraites estimée, CAS
+   * Pensions opérateurs compris). Le détail (taux, opérateurs, sources) va
+   * dans la note, masquée en mode intégré. Données : DATA.historique.
    */
+  const ANS = ["", "un", "deux", "trois", "quatre", "cinq", "six", "sept", "huit", "neuf", "dix"];
+  const fmtD = (v) => (v >= 0 ? "+" : "−") + fmt0(Math.abs(v));
   function renderHistoCard(key) {
     const H = DATA.historique;
     const serie = H && ((H.familles && H.familles[key]) || (H.missions && H.missions[key]));
@@ -642,14 +652,16 @@
     const y0 = years[0], y1 = years[years.length - 1];
     const cas = serie.cas || {};
     const hasCas = cas[y0] != null && cas[y1] != null;
+    const nAns = Number(y1) - Number(y0);
+    const duree = ANS[nAns] ? ANS[nAns] + " ans" : nAns + " ans";
 
-    // — mini graphique en barres (SVG inline, thème poster) —
-    const bw = 34, gap = 14, hMax = 74, pad = 4;
+    // — le graphique : barres empilées, valeurs en tête, légende en pied —
+    const bw = 36, gap = 12, hMax = 70, pad = 4;
     const vMax = Math.max.apply(null, years.map((y) => serie.cp[y]));
     const W = years.length * (bw + gap) - gap + pad * 2;
-    const HT = hMax + 34;
+    const HT = hMax + 46;
     let svg = '<svg width="' + W + '" height="' + HT + '" viewBox="0 0 ' + W + " " + HT +
-              '" role="img" aria-label="Évolution du budget par année">';
+              '" role="img" aria-label="Budget par année, part retraites en gris">';
     years.forEach((y, i) => {
       const x = pad + i * (bw + gap);
       const h = Math.max(3, (serie.cp[y] / vMax) * hMax);
@@ -660,117 +672,81 @@
         const hc = Math.max(2, (cas[y] / vMax) * hMax);
         svg += '<rect class="bar-cas" x="' + x + '" y="' + (14 + hMax - hc) + '" width="' + bw +
                '" height="' + hc + '" rx="2"></rect>';
+        if (i === 0 || i === years.length - 1) {
+          svg += '<text class="bar-cas-lbl" x="' + (x + bw / 2) + '" y="' + (14 + hMax - 3) +
+                 '" text-anchor="middle">' + fmt0(cas[y]) + "</text>";
+        }
       }
       svg += '<text x="' + (x + bw / 2) + '" y="' + (yTop - 3) + '" text-anchor="middle">' +
              fmt0(serie.cp[y]) + "</text>";
       svg += '<text class="axis-year" x="' + (x + bw / 2) + '" y="' + (14 + hMax + 12) +
              '" text-anchor="middle">' + y + "</text>";
     });
+    // légende
+    const ly = 14 + hMax + 28;
+    svg += '<rect class="bar-total" x="' + pad + '" y="' + (ly - 8) + '" width="10" height="10" rx="2"></rect>' +
+           '<text class="axis-year" x="' + (pad + 14) + '" y="' + ly + '">budget (Md€)</text>';
+    if (hasCas) {
+      svg += '<rect class="bar-cas" x="' + (pad + 96) + '" y="' + (ly - 8) + '" width="10" height="10" rx="2"></rect>' +
+             '<text class="axis-year" x="' + (pad + 110) + '" y="' + ly + '">dont retraites des fonctionnaires</text>';
+    }
     svg += "</svg>";
 
-    // — « Où va chaque hausse annuelle ? » : barres divergentes ΔCAS (gris)
-    //   vs Δ moyens hors retraites (beige au-dessus, ROUGE sous l'axe quand la
-    //   hausse du CAS dépasse celle du budget → de facto moins de moyens) —
-    let svg2 = "";
-    if (hasCas && years.length >= 3) {
-      const pairs = [];
-      for (let i = 1; i < years.length; i++) {
-        const ya = years[i - 1], yb = years[i];
-        if (cas[ya] == null || cas[yb] == null) continue;
-        const dTot = serie.cp[yb] - serie.cp[ya];
-        const dCasY = cas[yb] - cas[ya];
-        pairs.push({ y: yb, dCas: dCasY, dReste: dTot - dCasY });
-      }
-      if (pairs.length >= 2) {
-        const bw2 = 30, gap2 = 12, pad2 = 4;
-        const mAbs = Math.max.apply(null, pairs.map((p) =>
-          Math.max(Math.max(p.dCas, 0) + Math.max(p.dReste, 0),
-                   Math.abs(Math.min(p.dReste, 0)), Math.abs(p.dCas))));
-        const sc = 52 / Math.max(mAbs, 0.1);          // px par Md€
-        const axisY = 72;                              // ligne du zéro
-        const W2 = pairs.length * (bw2 + gap2) - gap2 + pad2 * 2;
-        svg2 = '<svg width="' + W2 + '" height="116" viewBox="0 0 ' + W2 + ' 116" role="img"' +
-               ' aria-label="Décomposition de la hausse annuelle : retraites contre moyens">' +
-               '<text x="' + (W2 / 2) + '" y="10" text-anchor="middle" class="axis-year">' +
-               "hausse annuelle : CAS (gris) vs moyens</text>";
-        pairs.forEach((p, i) => {
-          const x = pad2 + i * (bw2 + gap2);
-          const hCas = Math.abs(p.dCas) * sc;
-          svg2 += '<rect class="bar-cas" x="' + x + '" y="' +
-                  (p.dCas >= 0 ? axisY - hCas : axisY) + '" width="' + bw2 +
-                  '" height="' + Math.max(hCas, 1) + '" rx="2"></rect>';
-          const hR = Math.abs(p.dReste) * sc;
-          if (p.dReste >= 0) {  // moyens en hausse : beige, empilé au-dessus du gris
-            svg2 += '<rect class="bar-total" x="' + x + '" y="' +
-                    (axisY - Math.max(p.dCas, 0) * sc - hR) + '" width="' + bw2 +
-                    '" height="' + Math.max(hR, 1) + '" rx="2"></rect>';
-          } else {              // moyens en RECUL : rouge, sous l'axe
-            svg2 += '<rect class="bar-neg" x="' + x + '" y="' + axisY + '" width="' + bw2 +
-                    '" height="' + Math.max(hR, 2) + '" rx="2"></rect>';
-          }
-          svg2 += '<text class="axis-year" x="' + (x + bw2 / 2) + '" y="110" ' +
-                  'text-anchor="middle">' + p.y + "</text>";
-        });
-        svg2 += '<line x1="0" y1="' + axisY + '" x2="' + W2 + '" y2="' + axisY +
-                '" stroke="#1E2430" stroke-width="1"></line></svg>';
-      }
-    }
-
-    // — l'addition qui résume la période (formulations selon le signe) —
+    // — le verdict en mots, puis la phrase de chiffres —
     const dCp = serie.cp[y1] - serie.cp[y0];
-    const pct = Math.round((dCp / serie.cp[y0]) * 100);
-    let punch = "De " + y0 + " à " + y1 + " : budget <b>" + (dCp >= 0 ? "+" : "−") +
-                fmt0(Math.abs(dCp)) + " Md€</b> (" + (pct >= 0 ? "+" : "−") +
-                Math.abs(pct) + " %)";
+    let verdict = "<b>" + fmtD(dCp) + " Md€</b> en " + duree + ".";
+    let phrase = "Le budget passe de " + fmt0(serie.cp[y0]) + " à " + fmt0(serie.cp[y1]) + " Md€.";
+    let alerte = "";
     if (hasCas) {
       const dCas = cas[y1] - cas[y0];
       const part = dCp > 0 && dCas > 0 ? Math.round((dCas / dCp) * 100) : null;
-      // « part retraites » = ce qui finance les retraites, Y COMPRIS via les
-      // opérateurs (universités, CNRS, CNES…) — sans eux le chiffre serait
-      // trompeur pour les missions à opérateurs (cf. note_cas).
-      const CAS = "contributions retraites (CAS Pensions, <b>opérateurs compris</b>" +
-                  "&nbsp;: universités, CNRS, CNES…)";
-      if (dCas >= 0.05) {
-        punch += " — dont <b>≈ " + fmt0(dCas) + " Md€</b> absorbés par la hausse des " + CAS +
-                 (part != null && part > 0 && part <= 100
-                 ? ", soit <b>" + part + " %</b> de la hausse" : "") + ".";
+      if (part != null && part > 0) {
+        const mot = part >= 85 ? "Presque tout est allé" : part >= 60 ? "Plus de la moitié est allée"
+                  : part >= 45 ? "La moitié est allée" : part >= 30 ? "Un tiers est allé"
+                  : part >= 20 ? "Un quart est allé" : part + " % sont allés";
+        verdict += " " + mot + " aux retraites.";
+        phrase += " La part qui paie les pensions des fonctionnaires (en gris) passe de " +
+                  fmt0(cas[y0]) + " à " + fmt0(cas[y1]) + " Md€ : " + fmt0(dCas) + " des " +
+                  fmt0(dCp) + " Md€ de hausse.";
       } else if (dCas <= -0.05) {
-        punch += " — la part retraites (opérateurs compris) a, elle, baissé de <b>≈ " +
-                 fmt0(Math.abs(dCas)) + " Md€</b>.";
+        verdict += " La part retraites a baissé.";
+        phrase += " La part qui paie les pensions des fonctionnaires (en gris) recule de " +
+                  fmt0(Math.abs(dCas)) + " Md€.";
+      } else if (dCas >= 0.05) {
+        verdict += " La part retraites a encore monté.";
+        phrase += " La part qui paie les pensions des fonctionnaires (en gris) monte de " +
+                  fmt0(cas[y0]) + " à " + fmt0(cas[y1]) + " Md€.";
       } else {
-        punch += " — la part retraites (opérateurs compris) est restée stable.";
+        phrase += " La part retraites (en gris) est stable.";
       }
-      // ⚠ le moment-clé : la dernière hausse du CAS dépasse celle du budget
+      // le moment-clé : la dernière hausse de la part retraites dépasse celle du budget
       const yPrev = years[years.length - 2];
       if (yPrev && cas[yPrev] != null) {
         const dL = serie.cp[y1] - serie.cp[yPrev], dCL = cas[y1] - cas[yPrev];
         if (dCL > 0.02 && dCL > dL) {
-          const tx = tauxCas(y1);
-          punch += ' <span class="histo-alert">⚠ En ' + y1 + ", la hausse des contributions " +
-                   "retraites (+" + fmt0(dCL) + " Md€" + (tx ? ", taux relevé à " + fmt2(tx) + " %" : "") +
-                   ") dépasse celle " +
-                   "du budget (" + (dL >= 0 ? "+" : "−") + fmt0(Math.abs(dL)) +
-                   ") : les moyens hors retraites reculent.</span>";
+          alerte = "En " + y1 + ", le budget " + (dL < 0 ? "recule (" + fmtD(dL) + ")" : "monte peu (" + fmtD(dL) + ")") +
+                   " et la part retraites monte encore (" + fmtD(dCL) + ") : <b>" +
+                   fmtD(dL - dCL) + " Md€ de moyens</b> pour tout le reste.";
         }
       }
-    } else {
-      punch += ".";
     }
     let noteOp = "";
     if (serie.op25) {
       const t1 = tauxCas(2025), t0 = tauxCas(2024);
       const surcout = t1 && t0 ? serie.op25 * (t1 - t0) / t1 : 0;
-      noteOp = " Dont opérateurs (universités, CNRS, CNES…) : ≈ " + fmt0(serie.op25) +
-               " Md€ versés au CAS en 2025 (estimation, hachures)" +
-               (surcout ? " — le relèvement du taux à " + fmt2(t1) + " % leur coûte ≈ " + fmt0(surcout) +
-               " Md€ de plus, non compensés dans le budget de la mission (Sénat, PLF 2025)." : ".");
+      noteOp = " La part retraites additionne le CAS Pensions de la mission et celui de ses opérateurs " +
+               "(universités, CNRS, CNES… ≈ " + fmt0(serie.op25) + " Md€ en 2025, estimation)" +
+               (t1 ? " ; taux de contribution employeur porté à " + fmt2(t1) + " % en 2025" : "") +
+               (surcout ? ", soit ≈ " + fmt0(surcout) + " Md€ de plus pour les opérateurs, non compensés (Sénat, PLF 2025)." : ".");
     }
     histoEl.innerHTML =
-      '<div class="histo-text"><h3>Évolution du budget ' + y0 + " → " + y1 + "</h3>" +
-      '<p class="histo-punch">' + punch + "</p>" +
+      '<div class="histo-text"><h3>' + esc(shortLabel(key).replace(/^É · /, "")) + " · " + y0 + " → " + y1 + "</h3>" +
+      '<p class="histo-verdict">' + verdict + "</p>" +
+      '<p class="histo-punch">' + phrase + "</p>" +
+      (alerte ? '<p class="histo-punch histo-alert">' + alerte + "</p>" : "") +
       '<p class="histo-note">Crédits de paiement votés (LFI ; 2024 : PLF), budget général. ' +
       esc(H.note_cas || "") + esc(noteOp) + "</p></div>" +
-      '<div class="histo-charts">' + svg + svg2 + "</div>";
+      '<div class="histo-charts">' + svg + "</div>";
     histoEl.hidden = false;
   }
 

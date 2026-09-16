@@ -11,7 +11,7 @@
   <meta property="og:image" content="https://michoc.github.io/ou-va-largent/assets/og-card.png">
   <link rel="preconnect" href="https://cdnjs.cloudflare.com">
   <!-- ?v= : cache-busting — incrémenter à chaque déploiement de style/app -->
-  <link rel="stylesheet" href="style.css?v=20260920i">
+  <link rel="stylesheet" href="style.css?v=20260921f">
 </head>
 <body class="landing fil">
   <nav class="site-nav" aria-label="Navigation du site">
@@ -20,6 +20,7 @@
       <a href="index.html" aria-current="page"><span class="art">Le </span>fil</a>
       <a href="sankey.html"><span class="art">Les </span>flux</a>
       <a href="treemap.html"><span class="art">Les </span>masses</a>
+      <a href="labo/simulateur.html" class="nav-labo"><span class="art">Le </span>labo</a>
     </span>
   </nav>
   <header class="masthead" id="t0">
@@ -59,10 +60,17 @@
         <iframe id="stage-sankey" class="stage-frame" title="Les flux" src="sankey.html?embed=1#these"></iframe>
         <iframe id="stage-treemap" class="stage-frame" title="Les masses" src="treemap.html?embed=1#realite" hidden></iframe>
         <div id="stage-svg" class="stage-svg" hidden>
-          <div class="fil-svg" id="svg-t6" role="img" aria-label="Cotisants pour un retraité : 2002, 2025, 2070"></div>
-          <p class="stage-cap"><b>Pour un retraité, le nombre d'actifs qui cotisent</b> — <span data-ch="cotisants">30,6</span>&nbsp;millions
-            de cotisants, <span data-ch="retraites_m">17,4</span>&nbsp;millions de retraités (COR, juin 2026). Le pointillé,
-            c'est le cotisant qui manque.</p>
+          <div class="stage-panel">
+            <p class="stage-cap"><b>Cotisants pour un retraité</b><span class="cap-more"> — <span data-ch="cotisants">30,6</span>&nbsp;millions
+              de cotisants, <span data-ch="retraites_m">17,4</span>&nbsp;millions de retraités en 2025 (COR, juin 2026).</span></p>
+            <div class="fil-svg" id="svg-t6" role="img" aria-label="Cotisants pour un retraité : 2002, 2025, 2070"></div>
+          </div>
+          <div class="stage-panel">
+            <p class="stage-cap"><b>Ce qu'une génération récupère pour 1&nbsp;€ versé</b><span class="cap-more"> — pensions reçues sur toute la retraite,
+              rapportées aux cotisations et impôts versés pendant la carrière. Salariés du privé, règles de 2014, avant la
+              réforme de 2023 (INSEE, Destinie&nbsp;2).</span></p>
+            <div class="fil-svg" id="svg-t6b" role="img" aria-label="Taux de récupération par génération, 1950 à 1985"></div>
+          </div>
         </div>
       </div>
     </aside>
@@ -186,54 +194,65 @@
           <strong><span data-ch="pens_cot">13&nbsp;800</span>&nbsp;€</strong> par cotisant et par an.</p>
         <p class="temps-exergue"><span data-ch="ratio_2002">2,1</span> cotisants par retraité en 2002.
           <span data-ch="ratio_2025">1,8</span> aujourd'hui. <span data-ch="ratio_2070">1,3</span> en 2070.</p>
-        <p>En 2025, pour la première fois, la France a compté plus de décès que de naissances. Même métier, même
-          salaire, même carrière&nbsp;: née en 1950, 1975, 2000 ou 2026, la même vie ne reçoit pas la même retraite
-          pour la même somme versée. Et l'équilibre de 2050 reste à trouver&nbsp;: par le taux, par l'âge, par le
-          niveau des pensions — ou par ceux qui ne sont pas encore nés.</p>
-        <p class="temps-soon">Deux outils en préparation&nbsp;: <em>comparer les quatre vies</em> et
-          <em>équilibrer le système en 2050</em>.</p>
+        <p>Chaque génération récupère donc moins que la précédente. Un salarié du privé né en 1950 reçoit, sur toute
+          sa retraite, <strong><span data-ch="rec_1950">1,59</span>&nbsp;€</strong> pour chaque euro versé pendant sa
+          carrière&nbsp;; né en 1980, <strong><span data-ch="rec_1980">1,17</span>&nbsp;€</strong> — et c'était avant la
+          réforme de 2023. En 2025, pour la première fois, la France a compté plus de décès que de naissances.</p>
+        <p>Même métier, même salaire, même carrière&nbsp;: née en 1950, 1975, 2000 ou 2026, la même vie ne reçoit pas la
+          même retraite pour la même somme versée. Et l'équilibre de 2050 reste à trouver&nbsp;: par le taux, par
+          l'âge, par le niveau des pensions — ou par ceux qui ne sont pas encore nés.</p>
+        <p class="temps-ctas"><a class="temps-cta" href="labo/simulateur.html#vies">Comparer les quatre vies →</a>
+          <a class="temps-cta" href="labo/simulateur.html#equilibre">Équilibrer le système en 2050 →</a></p>
       </div>
     </section>
 
-    <!-- ===== Temps 7 · la sortie ===== -->
-    <section class="temps temps-fin" id="t7" aria-labelledby="t7-h">
-      <div class="fil-exit">
-        <div class="fil-exit-text">
-          <p class="temps-kicker">Ce qu'il faut retenir</p>
-          <h2 id="t7-h"><span class="hl"><span data-ch="pensions">422</span> milliards de retraites. <span data-ch="cotisations">277</span> cotisés.
-            <span data-ch="non_contributif">145</span> pris ailleurs.</span></h2>
-          <p class="fil-these">Le budget de l'État présente comme des dépenses d'éducation, de défense ou de justice des sommes
-            qui paient, dans les faits, des retraites. Sur les <span data-ch="pensions">422</span>&nbsp;milliards de pensions
-            versées en 2025, <span data-ch="cotisations">277</span> seulement sont financés par des cotisations. Les
-            <span data-ch="non_contributif">145</span>&nbsp;milliards restants — une fois et demie les bénéfices du CAC&nbsp;40 —
-            sont pris ailleurs&nbsp;: dans les budgets des ministères, dans les impôts, dans la Sécurité sociale, dans la
-            dette. Au détriment des services publics.</p>
-          <p class="fil-exit-nums"><b><span data-ch="hab">18&nbsp;800</span>&nbsp;€</b> par habitant et par an ·
-            <b><span data-ch="pensions">422</span>&nbsp;Md€</b> de retraites · <b><span data-ch="non_contributif">145</span>&nbsp;Md€</b> sans cotisation.</p>
-          <p class="fil-exit-src">Tout est sourcé&nbsp;: documents budgétaires en open data, Conseil d'orientation des retraites,
-            Cour des comptes, INSEE. Chaque chiffre a une infobulle et une source&nbsp;; chaque erreur peut être signalée.</p>
-          <p class="fil-exit-links">
-            <button type="button" class="linklike" id="share-btn">Partager cette page</button> ·
-            <a href="sankey.html#signaler">Signaler une erreur</a> ·
-            <a href="sankey.html#metho">Méthode et sources</a>
-            <span class="fil-toast" id="share-toast" hidden>— lien copié</span>
-          </p>
-        </div>
-        <div class="fil-exit-tools">
-          <a class="fil-tool" href="sankey.html">
-            <img src="assets/preview-sankey.svg" alt="" loading="lazy" onerror="this.style.display='none'">
-            <span><b>Voir les flux →</b><small>d'où vient chaque euro, qui le dépense, où il finit</small></span>
-          </a>
-          <a class="fil-tool" href="treemap.html#realite">
-            <img src="assets/preview-mondrian.svg" alt="" loading="lazy" onerror="this.style.display='none'">
-            <span><b>Voir les masses →</b><small>les <span data-ch="non_contributif">145</span>&nbsp;milliards, en trois lectures</small></span>
-          </a>
-        </div>
-      </div>
-    </section>
 
     </div>
    </div>
+
+   <!-- ===== Temps 7 · la sortie ===== -->
+   <section class="temps temps-fin" id="t7" aria-labelledby="t7-h">
+     <div class="fil-exit">
+       <div class="fil-exit-text">
+         <p class="temps-kicker">Ce qu'il faut retenir</p>
+         <h2 id="t7-h"><span class="hl"><span data-ch="pensions">422</span> milliards de retraites. <span data-ch="cotisations">277</span> cotisés.
+           <span data-ch="non_contributif">145</span> pris ailleurs.</span></h2>
+         <p class="fil-these">Le budget de l'État présente comme des dépenses d'éducation, de défense ou de justice des sommes
+           qui paient, dans les faits, des retraites. Sur les <span data-ch="pensions">422</span>&nbsp;milliards de pensions
+           versées en 2025, <span data-ch="cotisations">277</span> seulement sont financés par des cotisations. Les
+           <span data-ch="non_contributif">145</span>&nbsp;milliards restants — une fois et demie les bénéfices du CAC&nbsp;40 —
+           sont pris ailleurs&nbsp;: dans les budgets des ministères, dans les impôts, dans la Sécurité sociale, dans la
+           dette. Au détriment des services publics.</p>
+         <p class="fil-exit-nums">
+           <span><b><span data-ch="hab">18&nbsp;800</span>&nbsp;€</b><small>par habitant et par an</small></span>
+           <span><b><span data-ch="pensions">422</span>&nbsp;Md€</b><small>de retraites versées</small></span>
+           <span><b><span data-ch="non_contributif">145</span>&nbsp;Md€</b><small>sans cotisation en face</small></span>
+         </p>
+         <p class="fil-exit-src">Tout est sourcé&nbsp;: documents budgétaires en open data, Conseil d'orientation des retraites,
+           Cour des comptes, INSEE. Chaque chiffre a une infobulle et une source&nbsp;; chaque erreur peut être signalée.</p>
+         <p class="fil-exit-links">
+           <button type="button" class="linklike" id="share-btn">Partager cette page</button> ·
+           <a href="sankey.html#signaler">Signaler une erreur</a> ·
+           <a href="sankey.html#metho">Méthode et sources</a>
+           <span class="fil-toast" id="share-toast" hidden>— lien copié</span>
+         </p>
+       </div>
+       <div class="fil-exit-tools">
+         <a class="fil-tool" href="sankey.html">
+           <img src="assets/preview-sankey.svg?v=20260921f" alt="" loading="lazy" onerror="this.style.display='none'">
+           <span><b>Voir les flux →</b><small>d'où vient chaque euro, qui le dépense, où il finit</small></span>
+         </a>
+         <a class="fil-tool" href="treemap.html#realite">
+           <img src="assets/preview-mondrian.svg?v=20260921f" alt="" loading="lazy" onerror="this.style.display='none'">
+           <span><b>Voir les masses →</b><small>les <span data-ch="non_contributif">145</span>&nbsp;milliards, en trois lectures</small></span>
+         </a>
+         <a class="fil-tool" href="labo/simulateur.html">
+           <img src="assets/preview-labo.svg?v=20260921f" alt="" loading="lazy" onerror="this.style.display='none'">
+           <span><b>Passer au labo →</b><small>comparer les quatre vies, équilibrer le système en 2050</small></span>
+         </a>
+       </div>
+     </div>
+   </section>
   </main>
 
   <footer class="metho">
@@ -246,7 +265,7 @@
     </p>
   </footer>
 
-  <script src="fil.js?v=20260920i"></script>
-  <script src="lexique.js?v=20260920i"></script>
+  <script src="fil.js?v=20260921f"></script>
+  <script src="lexique.js?v=20260921f"></script>
 </body>
 </html>

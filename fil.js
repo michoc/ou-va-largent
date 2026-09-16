@@ -23,11 +23,18 @@
   const esc = (s) => String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;");
 
   // palette du site
-  const C = { etat: "#3D6FB4", secu: "#D95970", pens: "#C94A6E", cram: "#8E1B38", ct: "#D9A441",
+  const C = { etat: "#3D6FB4", secu: "#D95970", pens: "#6E5BAE", cram: "#8E1B38", ct: "#D9A441",
               dette: "#4B4F58", cas: "#7E8494", ink: "#1E2430", soft: "#4A5265", faint: "#8A8F96",
-              bg: "#FAF6EF", rule: "#E4DCCB" };
+              bg: "#FAF6EF", rule: "#E4DCCB", paper: "#FFFFFF" };
   const T = (x, y, txt, opt) => '<text x="' + x + '" y="' + y + '" font-size="' + (opt.s || 9) + '" fill="' + (opt.c || C.soft) + '"' +
-    (opt.a ? ' text-anchor="' + opt.a + '"' : "") + (opt.w ? ' font-weight="' + opt.w + '"' : "") + ">" + esc(txt) + "</text>";
+    (opt.a ? ' text-anchor="' + opt.a + '"' : "") + (opt.w ? ' font-weight="' + opt.w + '"' : "") +
+    (opt.f ? ' font-family="' + opt.f + '"' : "") + ">" + esc(txt) + "</text>";
+  // étiquette posée sur un fond papier, ancrée à droite : lisible par-dessus une barre
+  const TAG = (xEnd, y, txt, color, fs) => {
+    const w = txt.length * fs * 0.56 + 8, h = fs + 5;
+    return R(xEnd - w, y - h + 2, w, h, C.paper, ' rx="3" stroke="' + color + '" stroke-width=".6"') +
+           T(xEnd - 4, y - 2, txt, { a: "end", s: fs, c: color, w: 600 });
+  };
   const R = (x, y, w, h, fill, extra) => '<rect x="' + x + '" y="' + y + '" width="' + w + '" height="' + h + '" fill="' + fill + '"' + (extra || "") + "/>";
   const SVG = (id, vbW, vbH, inner) => {
     const el = document.getElementById(id);
@@ -72,6 +79,9 @@
     if (cotisants) { set("nc_cot", f0(round100(nc * 1000 / cotisants))); set("pens_cot", f0(round100(pens * 1000 / cotisants))); set("cotisants", f1(cotisants)); }
     if (ch.retraites_droit_direct_millions) set("retraites_m", f1(ch.retraites_droit_direct_millions));
     const ratio = ch.ratio_cotisants_retraites || {};
+    const recup = (ch.taux_recuperation || {}).tout_financement || {};
+    if (recup["1950"]) set("rec_1950", f2(recup["1950"]));
+    if (recup["1980"]) set("rec_1980", f2(recup["1980"]));
     Object.keys(ratio).forEach((y) => set("ratio_" + y, f1(ratio[y])));
 
     // ---- temps 2 : les masses ----
@@ -134,6 +144,7 @@
     svgT4(taux, tPriv);
     if (esrData) svgT5(esrData);
     svgT6(ratio);
+    svgT6b(recup);
   }
 
   /* ---------- 1 · recettes et emprunt ---------- */
@@ -218,35 +229,45 @@
     SVG("svg-t5", W, 130, s);
   }
 
-  /* ---------- 6 · cotisants pour un retraité ---------- */
+  /* ---------- 6a · cotisants pour un retraité : trois colonnes, un chiffre ---------- */
   function svgT6(ratio) {
     const years = Object.keys(ratio).sort();
     if (!years.length) return;
-    const W = 300, groupW = W / years.length;
-    const person = (x, y, h, fill, extra) => {   // silhouette : tête + buste, hauteur h
-      const r = h * 0.17, bw = h * 0.42;
-      return '<circle cx="' + (x + bw / 2) + '" cy="' + (y + r) + '" r="' + r + '" fill="' + fill + '"' + (extra || "") + "/>" +
-             '<rect x="' + x + '" y="' + (y + 2 * r + 2) + '" width="' + bw + '" height="' + (h - 2 * r - 2) + '" rx="' + (bw / 4) + '" fill="' + fill + '"' + (extra || "") + "/>";
-    };
+    const W = 300, H = 120, colW = W / years.length, vMax = Math.max.apply(null, years.map((y) => ratio[y]));
+    const base = 100, hMax = 56, sc = hMax / vMax, bw = 44;
     let s = "";
-    years.forEach((y, gi) => {
-      const v = ratio[y], gx = gi * groupW, h = 44, y0 = 30;
-      s += T(gx + groupW / 2, 18, y, { a: "middle", s: 9, w: 600, c: C.ink });
-      // le retraité, en couleur, à gauche du groupe
-      s += person(gx + 10, y0, h, C.pens);
-      s += T(gx + 10 + h * 0.21, y0 + h + 12, "1 retraité", { a: "middle", s: 7, c: C.pens });
-      // les cotisants : entiers pleins, la fraction tronquée, le manquant en pointillé
-      const full = Math.floor(v), frac = v - full, x1 = gx + 36;
-      for (let i = 0; i < full; i++) s += person(x1 + i * 22, y0, h, C.etat);
-      if (frac > 0.005) {
-        const xf = x1 + full * 22, id = "clip" + gi, hf = h * frac;
-        s += '<defs><clipPath id="' + id + '"><rect x="' + xf + '" y="' + (y0 + h - hf) + '" width="30" height="' + hf + '"/></clipPath></defs>';
-        s += person(xf, y0, h, "none", ' stroke="' + C.etat + '" stroke-width="1" stroke-dasharray="2 2"');
-        s += '<g clip-path="url(#' + id + ')">' + person(xf, y0, h, C.etat) + "</g>";
-      }
-      s += T(x1 + Math.max(1, Math.ceil(v)) * 11, y0 + h + 12, f1(v) + " cotisant" + (v >= 2 ? "s" : ""), { a: "middle", s: 7, c: C.etat });
+    // la ligne du retraité : 1 pour 1
+    const y1 = base - 1 * sc;
+    s += '<line x1="6" y1="' + y1 + '" x2="' + (W - 6) + '" y2="' + y1 + '" stroke="' + C.pens + '" stroke-width="1" stroke-dasharray="3 3"/>';
+    years.forEach((y, i) => {
+      const v = ratio[y], x = i * colW + (colW - bw) / 2, h = v * sc;
+      s += R(x, base - h, bw, h, C.etat, ' rx="3"' + (i === years.length - 1 ? ' opacity=".55"' : ""));
+      s += T(x + bw / 2, base - h - 6, f1(v), { a: "middle", s: 16, c: C.ink, w: 700, f: "Georgia, serif" });
+      s += T(x + bw / 2, base + 12, y + (i === 1 ? " · aujourd'hui" : i === years.length - 1 ? " · projection" : ""), { a: "middle", s: 7.5, c: C.soft });
     });
-    SVG("svg-t6", W, 100, s);
+    s += TAG(W - 6, y1 - 1, "pour 1 retraité", C.pens, 7);
+    SVG("svg-t6", W, H, s);
+  }
+
+  /* ---------- 6b · ce qu'une génération récupère pour 1 € versé ---------- */
+  function svgT6b(rec) {
+    const gens = Object.keys(rec).sort();
+    if (!gens.length) return;
+    const W = 300, H = 120, colW = W / gens.length, bw = Math.min(26, colW - 8);
+    const base = 100, hMax = 62, vMax = Math.max.apply(null, gens.map((g) => rec[g])), sc = hMax / vMax;
+    let s = "";
+    const y1 = base - 1 * sc;
+    const fx2 = (v) => v.toFixed(2).replace(".", ",");
+    gens.forEach((g, i) => {
+      const v = rec[g], x = i * colW + (colW - bw) / 2, h = v * sc, key = i === 0 || g === "1980";
+      s += R(x, base - h, bw, h, C.pens, ' rx="2"' + (key ? "" : ' opacity=".5"'));
+      s += T(x + bw / 2, base - h - 4, fx2(v) + (key ? " €" : ""), { a: "middle", s: key ? 9 : 7, c: key ? C.ink : C.soft, w: key ? 700 : 400 });
+      s += T(x + bw / 2, base + 12, g, { a: "middle", s: 7.5, c: key ? C.ink : C.soft, w: key ? 700 : 400 });
+    });
+    s += '<line x1="6" y1="' + y1 + '" x2="' + (W - 6) + '" y2="' + y1 + '" stroke="' + C.ink + '" stroke-width="1" stroke-dasharray="3 3"/>';
+    s += TAG(W - 6, y1 - 1, "1 € versé", C.ink, 7);
+    s += T(6, 10, "génération (année de naissance)", { s: 7, c: C.soft });
+    SVG("svg-t6b", W, H, s);
   }
 
   /* ---------- la scène : le vrai graphique, dans l'état du temps en cours ----------
@@ -260,8 +281,8 @@
     3: { tool: "treemap", hash: "#realite:Retraites/Déséquilibre des retraites", title: "Les masses · d'où viennent les 145 milliards" },
     4: { tool: "treemap", hash: "#revele",  title: "Les masses · ce qui s'y cache" },
     5: { tool: "sankey",  hash: "#dive=Enseignement sup. & recherche (ESR)", title: "Les flux · enseignement supérieur et recherche, 2020 → 2025" },
-    6: { tool: "svg",     hash: "",         title: "Pour un retraité, le nombre d'actifs qui cotisent" },
-    7: { tool: "treemap", hash: "#realite", title: "Les masses · ce que ça coûte vraiment" },
+    6: { tool: "svg",     hash: "",         title: "Moins de cotisants par retraité, moins récupéré par génération" },
+    7: { tool: "sankey",  hash: "#these",   title: "Les flux · ce qui finance les retraites sous un autre nom" },
   };
   const PAGES = { sankey: "sankey.html", treemap: "treemap.html" };
   const frames = { sankey: document.getElementById("stage-sankey"), treemap: document.getElementById("stage-treemap") };
