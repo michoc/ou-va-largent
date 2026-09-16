@@ -3,64 +3,250 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Où va l'argent public ? — Les dépenses publiques 2025, deux visions</title>
-  <meta name="description" content="Où va l'argent public français en 2025 ? Deux visualisations interactives des mêmes ≈ 1 300 Md€ de dépenses : le flux (Sankey) et le Mondrian. Données open data, sourcées et auditées.">
+  <title>Où va l'argent public ? — 422 milliards de retraites, 277 cotisés, 145 pris ailleurs</title>
+  <meta name="description" content="Le budget de l'État présente comme des dépenses d'éducation, de défense ou de justice des sommes qui paient, dans les faits, des retraites. Sur 422 milliards de pensions en 2025, 277 sont financés par des cotisations ; les 145 restants sont pris ailleurs. Le récit en sept temps, sourcé dans l'open data, le COR, la Cour des comptes et l'INSEE.">
   <meta name="author" content="Michael Colla">
-  <meta property="og:title" content="Où va l'argent public ? — 2025">
-  <meta property="og:description" content="Deux façons de regarder les mêmes ≈ 1 300 Md€ de dépenses publiques : le flux (Sankey) et le Mondrian.">
+  <meta property="og:title" content="Où va l'argent public ? — 422 milliards de retraites. 277 cotisés. 145 pris ailleurs.">
+  <meta property="og:description" content="Des dépenses d'éducation, de défense ou de justice qui paient, dans les faits, des retraites : le récit en sept temps, chiffres 2025 définitifs.">
   <meta property="og:image" content="https://michoc.github.io/ou-va-largent/assets/og-card.png">
   <link rel="preconnect" href="https://cdnjs.cloudflare.com">
   <!-- ?v= : cache-busting — incrémenter à chaque déploiement de style/app -->
-  <link rel="stylesheet" href="style.css?v=20260916a">
+  <link rel="stylesheet" href="style.css?v=20260917a">
 </head>
-<body class="landing">
+<body class="landing fil">
   <header class="masthead">
     <div class="masthead-inner">
-      <p class="kicker">Les finances publiques françaises · exercice <span id="exercice">2025</span></p>
+      <p class="kicker">Les finances publiques françaises · exercice <span id="exercice">2025</span> · le récit en sept temps</p>
       <h1><span class="hl">Où va l'argent public&nbsp;?</span></h1>
-      <p class="standfirst">
-        <strong>Deux façons</strong> de regarder les mêmes <strong id="tot-dep">1&nbsp;300,5&nbsp;Md€</strong>
-        de dépenses publiques&nbsp;: en <strong>flux</strong>, pour suivre chaque euro de sa recette à
-        sa destination&nbsp;; en <strong>rectangles</strong>, pour comparer les masses d'un coup d'œil.
-        Données open data officielles, sourcées, auditées.
+      <p class="standfirst fil-these">
+        Le budget de l'État présente comme des dépenses d'éducation, de défense ou de justice des sommes qui
+        paient, dans les faits, des retraites. Sur les <strong><span data-ch="pensions">422</span>&nbsp;milliards</strong>
+        de pensions versées en 2025, <strong><span data-ch="cotisations">277</span></strong> seulement sont
+        financés par des cotisations. Les <strong><span data-ch="non_contributif">145</span>&nbsp;milliards</strong>
+        restants — une fois et demie les bénéfices du CAC&nbsp;40 — sont pris ailleurs&nbsp;: dans les budgets des
+        ministères, dans les impôts, dans la Sécurité sociale, dans la dette. Au détriment des services publics.
       </p>
       <div class="statband" id="statband" aria-label="Totaux de l'exercice"></div>
     </div>
   </header>
 
-  <main class="landing-main">
-    <div class="choice-grid">
-      <a class="choice-card" href="sankey.html" aria-label="Ouvrir le diagramme de flux (Sankey)">
-        <div class="choice-thumb choice-thumb-sankey">
-          <img src="assets/preview-sankey.svg" alt="Aperçu du diagramme de flux Sankey"
-               loading="lazy" onerror="this.style.display='none'">
-        </div>
-        <div class="choice-body">
-          <h2>Le flux <span class="choice-tag">Sankey</span></h2>
-          <p>D'où vient l'argent, où il va. Les recettes se ramifient vers l'État, la Sécu, les
-            collectivités et les retraites. Cliquez un flux pour <strong>plonger</strong> jusqu'au
-            programme et à l'action.</p>
-          <span class="choice-cta">Explorer le flux →</span>
-        </div>
-      </a>
+  <main class="fil-main">
 
-      <a class="choice-card" href="treemap.html" aria-label="Ouvrir le Mondrian des dépenses">
-        <div class="choice-thumb choice-thumb-mondrian">
-          <img src="assets/preview-mondrian.svg" alt="Aperçu du Mondrian des dépenses"
-               loading="lazy" onerror="this.style.display='none'">
-        </div>
-        <div class="choice-body">
-          <h2>Le Mondrian <span class="choice-tag">Rectangles</span></h2>
-          <p>Chaque euro dépensé, en aires proportionnelles. Un <strong>comparateur</strong> intégré,
-            le <strong>déséquilibre des retraites</strong> (<span id="ch-nc">145</span> Md€) en évidence, et un bouton pour
-            révéler le <strong>maquillage comptable</strong>.</p>
-          <span class="choice-cta">Explorer le Mondrian →</span>
-        </div>
-      </a>
-    </div>
+    <!-- ===== Temps 1 · l'échelle ===== -->
+    <section class="temps" id="t1" aria-labelledby="t1-h">
+      <div class="temps-text">
+        <p class="temps-kicker">Temps 1 · l'échelle</p>
+        <h2 id="t1-h"><span class="hl"><span data-ch="depenses_md">1&nbsp;300</span>&nbsp;milliards.</span><br>
+          <span data-ch="hab">18&nbsp;800</span>&nbsp;euros par habitant.</h2>
+        <p>Chaque année, l'État, la Sécurité sociale, les collectivités et les régimes de retraite dépensent
+          près de <strong><span data-ch="depenses_md">1&nbsp;300</span>&nbsp;milliards d'euros</strong> —
+          <strong><span data-ch="hab">18&nbsp;800</span>&nbsp;€ par habitant</strong>. Un euro sur
+          <span data-ch="dette_un_sur">huit</span> est emprunté. Ce site présente ces dépenses à partir des
+          documents budgétaires officiels, en rattachant chaque somme à la recette qui la finance — impôt,
+          cotisation ou emprunt — sans compter un euro deux fois. Il montre aussi ce que ces documents ne
+          montrent pas&nbsp;: les sommes qui financent les retraites sous un autre nom.</p>
+        <a class="temps-cta" href="sankey.html">Voir d'où vient l'argent et où il va →</a>
+      </div>
+      <figure class="temps-fig">
+        <p class="fil-big"><span data-ch="hab">18&nbsp;800</span>&nbsp;€<small>par habitant et par an —
+          <span data-ch="depenses">1&nbsp;300,5</span>&nbsp;Md€ pour <span data-ch="pop">69,1</span>&nbsp;millions
+          d'habitants (INSEE, 1er&nbsp;janvier 2026)</small></p>
+        <div class="fil-svg" id="svg-t1" role="img" aria-label="Recettes et emprunt, en proportion des dépenses"></div>
+        <figcaption>Recettes et emprunt, en part des dépenses. Le contour vide, c'est l'argent qu'on n'a pas.</figcaption>
+      </figure>
+    </section>
 
-    <p class="landing-note">Les deux vues sont <strong>comptablement équilibrées</strong>&nbsp;:
-      recettes + dette = dépenses. Méthodologie détaillée et sources sur chaque page.</p>
+    <!-- ===== Temps 2 · le premier poste ===== -->
+    <section class="temps" id="t2" aria-labelledby="t2-h">
+      <div class="temps-text">
+        <p class="temps-kicker">Temps 2 · le premier poste</p>
+        <h2 id="t2-h">Le premier poste <span class="hl">n'est pas celui qu'on croit.</span></h2>
+        <p>Les retraites, c'est <strong><span data-ch="pensions">422</span>&nbsp;milliards</strong> de pensions
+          versées en 2025. Près d'<strong>un euro public sur quatre</strong> — plus que l'assurance maladie
+          (<span data-ch="sante">255</span>)&nbsp;; plus que l'école, l'armée, la justice, la police et les intérêts
+          de la dette réunis (<span data-ch="cinq">248</span>). Pourtant, ce poste de dépense n'apparaît nulle part en
+          entier. Il n'est voté en entier par aucune loi&nbsp;: la loi de financement de la Sécurité sociale en couvre
+          une part, la loi de finances une autre, et les régimes complémentaires (une centaine de milliards)
+          échappent au Parlement. Il n'est jamais présenté aux Français d'un seul bloc. Et chaque année, c'est un
+          peu plus du budget des ministères, de la Sécurité sociale et de la dette qui est prélevé pour assurer
+          l'équilibre du système.</p>
+        <a class="temps-cta" href="treemap.html#realite">Voir les masses côte à côte →</a>
+      </div>
+      <figure class="temps-fig">
+        <p class="fil-big"><span data-ch="pensions_1">422,2</span>&nbsp;Md€<small><span data-ch="part_pib">14,1</span>&nbsp;%
+          du PIB, <span data-ch="part_dep">24,3</span>&nbsp;% de la dépense publique (COR, juin 2026)</small></p>
+        <div class="fil-svg" id="svg-t2" role="img" aria-label="Retraites comparées à l'assurance maladie et à cinq postes réunis"></div>
+        <figcaption>Milliards d'euros, 2025 — missions de l'État en crédits votés.</figcaption>
+      </figure>
+    </section>
+
+    <!-- ===== Temps 3 · la tension ===== -->
+    <section class="temps" id="t3" aria-labelledby="t3-h">
+      <div class="temps-text">
+        <p class="temps-kicker">Temps 3 · la question</p>
+        <h2 id="t3-h"><span data-ch="pensions">422</span> versés. <span data-ch="cotisations">277</span> cotisés.
+          <span class="hl">Il manque <span data-ch="non_contributif">145</span>.</span></h2>
+        <p>La retraite par répartition, c'est en principe la cotisation des actifs directement utilisée pour
+          financer la pension des retraités. En 2025, les cotisations ont rapporté
+          <strong><span data-ch="cotisations">277</span>&nbsp;milliards</strong>&nbsp;; les pensions en ont coûté
+          <strong><span data-ch="pensions">422</span></strong>. Les <strong class="cr"><span data-ch="non_contributif">145</span>&nbsp;milliards
+          qui manquent</strong> ne sont officiellement pas un «&nbsp;déficit&nbsp;». Ils doivent néanmoins être
+          trouvés chaque année. Pour cela, l'État puise dans quatre caisses&nbsp;: les budgets des ministères, les
+          impôts affectés, la Sécurité sociale et les collectivités — et, pour le solde, la dette.</p>
+        <a class="temps-cta" href="treemap.html#officiel">Décomposer les <span data-ch="non_contributif">145</span>&nbsp;milliards →</a>
+      </div>
+      <figure class="temps-fig">
+        <p class="fil-big"><span data-ch="non_contributif_1">145,2</span>&nbsp;Md€<small><span data-ch="nc_hab">2&nbsp;100</span>&nbsp;€
+          par habitant · <span data-ch="nc_cot">4&nbsp;700</span>&nbsp;€ par cotisant. Le solde officiel du système, lui,
+          est de <span data-ch="solde">−5,1</span>&nbsp;Md€.</small></p>
+        <div class="fil-svg" id="svg-t3" role="img" aria-label="Pensions versées contre cotisations"></div>
+        <ul class="fil-caisses" id="caisses">
+          <li><b><span data-ch="etat_total">57</span></b><span>État — contribution d'équilibre pour ses fonctionnaires (<span data-ch="contribution_etat">49</span>) et subventions aux régimes spéciaux (<span data-ch="regimes_speciaux">8</span>)</span></li>
+          <li><b><span data-ch="itaf">64,7</span></b><span>impôts et taxes affectés, dont la CSG</span></li>
+          <li><b><span data-ch="transferts">16,5</span></b><span>Sécurité sociale et Unédic</span></li>
+          <li><b><span data-ch="solde_pf">7</span></b><span>solde&nbsp;: dette et produits financiers</span></li>
+        </ul>
+      </figure>
+    </section>
+
+    <!-- ===== Temps 4 · le mécanisme ===== -->
+    <section class="temps" id="t4" aria-labelledby="t4-h">
+      <div class="temps-text">
+        <p class="temps-kicker">Temps 4 · le mécanisme</p>
+        <h2 id="t4-h">L'employeur qui <span class="hl">cotise à <span data-ch="taux_2026_0">82</span>&nbsp;%.</span></h2>
+        <p>Pour chaque fonctionnaire, l'État se verse à lui-même une «&nbsp;cotisation employeur&nbsp;»&nbsp;:
+          <strong><span data-ch="taux_2026">82,28</span>&nbsp;% du traitement</strong> en 2026, contre
+          <strong><span data-ch="taux_prive">16,58</span>&nbsp;%</strong> pour un employeur privé. Cette somme —
+          <strong><span data-ch="contribution_etat">49</span>&nbsp;milliards</strong> en 2025 — est inscrite dans les
+          budgets des ministères comme si elle payait des professeurs, des militaires, des juges. En réalité, elle
+          sert à équilibrer le régime de retraite des fonctionnaires. Au taux du privé, l'État n'en devrait que
+          <strong><span data-ch="part_privee">10</span></strong>&nbsp;; les <strong><span data-ch="surco">40</span>&nbsp;milliards</strong>
+          restants sont une subvention d'équilibre. La direction du Budget elle-même arrive au même résultat&nbsp;:
+          <span data-ch="dgb">41</span>&nbsp;milliards sur 52 pour 2026. Cette somme figure sur chaque bulletin de paie
+          de fonctionnaire (ligne 411050 — une contribution que l'agent ne paie pas et qui ne lui ouvre aucun
+          droit) et, dans la comptabilité des ministères, sous l'appellation «&nbsp;CAS Pensions&nbsp;».</p>
+        <a class="temps-cta" href="treemap.html#revele">Révéler ces sommes dans chaque ministère →</a>
+        <p class="temps-note"><b>L'objection.</b> Le Conseil d'analyse économique conteste le mot «&nbsp;caché&nbsp;»&nbsp;:
+          pour lui, c'est un coût salarial surévalué, pas un déficit dissimulé — et, à assiette corrigée, la
+          subvention vaut <span data-ch="cae">21,5</span>&nbsp;milliards. Entre <span data-ch="cae">21,5</span> (CAE),
+          <span data-ch="surco_1">39,8</span> (au taux du privé) et <span data-ch="dgb">41</span> (direction du Budget),
+          la conclusion ne change pas&nbsp;: des dizaines de milliards de retraites sont comptés comme des dépenses de
+          ministères.</p>
+      </div>
+      <figure class="temps-fig">
+        <p class="fil-big"><span data-ch="taux_2026">82,28</span>&nbsp;% <span class="vs">contre</span> <span data-ch="taux_prive">16,58</span>&nbsp;%<small>cotisation
+          retraite <b>à la charge de l'employeur</b>&nbsp;: l'État pour ses fonctionnaires civils (en % du traitement
+          indiciaire, 2026) contre le droit commun du privé (en % du salaire brut)</small></p>
+        <div class="fil-svg" id="svg-t4" role="img" aria-label="Taux de cotisation retraite à la charge de l'employeur : l'État contre un employeur privé"></div>
+        <figcaption>Décrets 2012-1507, 2025-61, 2025-1341. Militaires&nbsp;: <span data-ch="taux_mil">126,07</span>&nbsp;%.</figcaption>
+      </figure>
+    </section>
+
+    <!-- ===== Temps 5 · la conséquence ===== -->
+    <section class="temps" id="t5" aria-labelledby="t5-h">
+      <div class="temps-text">
+        <p class="temps-kicker">Temps 5 · la conséquence</p>
+        <h2 id="t5-h">Des budgets qui montent, <span class="hl">des moyens qui baissent.</span></h2>
+        <p>Quand le taux de cette «&nbsp;cotisation&nbsp;» monte, la charge de retraites d'un ministère monte avec
+          lui — sans qu'un poste soit créé. Enseignement supérieur et recherche, <span data-ch="esr_y1">2025</span>&nbsp;:
+          le budget de la mission <strong><span data-ch="esr_dcp">baisse de 0,5 milliard</span></strong> pendant que
+          sa charge de retraites <strong><span data-ch="esr_dcas">augmente de 0,2</span></strong>. Les universités et
+          les laboratoires perdent <strong><span data-ch="esr_moyens">0,7 milliard</span></strong> de moyens réels.
+          Sur cinq ans, <span data-ch="esr_part5">un quart</span> de la hausse de la mission
+          (<span data-ch="esr_cas5">0,6</span> sur <span data-ch="esr_cp5">2,6</span>&nbsp;milliards) a été absorbé par
+          les retraites. Même année, Éducation nationale&nbsp;: sur <span data-ch="edu_dcp">2</span>&nbsp;milliards de
+          hausse, <span data-ch="edu_dcas">1,6</span> partent dans les retraites.</p>
+        <a class="temps-cta" href="sankey.html#dive=Enseignement%20sup.%20%26%20recherche%20(ESR)">Voir l'évolution mission par mission →</a>
+      </div>
+      <figure class="temps-fig">
+        <p class="fil-big"><span data-ch="esr_moyens_md">−0,7</span>&nbsp;Md€<small>de moyens réels pour l'enseignement
+          supérieur et la recherche en <span data-ch="esr_y1">2025</span>&nbsp;: budget <span data-ch="esr_dcp_s">−0,5</span>,
+          charge de retraites <span data-ch="esr_dcas_s">+0,2</span> (opérateurs compris&nbsp;: universités, CNRS, CNES…).
+          Crédits votés.</small></p>
+        <div class="fil-svg" id="svg-t5" role="img" aria-label="Budget de l'enseignement supérieur et de la recherche de 2020 à 2025, part retraites en gris"></div>
+        <figcaption>Mission Recherche et enseignement supérieur, Md€ — gris&nbsp;: la part qui finance les retraites.</figcaption>
+      </figure>
+    </section>
+
+    <!-- ===== Temps 6 · les générations ===== -->
+    <section class="temps" id="t6" aria-labelledby="t6-h">
+      <div class="temps-text">
+        <p class="temps-kicker">Temps 6 · qui paie</p>
+        <h2 id="t6-h">La même vie, <span class="hl">née quatre fois.</span></h2>
+        <p>Retraite par répartition&nbsp;: ce sont les actifs d'aujourd'hui qui paient les pensions d'aujourd'hui —
+          par leurs cotisations (<span data-ch="cotisations">277</span>&nbsp;milliards), puis par leurs impôts et
+          par la dette qu'ils rembourseront (<span data-ch="non_contributif">145</span>). Au total,
+          <strong><span data-ch="pens_cot">13&nbsp;800</span>&nbsp;€ par cotisant et par an</strong>. En 2002, il y
+          avait <span data-ch="ratio_2002">2,1</span> cotisants pour un retraité&nbsp;; il y en a
+          <strong><span data-ch="ratio_2025">1,8</span></strong>&nbsp;; il y en aura <span data-ch="ratio_2070">1,3</span>.
+          En 2025, pour la première fois, la France a compté plus de décès que de naissances. Même métier, même
+          salaire, même carrière&nbsp;: née en 1950, 1975, 2000 ou 2026, la même vie ne reçoit pas la même retraite
+          pour la même somme versée. Et l'équilibre de 2050 reste à trouver&nbsp;: par le taux, par l'âge, par le
+          niveau des pensions — ou par ceux qui ne sont pas encore nés.</p>
+        <p class="temps-soon">Deux outils en préparation&nbsp;: <em>comparer les quatre vies</em> et
+          <em>équilibrer le système en 2050</em>.</p>
+      </div>
+      <figure class="temps-fig">
+        <p class="fil-big"><span data-ch="ratio_2002">2,1</span> → <span data-ch="ratio_2025">1,8</span> → <span data-ch="ratio_2070">1,3</span><small>cotisants
+          par retraité en 2002, 2025 et 2070 (COR, juin 2026&nbsp;: <span data-ch="cotisants">30,6</span>&nbsp;millions de
+          cotisants, <span data-ch="retraites_m">17,4</span>&nbsp;millions de retraités)</small></p>
+        <div class="fil-svg" id="svg-t6" role="img" aria-label="Cotisants pour un retraité : 2002, 2025, 2070"></div>
+        <figcaption>Pour un retraité (en couleur), le nombre d'actifs qui cotisent. Le pointillé, c'est le cotisant qui manque.</figcaption>
+      </figure>
+    </section>
+
+    <!-- ===== Temps 7 · la sortie ===== -->
+    <section class="temps temps-fin" id="t7" aria-labelledby="t7-h">
+      <div class="temps-text">
+        <p class="temps-kicker">Ce qu'il faut retenir</p>
+        <h2 id="t7-h"><span class="hl"><span data-ch="pensions">422</span> milliards de retraites. <span data-ch="cotisations">277</span> cotisés.
+          <span data-ch="non_contributif">145</span> pris ailleurs.</span></h2>
+        <p class="fil-these">Le budget de l'État présente comme des dépenses d'éducation, de défense ou de justice des sommes
+          qui paient, dans les faits, des retraites. Sur les <span data-ch="pensions">422</span>&nbsp;milliards de pensions
+          versées en 2025, <span data-ch="cotisations">277</span> seulement sont financés par des cotisations. Les
+          <span data-ch="non_contributif">145</span>&nbsp;milliards restants — une fois et demie les bénéfices du CAC&nbsp;40 —
+          sont pris ailleurs&nbsp;: dans les budgets des ministères, dans les impôts, dans la Sécurité sociale, dans la
+          dette. Au détriment des services publics.</p>
+        <p>Tout est sourcé&nbsp;: documents budgétaires en open data, Conseil d'orientation des retraites, Cour des
+          comptes, INSEE. Chaque chiffre a une infobulle et une source&nbsp;; chaque erreur peut être signalée.</p>
+        <div class="statband fil-trois" aria-label="Les trois nombres à retenir">
+          <span class="stat"><b><span data-ch="hab">18&nbsp;800</span>&nbsp;€</b> par habitant</span>
+          <span class="stat-eq">·</span>
+          <span class="stat"><b><span data-ch="pensions">422</span>&nbsp;Md€</b> de retraites</span>
+          <span class="stat-eq">·</span>
+          <span class="stat stat-dette"><b><span data-ch="non_contributif">145</span>&nbsp;Md€</b> sans cotisation</span>
+        </div>
+        <div class="fil-actions">
+          <button type="button" class="temps-cta temps-cta-btn" id="share-btn">Partager cette page</button>
+          <a class="temps-cta temps-cta-ghost" href="sankey.html#signaler">⚑ Signaler une erreur</a>
+          <a class="temps-cta temps-cta-ghost" href="sankey.html#metho">Méthode et sources</a>
+        </div>
+        <p class="fil-toast" id="share-toast" hidden>Lien copié.</p>
+      </div>
+      <div class="choice-grid fil-tools">
+        <a class="choice-card" href="sankey.html" aria-label="Ouvrir le diagramme des flux">
+          <div class="choice-thumb choice-thumb-sankey">
+            <img src="assets/preview-sankey.svg" alt="Aperçu du diagramme des flux" loading="lazy" onerror="this.style.display='none'">
+          </div>
+          <div class="choice-body">
+            <h3>D'où vient l'argent, où il va <span class="choice-tag">diagramme de flux</span></h3>
+            <p>Chaque recette rattachée à sa dépense, jusqu'au programme et à l'action. La voie retraites longe le bord gauche.</p>
+            <span class="choice-cta">Voir les flux →</span>
+          </div>
+        </a>
+        <a class="choice-card" href="treemap.html#realite" aria-label="Ouvrir la carte des masses">
+          <div class="choice-thumb choice-thumb-mondrian">
+            <img src="assets/preview-mondrian.svg" alt="Aperçu de la carte des masses" loading="lazy" onerror="this.style.display='none'">
+          </div>
+          <div class="choice-body">
+            <h3>Ce qu'on ne montre pas <span class="choice-tag">carte des masses</span></h3>
+            <p><span data-ch="non_contributif">145</span>&nbsp;milliards que le budget officiel range ailleurs, en trois lectures&nbsp;: ce qu'on montre, ce qui s'y cache, ce que ça coûte vraiment.</p>
+            <span class="choice-cta">Voir les masses →</span>
+          </div>
+        </a>
+      </div>
+    </section>
+
   </main>
 
   <footer class="metho">
@@ -68,35 +254,11 @@
       <strong>Un projet conçu et réalisé par Michael Colla.</strong>
       Design inspiré du poster «&nbsp;Où va l'argent public&nbsp;?&nbsp;» (<em>Le&nbsp;1 hebdo</em> n°569,
       C.&nbsp;Alet &amp; C.&nbsp;Martha, avec F.&nbsp;Ecalle/Fipeco). Données&nbsp;: data.economie.gouv.fr,
-      data.gouv.fr, PLFSS (open data Assemblée nationale), rapports Sénat PLF 2025 —
-      Licence Ouverte 2.0. Code&nbsp;: MIT.
+      data.gouv.fr, PLFSS (open data Assemblée nationale), rapports Sénat PLF 2025 et 2026, COR (rapport annuel
+      juin 2026), Cour des comptes (budget de l'État en 2025), INSEE — Licence Ouverte 2.0. Code&nbsp;: MIT.
     </p>
   </footer>
 
-  <script>
-    // Landing autonome : remplit le bandeau de totaux depuis les données.
-    fetch("data/unified_finances.json", { cache: "no-cache" })
-      .then((r) => r.json())
-      .then((d) => {
-        const c = (d.meta && d.meta.checks) || {};
-        const ch = (d.meta && d.meta.chiffres) || {};
-        const f0 = (v) => Number(v).toLocaleString("fr-FR", { maximumFractionDigits: 1 });
-        const pop = (ch.population_france || {}).millions;
-        const hab = pop ? Math.round(c.depenses_totales * 1000 / pop / 10) * 10 : null;
-        if (ch.non_contributif) document.getElementById("ch-nc").textContent = Math.round(ch.non_contributif);
-        document.getElementById("exercice").textContent = (d.meta || {}).exercice || "2025";
-        document.getElementById("tot-dep").innerHTML =
-          f0(c.depenses_totales).replace(/\s/g, "&nbsp;") + "&nbsp;Md€";
-        document.getElementById("statband").innerHTML =
-          '<span class="stat"><b>Recettes</b> ' + f0(c.recettes_hors_dette) + " Md€</span>" +
-          '<span class="stat stat-dette"><b>+ Dette</b> ' + f0(c.dette) + " Md€</span>" +
-          '<span class="stat-eq">=</span>' +
-          '<span class="stat stat-dep"><b>Dépenses</b> ' + f0(c.depenses_totales) + " Md€</span>" +
-          '<span class="stat-year">' + ((d.meta || {}).exercice || "2025") + "</span>" +
-          (hab ? '<span class="stat-hab">≈ <b>' + f0(hab) + " €</b> par habitant et par an (" + f0(pop) +
-                 " M hab., INSEE 1er janv. 2026)</span>" : "");
-      })
-      .catch(() => {});
-  </script>
+  <script src="fil.js?v=20260917a"></script>
 </body>
 </html>

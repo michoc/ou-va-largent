@@ -1,0 +1,267 @@
+/* ==========================================================================
+ * Où va l'argent public ? — LE FIL (index.html)
+ * --------------------------------------------------------------------------
+ * Le récit en sept temps. Règle : aucun montant en dur dans la page — tout
+ * vient de data/unified_finances.json (meta.chiffres, meta.retraites, flux,
+ * historique) ; les valeurs écrites dans le HTML ne sont que des replis
+ * lisibles avant le chargement. Six vignettes SVG, dessinées ici à l'échelle.
+ * ========================================================================== */
+(function () {
+  "use strict";
+
+  const f0 = (v) => Number(v).toLocaleString("fr-FR", { maximumFractionDigits: 0 });
+  const f1 = (v) => Number(v).toLocaleString("fr-FR", { maximumFractionDigits: 1 });
+  const f2 = (v) => Number(v).toLocaleString("fr-FR", { maximumFractionDigits: 2 });
+  const round100 = (v) => Math.round(v / 100) * 100;
+  const signed = (v, d) => (v > 0 ? "+" : v < 0 ? "−" : "") + (d ? f1(Math.abs(v)) : f0(Math.abs(v)));
+  const MOTS = { 2: "deux", 3: "trois", 4: "quatre", 5: "cinq", 6: "six", 7: "sept", 8: "huit", 9: "neuf", 10: "dix", 11: "onze", 12: "douze" };
+  const set = (key, txt) => document.querySelectorAll('[data-ch="' + key + '"]').forEach((el) => { el.textContent = txt; });
+  const esc = (s) => String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;");
+
+  // palette du site
+  const C = { etat: "#3D6FB4", secu: "#D95970", pens: "#C94A6E", cram: "#8E1B38", ct: "#D9A441",
+              dette: "#4B4F58", cas: "#7E8494", ink: "#1E2430", soft: "#4A5265", faint: "#8A8F96",
+              bg: "#FAF6EF", rule: "#E4DCCB" };
+  const T = (x, y, txt, opt) => '<text x="' + x + '" y="' + y + '" font-size="' + (opt.s || 9) + '" fill="' + (opt.c || C.soft) + '"' +
+    (opt.a ? ' text-anchor="' + opt.a + '"' : "") + (opt.w ? ' font-weight="' + opt.w + '"' : "") + ">" + esc(txt) + "</text>";
+  const R = (x, y, w, h, fill, extra) => '<rect x="' + x + '" y="' + y + '" width="' + w + '" height="' + h + '" fill="' + fill + '"' + (extra || "") + "/>";
+  const SVG = (id, vbW, vbH, inner) => {
+    const el = document.getElementById(id);
+    if (el) el.innerHTML = '<svg viewBox="0 0 ' + vbW + " " + vbH + '" xmlns="http://www.w3.org/2000/svg" ' +
+      'font-family="Helvetica Neue, Helvetica, Arial, sans-serif">' + inner + "</svg>";
+  };
+
+  function fill(d) {
+    const meta = d.meta || {}, c = meta.checks || {}, ch = meta.chiffres || {}, r = meta.retraites || {};
+    const dec = r.decomposition || {}, tp = dec.taux_prive || {}, four = ch.subvention_equilibre_fpe_fourchette || {};
+    const L = d.links || [];
+    const sum = (p) => L.filter(p).reduce((s, l) => s + l.value, 0);
+    const drillLink = (view, target) => {
+      const v = d.drill && d.drill[view];
+      return v ? v.links.filter((l) => l.target === target).reduce((s, l) => s + l.value, 0) : 0;
+    };
+
+    const pens = ch.pensions_versees, cot = ch.cotisations, nc = ch.non_contributif;
+    const pop = (ch.population_france || {}).millions, cotisants = ch.cotisants_millions;
+    const dep = c.depenses_totales, rec = c.recettes_hors_dette, dette = c.dette;
+
+    // ---- masthead / bandeau ----
+    document.getElementById("exercice").textContent = meta.exercice || "2025";
+    const hab = pop ? round100(dep * 1000 / pop) : null;
+    document.getElementById("statband").innerHTML =
+      '<span class="stat"><b>Recettes</b> ' + f1(rec) + " Md€</span>" +
+      '<span class="stat stat-dette"><b>+ Dette</b> ' + f1(dette) + " Md€</span>" +
+      '<span class="stat-eq">=</span>' +
+      '<span class="stat stat-dep"><b>Dépenses</b> ' + f1(dep) + " Md€</span>" +
+      '<span class="stat-year">' + (meta.exercice || "2025") + "</span>" +
+      (hab ? '<span class="stat-hab">≈ <b>' + f0(hab) + " €</b> par habitant et par an (" + f1(pop) +
+             " M hab., INSEE 1er janv. 2026)</span>" : "");
+
+    // ---- chiffres transverses ----
+    set("pensions", f0(pens)); set("pensions_1", f1(pens));
+    set("cotisations", f0(cot));
+    set("non_contributif", f0(nc)); set("non_contributif_1", f1(nc));
+    set("depenses", f1(dep)); set("depenses_md", f0(round100(dep)));
+    if (hab) set("hab", f0(hab));
+    if (pop) set("pop", f1(pop));
+    set("dette_un_sur", MOTS[Math.round(dep / dette)] || f0(Math.round(dep / dette)));
+    if (ch.part_pib_pct) set("part_pib", f1(ch.part_pib_pct));
+    if (ch.part_depenses_publiques_pct) set("part_dep", f1(ch.part_depenses_publiques_pct));
+    if (ch.solde_systeme_2025 != null) set("solde", signed(ch.solde_systeme_2025, true));
+    if (pop) set("nc_hab", f0(round100(nc * 1000 / pop)));
+    if (cotisants) { set("nc_cot", f0(round100(nc * 1000 / cotisants))); set("pens_cot", f0(round100(pens * 1000 / cotisants))); set("cotisants", f1(cotisants)); }
+    if (ch.retraites_droit_direct_millions) set("retraites_m", f1(ch.retraites_droit_direct_millions));
+    const ratio = ch.ratio_cotisants_retraites || {};
+    Object.keys(ratio).forEach((y) => set("ratio_" + y, f1(ratio[y])));
+
+    // ---- temps 2 : les masses ----
+    const sante = sum((l) => l.target === "Santé (maladie)");
+    const ecole = drillLink("É · Enseignement & recherche", "Éducation nationale");
+    const armee = drillLink("É · Défense, sécurité, justice", "Défense");
+    const police = drillLink("É · Défense, sécurité, justice", "Police, gendarmerie & sécurité civile");
+    const justice = drillLink("É · Défense, sécurité, justice", "Justice");
+    const interets = sum((l) => l.target === "É · Charge de la dette");
+    const cinq = ecole + armee + police + justice + interets;
+    set("sante", f0(sante)); set("cinq", f0(cinq));
+
+    // ---- temps 3 : les caisses ----
+    const etatTotal = (dec.contribution_etat || 0) + (dec.subventions_regimes_speciaux || 0);
+    set("etat_total", f1(etatTotal)); set("contribution_etat", f0(dec.contribution_etat));
+    set("regimes_speciaux", f0(dec.subventions_regimes_speciaux));
+    set("itaf", f1(dec.itaf)); set("transferts", f1(dec.transferts_branches));
+    set("solde_pf", f1((dec.deficit || 0) + (dec.divers || 0)));
+
+    // ---- temps 4 : le taux ----
+    const taux = ch.taux_cas_civils || {};
+    const t26 = taux["2026"], tPriv = ch.taux_prive_employeur;
+    if (t26) { set("taux_2026", f2(t26)); set("taux_2026_0", f0(t26)); }
+    if (tPriv) set("taux_prive", f2(tPriv));
+    if (ch.taux_cas_militaires) set("taux_mil", f2(ch.taux_cas_militaires));
+    if (tp.part_etat_au_taux_prive) set("part_privee", f0(tp.part_etat_au_taux_prive));
+    if (tp.surcotisation_etat_fpe) { set("surco", f0(tp.surcotisation_etat_fpe)); set("surco_1", f1(tp.surcotisation_etat_fpe)); }
+    if (four.dg_budget_jaune_2026) set("dgb", f0(four.dg_budget_jaune_2026));
+    if (four.cae) set("cae", f1(four.cae));
+
+    // ---- temps 5 : l'enseignement supérieur ----
+    const H = d.historique || {}, HM = H.missions || {};
+    const esr = HM["Enseignement sup. & recherche (ESR)"], edu = HM["Éducation nationale"];
+    let esrData = null;
+    if (esr && esr.cp) {
+      const ys = Object.keys(esr.cp).sort(), y1 = ys[ys.length - 1], y0 = ys[0], yp = ys[ys.length - 2];
+      const cas = esr.cas || {};
+      const dcp = esr.cp[y1] - esr.cp[yp], dcas = (cas[y1] || 0) - (cas[yp] || 0), moyens = dcp - dcas;
+      const cp5 = esr.cp[y1] - esr.cp[y0], cas5 = (cas[y1] || 0) - (cas[y0] || 0);
+      set("esr_y1", y1);
+      set("esr_dcp", (dcp < 0 ? "baisse de " : "augmente de ") + f1(Math.abs(dcp)) + " milliard" + (Math.abs(dcp) >= 2 ? "s" : ""));
+      set("esr_dcas", (dcas < 0 ? "baisse de " : "augmente de ") + f1(Math.abs(dcas)));
+      set("esr_moyens", f1(Math.abs(moyens)) + " milliard" + (Math.abs(moyens) >= 2 ? "s" : ""));
+      set("esr_moyens_md", signed(moyens, true)); set("esr_dcp_s", signed(dcp, true)); set("esr_dcas_s", signed(dcas, true));
+      set("esr_cas5", f1(cas5)); set("esr_cp5", f1(cp5));
+      const part = cp5 > 0 ? cas5 / cp5 : 0;
+      set("esr_part5", part < 0.2 ? "moins d'un cinquième" : part < 0.3 ? "un quart" : part < 0.4 ? "un tiers" :
+                       part < 0.6 ? "la moitié" : f0(part * 100) + " %");
+      esrData = { ys: ys, cp: esr.cp, cas: cas, y1: y1, dcp: dcp, dcas: dcas, moyens: moyens };
+    }
+    if (edu && edu.cp) {
+      const ys = Object.keys(edu.cp).sort(), y1 = ys[ys.length - 1], yp = ys[ys.length - 2];
+      set("edu_dcp", f0(edu.cp[y1] - edu.cp[yp])); set("edu_dcas", f1(((edu.cas || {})[y1] || 0) - ((edu.cas || {})[yp] || 0)));
+    }
+
+    // ---- vignettes ----
+    svgT1(rec, dette, dep);
+    svgT2(pens, sante, { ecole: ecole, armee: armee, police: police, justice: justice, interets: interets });
+    svgT3(pens, cot, nc, pop);
+    svgT4(taux, tPriv);
+    if (esrData) svgT5(esrData);
+    svgT6(ratio);
+  }
+
+  /* ---------- 1 · recettes et emprunt ---------- */
+  function svgT1(rec, dette, dep) {
+    const W = 300, x0 = 16, w = 268, wr = Math.round(w * rec / dep), wd = w - wr;
+    SVG("svg-t1", W, 96,
+      R(x0, 30, wr, 26, C.etat, ' opacity=".8"') +
+      R(x0 + wr, 30, wd, 26, "none", ' stroke="' + C.dette + '" stroke-width="1.5" stroke-dasharray="3 2"') +
+      T(x0 + 6, 47, "recettes " + f0(100 * rec / dep) + " %", { c: "#fff", s: 10, w: 600 }) +
+      T(x0 + w, 24, "emprunt " + f0(100 * dette / dep) + " %", { a: "end", s: 8.5 }) +
+      T(x0 + w, 70, "l'argent qu'on n'a pas", { a: "end", s: 8, c: C.cram }) +
+      T(x0, 86, "1 euro sur " + Math.round(dep / dette) + " est emprunté", { s: 8.5, c: C.faint }));
+  }
+
+  /* ---------- 2 · trois masses ---------- */
+  function svgT2(pens, sante, p) {
+    const W = 300, x0 = 104, wmax = 176, sc = wmax / pens;
+    const cinq = p.ecole + p.armee + p.police + p.justice + p.interets;
+    let s = "";
+    s += R(x0, 14, Math.round(pens * sc), 18, C.pens) + T(10, 27, "Retraites", {}) + T(x0 + pens * sc - 4, 27, f0(pens), { a: "end", c: "#fff", w: 600 });
+    s += R(x0, 42, Math.round(sante * sc), 18, C.secu, ' opacity=".8"') + T(10, 55, "Assurance maladie", {}) + T(x0 + sante * sc - 4, 55, f0(sante), { a: "end", c: "#fff" });
+    // barre empilée : école, armée, police, justice, intérêts (pointillé)
+    const segs = [["école", p.ecole, .9], ["armée", p.armee, .7], ["police", p.police, .55], ["justice", p.justice, .42]];
+    let x = x0;
+    segs.forEach((sg) => { const ww = sg[1] * sc; s += R(x, 70, ww, 18, C.etat, ' opacity="' + sg[2] + '"'); x += ww; });
+    s += R(x, 70, p.interets * sc, 18, "none", ' stroke="' + C.dette + '" stroke-width="1.2" stroke-dasharray="2 2"');
+    s += T(10, 79, "École, armée, police,", {}) + T(10, 89, "justice, intérêts de la dette", {}) + T(x0 + cinq * sc + 5, 83, f0(cinq), { c: C.ink, w: 600 });
+    // légende des segments
+    let lx = x0; const lab = [["école " + f0(p.ecole), p.ecole], ["armée " + f0(p.armee), p.armee], ["police " + f0(p.police), p.police], ["justice " + f0(p.justice), p.justice], ["dette " + f0(p.interets), p.interets]];
+    lab.forEach((l, i) => { const ww = l[1] * sc; s += T(lx + ww / 2, 99 + (i % 2) * 9 + (i >= 3 ? 9 : 0), l[0], { a: "middle", s: 7.5, c: C.faint }); lx += ww; });
+    SVG("svg-t2", W, 126, s);
+  }
+
+  /* ---------- 3 · versé, cotisé, l'écart ---------- */
+  function svgT3(pens, cot, nc, pop) {
+    const W = 300, x0 = 40, wmax = 240, sc = wmax / pens, wc = cot * sc;
+    SVG("svg-t3", W, 110,
+      R(x0, 18, wmax, 22, C.pens) + T(x0 + 6, 33, "VERSÉ " + f0(pens), { c: "#fff", s: 10, w: 600 }) +
+      R(x0, 52, wc, 22, C.pens, ' opacity=".38"') + T(x0 + 6, 67, "COTISÉ " + f0(cot), { c: C.ink, s: 10 }) +
+      R(x0 + wc, 52, wmax - wc, 22, C.cram) +
+      '<line x1="' + (x0 + wc) + '" y1="48" x2="' + (x0 + wc) + '" y2="88" stroke="' + C.cram + '" stroke-width="1" stroke-dasharray="2 2"/>' +
+      '<line x1="' + (x0 + wmax) + '" y1="48" x2="' + (x0 + wmax) + '" y2="88" stroke="' + C.cram + '" stroke-width="1" stroke-dasharray="2 2"/>' +
+      T(x0 + wc + (wmax - wc) / 2, 67, f0(nc), { a: "middle", c: "#fff", s: 10, w: 700 }) +
+      (pop ? T(x0 + wc + (wmax - wc) / 2, 100, f0(round100(nc * 1000 / pop)) + " € par habitant", { a: "middle", s: 8.5, c: C.cram }) : ""));
+  }
+
+  /* ---------- 4 · le taux employeur ---------- */
+  function svgT4(taux, tPriv) {
+    const W = 300, base = 112, hmax = 60;
+    const T2006 = 49.9;                       // taux à la création du CAS (LOLF, 2006)
+    const bars = [["2006", T2006], ["2013-24", taux["2024"]], ["2025", taux["2025"]], ["2026", taux["2026"]]].filter((b) => b[1]);
+    const top = Math.max.apply(null, bars.map((b) => b[1]).concat([tPriv || 0]));
+    let s = T(12, 16, "Cotisation retraite payée par l'EMPLOYEUR", { s: 9, w: 600, c: C.ink }) +
+            T(12, 27, "en % de la paie de l'agent (traitement indiciaire / salaire brut)", { s: 8 }) +
+            '<line x1="12" y1="' + base + '" x2="288" y2="' + base + '" stroke="' + C.rule + '"/>' +
+            T(30, 46, "L'ÉTAT, pour ses fonctionnaires civils", { s: 8, c: C.cram, w: 600 });
+    bars.forEach((b, i) => {
+      const h = hmax * b[1] / top, x = 34 + i * 32;
+      s += R(x, base - h, 24, h, C.cram) + T(x + 12, base - h - 4, f1(b[1]) + " %", { a: "middle", s: 8.5, c: C.cram, w: 600 }) +
+           T(x + 12, base + 12, b[0], { a: "middle", s: 8 });
+    });
+    if (tPriv) {
+      const h = hmax * tPriv / top;
+      s += T(212, 46, "UN EMPLOYEUR PRIVÉ", { s: 8, w: 600 }) + R(228, base - h, 24, h, C.dette) +
+           T(240, base - h - 4, f1(tPriv) + " %", { a: "middle", s: 8.5, c: C.ink, w: 600 }) + T(240, base + 12, "2026", { a: "middle", s: 8 });
+    }
+    SVG("svg-t4", W, 130, s);
+  }
+
+  /* ---------- 5 · l'enseignement supérieur, six ans ---------- */
+  function svgT5(e) {
+    const W = 300, base = 100, hmax = 58, top = Math.max.apply(null, e.ys.map((y) => e.cp[y]));
+    let s = T(24, 18, "Enseignement sup. & recherche, Md€ · gris = part retraites", { s: 8, c: C.faint });
+    e.ys.forEach((y, i) => {
+      const x = 24 + i * 40, h = hmax * e.cp[y] / top, hc = hmax * (e.cas[y] || 0) / top, last = y === e.y1;
+      s += R(x, base - h, 28, h - hc, C.etat, ' opacity=".55"') + R(x, base - hc, 28, hc, last ? C.cram : C.cas) +
+           T(x + 14, base + 12, y, { a: "middle", s: 8 });
+      if (i === 0 || i === e.ys.length - 2 || last)
+        s += T(x + 14, base - h - 5, f1(e.cp[y]), { a: "middle", s: 8.5, c: last ? C.cram : C.soft, w: last ? 600 : 400 });
+    });
+    s += T(268, 60, signed(e.dcp, true), { s: 7.5, c: C.cram, w: 600 }) + T(268, 92, signed(e.dcas, true), { s: 7.5, c: C.cram, w: 600 }) +
+         T(24, 125, e.y1 + " : budget " + signed(e.dcp, true) + ", retraites " + signed(e.dcas, true) + " → moyens réels " + signed(e.moyens, true), { s: 7.5, c: C.faint });
+    SVG("svg-t5", W, 130, s);
+  }
+
+  /* ---------- 6 · cotisants pour un retraité ---------- */
+  function svgT6(ratio) {
+    const years = Object.keys(ratio).sort();
+    if (!years.length) return;
+    const W = 300, groupW = W / years.length;
+    const person = (x, y, h, fill, extra) => {   // silhouette : tête + buste, hauteur h
+      const r = h * 0.17, bw = h * 0.42;
+      return '<circle cx="' + (x + bw / 2) + '" cy="' + (y + r) + '" r="' + r + '" fill="' + fill + '"' + (extra || "") + "/>" +
+             '<rect x="' + x + '" y="' + (y + 2 * r + 2) + '" width="' + bw + '" height="' + (h - 2 * r - 2) + '" rx="' + (bw / 4) + '" fill="' + fill + '"' + (extra || "") + "/>";
+    };
+    let s = "";
+    years.forEach((y, gi) => {
+      const v = ratio[y], gx = gi * groupW, h = 44, y0 = 30;
+      s += T(gx + groupW / 2, 18, y, { a: "middle", s: 9, w: 600, c: C.ink });
+      // le retraité, en couleur, à gauche du groupe
+      s += person(gx + 10, y0, h, C.pens);
+      s += T(gx + 10 + h * 0.21, y0 + h + 12, "1 retraité", { a: "middle", s: 7, c: C.pens });
+      // les cotisants : entiers pleins, la fraction tronquée, le manquant en pointillé
+      const full = Math.floor(v), frac = v - full, x1 = gx + 36;
+      for (let i = 0; i < full; i++) s += person(x1 + i * 22, y0, h, C.etat);
+      if (frac > 0.005) {
+        const xf = x1 + full * 22, id = "clip" + gi, hf = h * frac;
+        s += '<defs><clipPath id="' + id + '"><rect x="' + xf + '" y="' + (y0 + h - hf) + '" width="30" height="' + hf + '"/></clipPath></defs>';
+        s += person(xf, y0, h, "none", ' stroke="' + C.etat + '" stroke-width="1" stroke-dasharray="2 2"');
+        s += '<g clip-path="url(#' + id + ')">' + person(xf, y0, h, C.etat) + "</g>";
+      }
+      s += T(x1 + Math.max(1, Math.ceil(v)) * 11, y0 + h + 12, f1(v) + " cotisant" + (v >= 2 ? "s" : ""), { a: "middle", s: 7, c: C.etat });
+    });
+    SVG("svg-t6", W, 100, s);
+  }
+
+  /* ---------- partage ---------- */
+  const shareBtn = document.getElementById("share-btn"), toast = document.getElementById("share-toast");
+  if (shareBtn) shareBtn.addEventListener("click", () => {
+    const data = { title: document.title, text: document.querySelector(".fil-these").textContent.trim(), url: location.href.split("#")[0] };
+    if (navigator.share) { navigator.share(data).catch(() => {}); return; }
+    (navigator.clipboard ? navigator.clipboard.writeText(data.url) : Promise.reject())
+      .then(() => { toast.hidden = false; setTimeout(() => { toast.hidden = true; }, 2200); })
+      .catch(() => { prompt("Copier le lien :", data.url); });
+  });
+
+  fetch("data/unified_finances.json", { cache: "no-cache" })
+    .then((r) => { if (!r.ok) throw new Error("HTTP " + r.status); return r.json(); })
+    .then(fill)
+    .catch(() => { /* les replis écrits dans la page restent affichés */ });
+})();

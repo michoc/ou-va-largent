@@ -72,7 +72,7 @@ html, body {
 }
 .choice-card:hover .choice-thumb img { transform: scale(1.045); }
 .choice-body { padding: 18px 22px 22px; display: flex; flex-direction: column; flex: 1; }
-.choice-body h2 {
+.choice-body h2, .choice-body h3 {
   font-family: var(--serif);
   font-size: 26px;
   margin: 0 0 8px;
@@ -654,3 +654,114 @@ body[data-mode="realite"] .mode-lbl:first-of-type { opacity: .5; }
 /* panneau retraites : part au-delà du taux privé, en second dans la même cellule */
 .ret-sub { display: block; font-size: 11.5px; color: var(--ink-soft); font-weight: 400; }
 .dlg-calc .dlg-calc-tot td:last-child { color: #8E1B38; font-size: 15px; }
+
+/* ==========================================================================
+   LE FIL (index.html) — le récit en sept temps
+   Une section par temps : texte à gauche (question → réponse), figure à droite
+   (le chiffre, la vignette SVG, la légende). Tout en tokens du site.
+   ========================================================================== */
+.fil .masthead .standfirst.fil-these { max-width: 900px; font-size: 16.5px; line-height: 1.6; color: var(--ink); }
+.fil .masthead .standfirst.fil-these strong { color: var(--accent); }
+.fil-main { max-width: 1180px; margin: 0 auto; padding: 8px 20px 20px; }
+
+.temps {
+  display: grid;
+  grid-template-columns: minmax(0, 1.25fr) minmax(280px, 1fr);
+  gap: 28px 44px;
+  align-items: start;
+  padding: 40px 0 44px;
+  border-bottom: 1px solid var(--rule);
+}
+.temps:last-of-type { border-bottom: 0; }
+.temps-kicker {
+  font-size: 12px; letter-spacing: .18em; text-transform: uppercase; font-weight: 700;
+  color: var(--accent); margin: 0 0 8px;
+}
+.temps h2 {
+  font-family: var(--serif);
+  font-size: clamp(26px, 3.6vw, 42px);
+  line-height: 1.12;
+  margin: 0 0 16px;
+  font-weight: 700;
+  letter-spacing: .01em;
+  text-transform: uppercase;
+  text-wrap: balance;
+}
+.temps h2 .hl {
+  background: linear-gradient(transparent 58%, #F5E663 58%, #F5E663 94%, transparent 94%);
+  padding: 0 4px;
+  -webkit-box-decoration-break: clone; box-decoration-break: clone;
+}
+.temps-text p { margin: 0 0 14px; font-size: 16.5px; line-height: 1.62; color: var(--ink); max-width: 62ch; }
+.temps-text p strong { font-weight: 700; }
+.temps-text .cr { color: #8E1B38; }
+.temps-cta {
+  display: inline-block;
+  font: 700 14.5px/1 var(--sans);
+  color: var(--accent);
+  background: var(--paper);
+  border: 1px solid var(--accent);
+  border-radius: 999px;
+  padding: 10px 18px;
+  text-decoration: none;
+  transition: background .15s, color .15s;
+  margin: 2px 8px 10px 0;
+}
+.temps-cta:hover { background: var(--accent); color: #fff; }
+.temps-cta-btn { cursor: pointer; }
+.temps-cta-ghost { color: var(--ink-soft); border-color: var(--rule); }
+.temps-cta-ghost:hover { background: var(--ink); border-color: var(--ink); color: var(--bg); }
+.temps-note {
+  margin-top: 14px; padding: 12px 14px;
+  background: var(--paper); border-left: 4px solid var(--rule);
+  font-size: 14px !important; line-height: 1.55 !important; color: var(--ink-soft) !important;
+}
+.temps-note b { color: var(--ink); }
+.temps-soon { font-size: 14px !important; color: var(--ink-soft) !important; font-style: italic; font-family: var(--serif); }
+
+.temps-fig { margin: 0; display: flex; flex-direction: column; gap: 12px; }
+.fil-big {
+  margin: 0;
+  font-family: var(--serif);
+  font-size: clamp(30px, 3.4vw, 40px);
+  line-height: 1.05;
+  font-weight: 700;
+  color: var(--ink);
+  letter-spacing: -.01em;
+}
+.fil-big .vs { font-size: .5em; color: var(--ink-soft); font-weight: 400; font-style: italic; }
+.fil-big small {
+  display: block; margin-top: 8px;
+  font: 400 13px/1.5 var(--sans); color: var(--ink-soft); letter-spacing: 0;
+}
+.fil-big small b { color: var(--ink); }
+.fil-svg {
+  background: var(--paper);
+  border: 1px solid var(--rule);
+  border-radius: 10px;
+  padding: 6px;
+  min-height: 110px;               /* place réservée avant le chargement de la donnée */
+}
+.fil-svg svg { display: block; width: 100%; height: auto; }
+.temps-fig figcaption { font-size: 12.5px; color: var(--ink-soft); line-height: 1.45; }
+.fil-caisses { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; font-size: 13.5px; color: var(--ink-soft); line-height: 1.4; }
+.fil-caisses li { display: grid; grid-template-columns: 52px 1fr; gap: 10px; align-items: baseline; }
+.fil-caisses b { font-family: var(--serif); font-size: 18px; color: #8E1B38; text-align: right; font-variant-numeric: tabular-nums; }
+
+/* temps 7 — la sortie */
+.temps-fin { grid-template-columns: 1fr; padding-top: 48px; }
+.temps-fin .temps-text p { max-width: 68ch; }
+.temps-fin .fil-these { font-size: 18px; line-height: 1.55; font-family: var(--serif); }
+.fil-trois { margin: 6px 0 18px; }
+.fil-trois .stat { font-size: 14px; }
+.fil-actions { display: flex; flex-wrap: wrap; gap: 8px 4px; align-items: center; }
+.fil-toast { font-size: 13px; color: var(--ink-soft); margin: 4px 0 0; }
+.fil-tools { margin-top: 26px; }
+.fil-tools .choice-body h3 { font-size: 20px; }
+.fil-tools .choice-thumb { height: 170px; }
+
+@media (max-width: 860px) {
+  .temps { grid-template-columns: 1fr; gap: 20px; padding: 30px 0 34px; }
+  .temps-text p { font-size: 15.5px; }
+  .fil-tools .choice-thumb { height: 150px; }
+}

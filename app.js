@@ -847,7 +847,53 @@
     renderStatband(json.meta || {});
     renderRetraitesPanel(json.meta || {});
     renderMacro();
+    deepLink();
   }
+
+  /* ---------------- liens profonds (depuis le fil, index.html) ----------------
+   *   #retraites          → la plongée « Qui paie les 422 Md€ ? »
+   *   #dive=<nom de vue>  → plongée directe (famille, mission ou programme :
+   *                         le chemin famille → mission → programme est reconstitué,
+   *                         un niveau par vue, carte historique comprise)
+   *   #metho              → ouvre la Méthodologie et y descend
+   *   #signaler           → ouvre « Signaler une erreur »
+   */
+  function deepLink() {
+    let h = "";
+    try { h = decodeURIComponent(location.hash || ""); } catch (e) { h = location.hash || ""; }
+    if (!h) return;
+    if (h === "#metho") {
+      const det = document.querySelector("footer.metho details");
+      if (det) { det.open = true; det.scrollIntoView({ behavior: "smooth", block: "start" }); }
+      return;
+    }
+    if (h === "#signaler") { document.getElementById("report-btn").click(); return; }
+    let target = null;
+    if (h === "#retraites") target = PENS;
+    else if (h.indexOf("#dive=") === 0) target = h.slice(6);
+    if (!target || !DATA.drill || !DATA.drill[target]) return;
+    // chemin jusqu'à la racine : parent = la vue dont un flux vise la cible
+    const isMacro = (n) => DATA.nodes.some((x) => x.name === n);
+    const path = [target];
+    let guard = 0;
+    while (!isMacro(path[0]) && guard++ < 4) {
+      const cur = path[0];
+      const parent = Object.keys(DATA.drill).find((k) => k !== cur &&
+        (DATA.drill[k].links || []).some((l) => l.target === cur));
+      if (!parent) break;
+      path.unshift(parent);
+    }
+    viewStack = path.map((k) => ({ key: k, rect: null,
+      label: DATA.drill[k].kind === "retraites" ? "Retraites" : shortLabel(k) }));
+    renderDrill();
+    stageEl.scrollIntoView({ behavior: "smooth", block: "start" });
+  }
+  // même page, hash qui change (liens du fil ouverts depuis une page déjà chargée)
+  window.addEventListener("hashchange", () => {
+    if (!DATA) return;
+    if (!location.hash) { renderMacro(); return; }
+    deepLink();
+  });
 
   /* ---------------- « Signaler une erreur » ----------------
    * Envoi via FormSubmit (service e-mail pour sites statiques) vers l'adresse
