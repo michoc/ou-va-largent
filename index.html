@@ -4,14 +4,14 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Où va l'argent public ? — Les dépenses publiques 2025, deux visions</title>
-  <meta name="description" content="Où va l'argent public français en 2025 ? Deux visualisations interactives des mêmes 1 287 Md€ de dépenses : le flux (Sankey) et le Mondrian. Données open data, sourcées et auditées.">
+  <meta name="description" content="Où va l'argent public français en 2025 ? Deux visualisations interactives des mêmes ≈ 1 300 Md€ de dépenses : le flux (Sankey) et le Mondrian. Données open data, sourcées et auditées.">
   <meta name="author" content="Michael Colla">
   <meta property="og:title" content="Où va l'argent public ? — 2025">
-  <meta property="og:description" content="Deux façons de regarder les mêmes 1 287 Md€ de dépenses publiques : le flux (Sankey) et le Mondrian.">
+  <meta property="og:description" content="Deux façons de regarder les mêmes ≈ 1 300 Md€ de dépenses publiques : le flux (Sankey) et le Mondrian.">
   <meta property="og:image" content="https://michoc.github.io/ou-va-largent/assets/og-card.png">
   <link rel="preconnect" href="https://cdnjs.cloudflare.com">
   <!-- ?v= : cache-busting — incrémenter à chaque déploiement de style/app -->
-  <link rel="stylesheet" href="style.css?v=20260713a">
+  <link rel="stylesheet" href="style.css?v=20260916a">
 </head>
 <body class="landing">
   <header class="masthead">
@@ -19,7 +19,7 @@
       <p class="kicker">Les finances publiques françaises · exercice <span id="exercice">2025</span></p>
       <h1><span class="hl">Où va l'argent public&nbsp;?</span></h1>
       <p class="standfirst">
-        <strong>Deux façons</strong> de regarder les mêmes <strong id="tot-dep">1&nbsp;286,7&nbsp;Md€</strong>
+        <strong>Deux façons</strong> de regarder les mêmes <strong id="tot-dep">1&nbsp;300,5&nbsp;Md€</strong>
         de dépenses publiques&nbsp;: en <strong>flux</strong>, pour suivre chaque euro de sa recette à
         sa destination&nbsp;; en <strong>rectangles</strong>, pour comparer les masses d'un coup d'œil.
         Données open data officielles, sourcées, auditées.
@@ -52,7 +52,7 @@
         <div class="choice-body">
           <h2>Le Mondrian <span class="choice-tag">Rectangles</span></h2>
           <p>Chaque euro dépensé, en aires proportionnelles. Un <strong>comparateur</strong> intégré,
-            le <strong>déséquilibre des retraites</strong> (136 Md€) en évidence, et un bouton pour
+            le <strong>déséquilibre des retraites</strong> (<span id="ch-nc">145</span> Md€) en évidence, et un bouton pour
             révéler le <strong>maquillage comptable</strong>.</p>
           <span class="choice-cta">Explorer le Mondrian →</span>
         </div>
@@ -79,7 +79,11 @@
       .then((r) => r.json())
       .then((d) => {
         const c = (d.meta && d.meta.checks) || {};
+        const ch = (d.meta && d.meta.chiffres) || {};
         const f0 = (v) => Number(v).toLocaleString("fr-FR", { maximumFractionDigits: 1 });
+        const pop = (ch.population_france || {}).millions;
+        const hab = pop ? Math.round(c.depenses_totales * 1000 / pop / 10) * 10 : null;
+        if (ch.non_contributif) document.getElementById("ch-nc").textContent = Math.round(ch.non_contributif);
         document.getElementById("exercice").textContent = (d.meta || {}).exercice || "2025";
         document.getElementById("tot-dep").innerHTML =
           f0(c.depenses_totales).replace(/\s/g, "&nbsp;") + "&nbsp;Md€";
@@ -88,7 +92,9 @@
           '<span class="stat stat-dette"><b>+ Dette</b> ' + f0(c.dette) + " Md€</span>" +
           '<span class="stat-eq">=</span>' +
           '<span class="stat stat-dep"><b>Dépenses</b> ' + f0(c.depenses_totales) + " Md€</span>" +
-          '<span class="stat-year">' + ((d.meta || {}).exercice || "2025") + "</span>";
+          '<span class="stat-year">' + ((d.meta || {}).exercice || "2025") + "</span>" +
+          (hab ? '<span class="stat-hab">≈ <b>' + f0(hab) + " €</b> par habitant et par an (" + f0(pop) +
+                 " M hab., INSEE 1er janv. 2026)</span>" : "");
       })
       .catch(() => {});
   </script>

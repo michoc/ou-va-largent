@@ -8,9 +8,9 @@
  *
  * Le diagramme est UNIFIÉ (une seule instance ECharts) :
  *   • Vue d'ensemble VERTICALE : recettes → blocs État/Sécu → dépenses, avec la
- *     VOIE RETRAITES sur le côté droit — cotisations (269) et impôts affectés
+ *     VOIE RETRAITES sur le côté droit — cotisations (270,3 en 2025) et impôts affectés
  *     descendent directement vers le nœud terminal « Pensions versées —
- *     405 Md€ » (constante PENS), rejoints par les apports re-fléchés de
+ *     » (constante PENS, 422,2 Md€ en 2025), rejoints par les apports re-fléchés de
  *     l'État (CAS Pensions), des Collectivités (CNRACL) et de la Sécu.
  *     L'ordre gauche→droite est DÉTERMINISTE (MACRO_COL0 + macroRank) pour
  *     garder la voie retraites au bord droit.
@@ -38,13 +38,13 @@
   let DATA = null;
   let viewStack = [];          // [] = vue d'ensemble ; sinon [{key,label,rect}, …]
 
-  const PENS = "Pensions versées — 405 Md€";
+  const PENS = "Pensions versées";
   const DETTE_NAMES = ["Émission de dette (Déficit)", "Déficit résiduel (dette sociale)"];
   // nœuds de la voie retraites (bord gauche) — pastilles rentrées sur mobile
   const LANE_NODES = {   // valeur = sens du décalage mobile (vers l'intérieur)
     "Système de retraites (tous régimes)": 1,
     "Régimes de base & complémentaires": 1,
-    "Pensions versées — 405 Md€": 1,
+    "Pensions versées": 1,
     "É · Autres missions": -1,          // agrégat mobile collé au bord droit
   };
   const REDUCED_MOTION = window.matchMedia &&
@@ -55,6 +55,12 @@
   const fmt = (v) =>
     Number(v).toLocaleString("fr-FR", { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + " Mds €";
   const fmt0 = (v) => Number(v).toLocaleString("fr-FR", { maximumFractionDigits: 1 });
+  const fmt2 = (v) => Number(v).toLocaleString("fr-FR", { maximumFractionDigits: 2 });
+  // chiffres transverses (meta.chiffres, un seul endroit : retraites_2025.json > cadrage_2025)
+  const CH = () => (DATA && DATA.meta && DATA.meta.chiffres) || {};
+  const tauxCas = (y) => { const t = CH().taux_cas_civils || {}; return t[String(y)] || null; };
+  const population = () => ((CH().population_france || {}).millions) || null;
+  const parHabitant = (md) => { const p = population(); return p ? Math.round(md * 1000 / p / 10) * 10 : null; };
   const esc = (s) =>
     String(s || "").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
 
@@ -80,7 +86,7 @@
   // Libellés courts pour les pastilles (les intitulés complets restent au survol).
   const SHORT = {
     "Impôts et taxes affectés (Sécu)": "Taxes affectées",
-    "Pensions versées — 405 Md€": "Pensions versées",
+    "Pensions versées": "Pensions versées",
     "É · Défense, sécurité, justice": "Défense & sécurité",
     "É · Solidarités, travail & santé": "Solidarités & santé",
     "É · Écologie, territoires & agriculture": "Écologie & territoires",
@@ -370,8 +376,8 @@
     const key = viewStack[viewStack.length - 1].key;
     const d = DATA.drill[key];
     if (d.kind === "retraites") {
-      // Plongée retraites : décomposition verticale façon poster (COR juin 2025),
-      // financeurs (ministères CAS Pensions + sources) → régimes → 405.
+      // Plongée retraites : décomposition verticale façon poster (COR, comptes 2025),
+      // financeurs (ministères CAS Pensions + sources) → régimes → pensions versées.
       chartEl.style.height = Math.max(940, Math.min(1180, window.innerWidth * 0.78)) + "px";
       chart.resize();
       chart.setOption(buildOption(d.nodes, d.links,
@@ -623,8 +629,10 @@
       if (yPrev && cas[yPrev] != null) {
         const dL = serie.cp[y1] - serie.cp[yPrev], dCL = cas[y1] - cas[yPrev];
         if (dCL > 0.02 && dCL > dL) {
+          const tx = tauxCas(y1);
           punch += ' <span class="histo-alert">⚠ En ' + y1 + ", la hausse des contributions " +
-                   "retraites (+" + fmt0(dCL) + " Md€, taux relevé à 78,28 %) dépasse celle " +
+                   "retraites (+" + fmt0(dCL) + " Md€" + (tx ? ", taux relevé à " + fmt2(tx) + " %" : "") +
+                   ") dépasse celle " +
                    "du budget (" + (dL >= 0 ? "+" : "−") + fmt0(Math.abs(dL)) +
                    ") : les moyens hors retraites reculent.</span>";
         }
@@ -634,11 +642,12 @@
     }
     let noteOp = "";
     if (serie.op25) {
-      const surcout = serie.op25 * 4 / 78.28;
+      const t1 = tauxCas(2025), t0 = tauxCas(2024);
+      const surcout = t1 && t0 ? serie.op25 * (t1 - t0) / t1 : 0;
       noteOp = " Dont opérateurs (universités, CNRS, CNES…) : ≈ " + fmt0(serie.op25) +
-               " Md€ versés au CAS en 2025 (estimation, hachures) — le relèvement du taux à " +
-               "78,28 % leur coûte ≈ " + fmt0(surcout) + " Md€ de plus, non compensés dans le " +
-               "budget de la mission (Sénat, PLF 2025).";
+               " Md€ versés au CAS en 2025 (estimation, hachures)" +
+               (surcout ? " — le relèvement du taux à " + fmt2(t1) + " % leur coûte ≈ " + fmt0(surcout) +
+               " Md€ de plus, non compensés dans le budget de la mission (Sénat, PLF 2025)." : ".");
     }
     histoEl.innerHTML =
       '<div class="histo-text"><h3>Évolution du budget ' + y0 + " → " + y1 + "</h3>" +
@@ -653,12 +662,15 @@
 
   function renderStatband(meta) {
     const c = meta.checks || {};
+    const hab = parHabitant(c.depenses_totales);
     statEl.innerHTML =
       '<span class="stat"><b>Recettes</b> ' + fmt0(c.recettes_hors_dette) + " Md€</span>" +
       '<span class="stat stat-dette"><b>+ Dette</b> ' + fmt0(c.dette) + " Md€</span>" +
       '<span class="stat-eq">=</span>' +
       '<span class="stat stat-dep"><b>Dépenses</b> ' + fmt0(c.depenses_totales) + " Md€</span>" +
-      '<span class="stat-year">' + meta.exercice + "</span>";
+      '<span class="stat-year">' + meta.exercice + "</span>" +
+      (hab ? '<span class="stat-hab">≈ <b>' + fmt0(hab) + " €</b> par habitant et par an (" +
+             fmt0(population()) + " M hab., INSEE 1er janv. 2026)</span>" : "");
   }
 
   /* ---------------- panneau pensions (explication) ---------------- */
@@ -666,26 +678,45 @@
   function renderRetraitesPanel(meta) {
     const r = meta.retraites;
     if (!r || !retPanel) { if (retPanel) retPanel.style.display = "none"; return; }
-    const f = r.ifrap || {};
+    const f = r.decomposition || {};
+    const ch = CH();
+    const P = r.pensions_versees;
+    const pct = (v) => Math.round(100 * v / P);
+    // UN chiffre par ministère : sa contribution au CAS Pensions (= le grisé des
+    // plongées = son flux vers les pensions ; convention COR : tout est
+    // contribution d'équilibre).
     const rows = Object.entries(r.contributions_par_mission || {})
       .sort((a, b) => b[1] - a[1])
       .map(([m, v]) => "<tr><td>" + esc(m) + "</td><td>" + fmt0(v) + " Md€</td></tr>")
       .join("");
+    const four = ch.subvention_equilibre_fpe_fourchette || {};
+    const tp = f.taux_prive || {};
+    const hab = parHabitant(r.ecart);
+    const reste = (f.transferts_branches || 0) + (f.subventions_regimes_speciaux || 0) + (f.deficit || 0) + (f.divers || 0);
     retPanel.innerHTML =
-      "<h3>Qui paie les 405 Md€ de retraites ?</h3>" +
-      '<p class="ret-big"><b>' + fmt0(r.cotisations_directes) + " Md€</b> de cotisations (au taux du privé) pour <b>" +
-      fmt0(r.pensions_versees) + " Md€</b> de pensions : <b>" + fmt0(r.ecart) + " Md€</b> financés autrement.</p>" +
-      "<p>Le diagramme ci-dessus décompose ces ressources selon la nomenclature du <b>COR (rapport juin 2025)</b> : " +
-      "cotisations ≈ 65 %, contributions de l'État employeur ≈ 12 % (<b>" + fmt0(f.surcotisations_fp_total || 52.9) +
-      " Md€</b> : État " + fmt0(f.fpe || 39.5) + ", opérateurs " + fmt0(f.operateurs || 4.6) + ", CNRACL " +
-      fmt0(f.cnracl || 8.8) + "), impôts &amp; taxes affectés ≈ 15 % (" + fmt0(f.itaf || 56.6) + " Md€), " +
-      "subventions d'équilibre et transferts ≈ 8 % (" + fmt0((f.transferts_branches || 16.8) + (f.subventions_regimes_speciaux || 7.8)) +
-      " Md€).</p>" +
-      "<p>Le canal budgétaire de l'État est le <b>CAS Pensions</b> : une subvention d'équilibre " +
-      "prélevée sur le budget de chaque ministère pour le système de retraites (contribution " +
-      "employeur totale, déjà comprise dans ses crédits — part grisée des flux) :</p>" +
+      "<h3>Qui paie les " + fmt0(P) + " Md€ de retraites ?</h3>" +
+      '<p class="ret-big"><b>' + fmt0(r.cotisations_directes) + " Md€</b> de cotisations pour <b>" +
+      fmt0(P) + " Md€</b> de pensions : <b>" + fmt0(r.ecart) + " Md€</b> financés autrement" +
+      (hab ? " — ≈ " + fmt0(hab) + " € par habitant et par an" : "") + ".</p>" +
+      "<p>Le diagramme ci-dessus décompose ces ressources d'après le <b>COR</b> (" + esc(ch.cor_millesime || "rapport annuel") + ") : " +
+      "cotisations ≈ " + pct(r.cotisations_directes) + " % (dont " + fmt0(f.cotisations_operateurs) +
+      " Md€ versés par les opérateurs de l'État — universités, CNRS… — depuis les subventions des ministères, en hachures), " +
+      "contribution d'équilibre de l'État pour ses fonctionnaires ≈ " + pct(f.contribution_etat || 0) + " % (<b>" +
+      fmt0(f.contribution_etat) + " Md€</b>, la « contribution employeur » au CAS Pensions inscrite dans les budgets des ministères), " +
+      "impôts &amp; taxes affectés dont CSG ≈ " + pct(f.itaf || 0) + " % (" + fmt0(f.itaf) + " Md€), " +
+      "subventions aux régimes spéciaux, transferts, dette et produits financiers ≈ " + pct(reste) + " % (" + fmt0(reste) + " Md€).</p>" +
+      (tp.surcotisation_etat_fpe ? "<p>Quelle part de ces " + fmt0(f.contribution_etat) + " Md€ serait une cotisation « normale » ? " +
+        "Au taux employeur du privé (" + fmt2(tp.taux_prive_employeur) + " %), " + fmt0(tp.part_etat_au_taux_prive) +
+        " Md€ ; les " + fmt0(tp.surcotisation_etat_fpe) + " restants sont une subvention d'équilibre. La direction du Budget " +
+        "(Jaune Pensions 2026) arrive à " + fmt0(four.dg_budget_jaune_2026) + " Md€ sur 52 ; le Conseil d'analyse économique, à " +
+        "assiette corrigée, à " + fmt0(four.cae) + " ; l'IPP chiffre le seul déséquilibre démographique à " +
+        fmt0(four.ipp_desequilibre_demographique) + ".</p>" : "") +
+      "<p>Le canal budgétaire de l'État est le <b>CAS Pensions</b> : une contribution d'équilibre " +
+      "prélevée sur le budget de chaque ministère pour le système de retraites (déjà comprise dans ses " +
+      "crédits — part grisée des flux) :</p>" +
       "<table>" + rows + "</table>" +
-      '<p class="ret-src">Sources : COR (rapport juin 2025), iFRAP (fév. 2025), PLFSS 2026 — détail dans data/reference/retraites_2025.json.</p>';
+      '<p class="ret-src">Sources : COR (' + esc(ch.cor_millesime || "") + "), Cour des comptes (budget de l'État en 2025), " +
+      "Sénat (avis PLF 2026, CAS Pensions), PLFSS 2026 — détail et calculs dans data/reference/retraites_2025.json.</p>";
   }
 
   /* ---------------- méthodologie ---------------- */
@@ -714,23 +745,47 @@
       "74,28&nbsp;% (2013-2024) · <strong>78,28&nbsp;% (2025, décret n°&nbsp;2025-61)</strong> · " +
       "<strong>82,28&nbsp;% (2026, décret n°&nbsp;2025-1341)</strong> — militaires&nbsp;: " +
       "100&nbsp;% → <strong>126,07&nbsp;%</strong> (inchangé depuis 2013) — à comparer aux " +
-      "≈ 16,5&nbsp;% de cotisation retraite employeur du privé. Cette hausse est une " +
+      "16,58&nbsp;% de cotisation retraite employeur de droit commun dans le privé. Cette hausse est une " +
       "<strong>subvention d'équilibre du système de retraites prélevée sur le budget de chaque " +
       "ministère</strong>&nbsp;: ce n'est <strong>ni une augmentation du salaire des " +
       "fonctionnaires, ni une ouverture de droits supplémentaires</strong> — la retenue payée " +
       "par l'agent (11,10&nbsp;%) est, elle, alignée sur le privé depuis la réforme de 2010.</p>" +
+      "<p><strong>Combien vaut cette subvention&nbsp;?</strong> Cela dépend de la convention. Le " +
+      "<strong>Jaune « Pensions » annexé au PLF 2026</strong> a refait le calcul au taux du privé (16,58&nbsp;%)&nbsp;: " +
+      "les contributions employeur tomberaient de 52,4 à 11&nbsp;Md€, soit <strong>41&nbsp;Md€</strong> de subvention " +
+      "d'équilibre. Le <strong>Conseil d'analyse économique</strong> (Focus n°&nbsp;121, sept. 2025) conteste le mot " +
+      "« caché » — « pas de déficit caché mais un coût salarial surévalué » — et, à assiette corrigée (le traitement " +
+      "indiciaire exclut les primes), situe le « juste taux » entre 25,4 et 34,7&nbsp;% et la contribution d'équilibre à " +
+      "<strong>21,5&nbsp;Md€</strong> (2023). L'<strong>Institut des politiques publiques</strong> chiffre le coût du " +
+      "déséquilibre démographique à 18&nbsp;Md€ (44&nbsp;% de la contribution). Ce site retient <strong>" +
+      fmt0((((meta.chiffres || {}).subvention_equilibre_fpe_fourchette) || {}).site) + "&nbsp;Md€</strong> " +
+      "(part au-delà du taux employeur privé, civils et militaires) — dans la fourchette. Le COR, dont ce site adopte la " +
+      "convention, compte l'intégralité de la contribution de l'État (49,3&nbsp;Md€ en 2025&nbsp;; 49,2 exécutés selon la Cour " +
+      "des comptes) en « contribution d'équilibre »&nbsp;: c'est le chiffre des flux de la voie retraites et du Mondrian.</p>" +
+      "<p><strong>Le CAS Pensions en 2025</strong> (Cour des comptes, avril 2026)&nbsp;: 69,3&nbsp;Md€ de dépenses, 67,3 de recettes, " +
+      "solde −2,0&nbsp;Md€ — quatrième déficit consécutif —, solde cumulé ramené à 2,6&nbsp;Md€. Le régime des fonctionnaires " +
+      "de l'État compte 1,1 cotisant par pensionné de droit direct (1,5 au régime général).</p>" +
+      "<p><strong>Réforme des retraites suspendue</strong> (LFSS 2026, art.&nbsp;105)&nbsp;: l'âge légal est gelé à " +
+      "62&nbsp;ans et 9&nbsp;mois et la durée requise à 170&nbsp;trimestres jusqu'au 1er&nbsp;janvier 2028, pour les " +
+      "pensions prenant effet à partir du 1er&nbsp;septembre 2026 (générations 1964-1968). Le COR (juin 2026) projette " +
+      "un besoin de financement du système de −5,1&nbsp;Md€ en 2025 et −5,0 en 2026, hors produits financiers.</p>" +
       "<h4>Comment lire les parts « retraites » des flux</h4>" +
       "<p><strong>Gris uni</strong> = contribution directe versée au CAS Pensions (catégorie 22 " +
       "des crédits votés, calibrée sur les recettes réelles du CAS — <strong>donnée sourcée</strong>). " +
       "<strong>Hachures</strong> = contribution des <strong>opérateurs</strong> financés par la " +
-      "mission (universités, CNRS, musées… — leurs établissements versent ≈ 5,9&nbsp;Md€/an au CAS, " +
+      "mission (universités, CNRS, musées… — leurs établissements versent ≈ " +
+      fmt0((((meta.retraites || {}).operateurs_cas) || {})["2025"] || 6.3) + "&nbsp;Md€/an au CAS, " +
       "ligne réelle de recettes, répartie au prorata des subventions pour charges de service " +
       "public&nbsp;: une <strong>estimation</strong>).</p>" +
       "<p>Pour ne compter chaque euro qu'une fois, la <strong>voie retraites</strong> de la vue " +
-      "d'ensemble ne re-flèche vers les pensions que la part <strong>au-delà du taux du privé</strong> " +
-      "(39,5&nbsp;Md€ pour l'État + 4,6 pour les opérateurs en 2025)&nbsp;: les contributions déjà " +
-      "comptées dans les crédits des ministères, la CNRACL (collectivités) et les transferts de " +
-      "branches (Sécu) ne sont pas ajoutées au total du bandeau.</p>" +
+      "d'ensemble re-flèche vers les pensions ce que les autres administrations leur versent déjà dans " +
+      "leurs propres dépenses (convention du <strong>COR</strong>)&nbsp;: la contribution d'équilibre de l'État (" +
+      fmt0((((meta.retraites || {}).decomposition) || {}).contribution_etat) + "&nbsp;Md€, dans les crédits des ministères), " +
+      "les subventions aux régimes spéciaux (" + fmt0((((meta.retraites || {}).decomposition) || {}).subventions_regimes_speciaux) +
+      "), les cotisations des opérateurs financées par leurs subventions (" +
+      fmt0((((meta.retraites || {}).decomposition) || {}).cotisations_operateurs) + ", hachures) et les transferts de " +
+      "branches de la Sécu&nbsp;: ces sommes ne sont pas ajoutées au total du bandeau. La CNRACL (collectivités et " +
+      "hôpitaux, taux employeur 34,65&nbsp;%) est une cotisation au sens du COR et n'est pas re-fléchée.</p>" +
       "<h4>Contrôle d'équilibre</h4>" +
       "<p>Axiome fondateur&nbsp;: recettes hors dette <strong>" + fmt(c.recettes_hors_dette) +
       "&nbsp;Md€</strong> + émission de dette <strong>" + fmt(c.dette) +
@@ -738,8 +793,9 @@
       '<p class="src"><strong>Sources</strong> — État&nbsp;: ' + esc(src.etat_depenses || "") +
       "&nbsp;· Recettes&nbsp;: " + esc(src.etat_recettes || "") +
       "&nbsp;· Sécu&nbsp;: " + esc(src.secu || "") +
-      "&nbsp;· CAS Pensions&nbsp;: recettes par ligne, PLF 2024 (data.economie.gouv.fr) ; taux " +
-      "de contribution&nbsp;: décrets 2012-1507/1508, 2025-61, 2025-1341.</p>" +
+      "&nbsp;· CAS Pensions&nbsp;: recettes par ligne, PLF 2025 (data.economie.gouv.fr) ; taux " +
+      "de contribution&nbsp;: décrets 2012-1507/1508, 2025-61, 2025-1341&nbsp;· Retraites tous régimes&nbsp;: COR, " +
+      "rapport annuel juin 2026 (comptes 2025, tableau 2.2)&nbsp;· Population&nbsp;: INSEE, bilan démographique 2025.</p>" +
       (meta.seed ? '<p class="src">⚠ ' + esc(meta.seed_note || "") + "</p>" : "");
   }
 

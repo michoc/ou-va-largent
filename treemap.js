@@ -5,18 +5,19 @@
  * Sankey (data/unified_finances.json : ministères → familles → missions →
  * programmes → actions, via DATA.drill).
  *
- * TROIS PHASES (sélecteur 3 positions), toutes additives (somme ≈ 1 286,7 Md€),
- * chacune STABLE, lisible et capturable. L'argent NON CONTRIBUTIF des retraites
- * (136) est un APLAT CRAMOISI #8E1B38 (jamais hachuré : la hachure = estimation) :
+ * TROIS PHASES (sélecteur 3 positions), toutes additives (somme = dépenses du
+ * bandeau), chacune STABLE, lisible et capturable. L'argent NON CONTRIBUTIF des
+ * retraites (151,9 en 2025 — TOUS les montants sont lus dans DATA, jamais en dur)
+ * est un APLAT CRAMOISI #8E1B38 (jamais hachuré : la hachure = estimation) :
  *   ① « officiel » (tel que présenté) : CAMOUFLAGE TOTAL fidèle aux documents
- *     budgétaires — budgets BRUTS, les 136 fondus dedans (contribution CAS
+ *     budgétaires — budgets BRUTS, le non contributif fondu dedans (contribution CAS
  *     couleur famille, transferts Sécu roses, CNRACL ocre, impôts rose pâle) ;
  *     le bloc retraites ne montre que 331. AUCUN cramoisi.
  *   ② « revele » : MÊME forme (mêmes valeurs que ①), mais les parts non
  *     contributives sont CRAMOISIES à leur place — 3 nœuds recolorés + 7 patchs
  *     de coin persistants sur les familles (leur CAS est en profondeur 3).
  *   ③ « realite » (défaut) : budgets NETS ; les 136 REGROUPÉS en un encart
- *     cramoisi (aire exacte, borderWidth 0) dans « Retraites — 405 Md€ ».
+ *     cramoisi (aire exacte, borderWidth 0) dans « Retraites — N Md€ » (422,2 en 2025).
  *   Passages de phase = animation NATIVE d'ECharts, géographie stable
  *   (sort:false + ordre identique) ; ①↔② ne bouge pas d'un pixel.
  *
@@ -47,7 +48,7 @@
   const cap = (s) => s ? s.charAt(0).toUpperCase() + s.slice(1) : s;
 
   const SYST = "Système de retraites (tous régimes)";
-  const PENS = "Pensions versées — 405 Md€";
+  const PENS = "Pensions versées";
   const SECU_N = "Sécurité sociale (hors retraites)";
   const ACCENT = "#C13B55";
   const DEFICIT = "#8E1B38";                    // cramoisi = argent NON CONTRIBUTIF des retraites
@@ -86,27 +87,29 @@
    * court      = nom court pour les phrases. chantier = « financer <chantier> ».
    * Ordres de grandeur INDICATIFS (compilation de l'auteur).                  */
   const REFS = [
+    // ⚠ les montants des « budgets publics » (md) sont RECALÉS depuis DATA au boot
+    // (refsFromData) : ils ne peuvent plus contredire les blocs du Mondrian.
     { id: "deficit", nom: "Déséquilibre du système de retraites", court: "le déséquilibre des retraites",
-      md: 136, flux: true, note: "pensions 405 − cotisations 269 (COR)", grp: "budget" },
+      md: 145.2, flux: true, note: "pensions − cotisations (COR)", grp: "budget" },
     // — BUDGETS PUBLICS (à l'échelle du Mondrian) —
     { id: "pensions", nom: "Ensemble des pensions (toutes retraites)", court: "les pensions versées",
-      md: 405, flux: true, grp: "budget", note: "405 Md€/an, tous régimes (COR juin 2025)" },
+      md: 422.2, flux: true, grp: "budget", note: "tous régimes (COR)" },
     { id: "sante", nom: "Assurance maladie (Santé)", court: "l'assurance maladie",
       md: 255.3, flux: true, grp: "budget" },
     { id: "totdep", nom: "Dépenses publiques totales", court: "l'ensemble des dépenses publiques",
-      md: 1286.7, flux: true, grp: "budget" },
+      md: 1300.5, flux: true, grp: "budget" },
     { id: "cotis", nom: "Cotisations retraite reçues", court: "les cotisations retraite",
-      md: 269, flux: true, grp: "budget", note: "≈ 2/3 des ressources des retraites" },
+      md: 277, flux: true, grp: "budget", note: "≈ 2/3 des ressources des retraites" },
     { id: "dette_ch", nom: "Charge de la dette (intérêts, 1 an)", court: "la charge de la dette",
       md: 61.3, flux: true, grp: "budget" },
-    { id: "defense", nom: "Budget de la Défense (mission)", court: "le budget de la Défense",
-      md: 50.5, flux: true, grp: "budget" },
-    { id: "educ", nom: "Éducation nationale (1er + 2nd degré)", court: "l'Éducation nationale",
-      md: 70.9, flux: true, grp: "budget" },
+    { id: "defense", nom: "Budget de la Défense (mission, crédits votés)", court: "le budget de la Défense",
+      md: 60, flux: true, grp: "budget" },
+    { id: "educ", nom: "Éducation nationale (mission Enseignement scolaire)", court: "l'Éducation nationale",
+      md: 88.8, flux: true, grp: "budget" },
     { id: "loyers", nom: "Loyers versés en France (1 an)", court: "les loyers versés en France",
       md: 95, flux: true },
-    { id: "benef_cac", nom: "Bénéfices mondiaux du CAC 40 (2025)", court: "les bénéfices du CAC 40",
-      md: 93, flux: true },
+    { id: "benef_cac", nom: "Bénéfices du CAC 40 (2025)", court: "les bénéfices du CAC 40",
+      md: 97.5, flux: true, note: "bénéfice net cumulé 2025, −25 % (Stellantis, Renault) — BFM Bourse, mars 2026" },
     { id: "div_cac", nom: "Dividendes mondiaux du CAC 40", court: "les dividendes du CAC 40",
       md: 107, flux: true },
     { id: "autos", nom: "Voitures neuves achetées en France (1 an)", court: "les voitures neuves d'une année",
@@ -123,7 +126,7 @@
     { id: "cdg", nom: "Porte-avions Charles de Gaulle", court: "le Charles de Gaulle",
       md: 4.5, flux: false, chantier: "la construction du porte-avions Charles de Gaulle (inflation comprise)" },
     { id: "ir", nom: "Impôt sur le revenu (recettes 1 an)", court: "l'impôt sur le revenu",
-      md: 93.5, flux: true },
+      md: 93.3, flux: true },
     { id: "alim", nom: "Alimentation de tout le pays (1 an)", court: "l'alimentation du pays",
       md: 200, flux: true },
     { id: "elec", nom: "Facture d'électricité des ménages (1 an)", court: "l'électricité des ménages",
@@ -268,7 +271,7 @@
   }
 
   // où « vivent » les parts non contributives dans le layout officiel
-  // (remplies par build : 7 bandes ∝ vp/brut + 3 nœuds, somme = 136)
+  // (remplies par build : 7 bandes ∝ vp/brut + 3 nœuds, somme = le non contributif)
   let MIG_SRC = [];
 
   function build(DATA, mode) {
@@ -284,9 +287,16 @@
     const migColor = (host) => revealed ? DEFICIT : host;
     const migInk = (host) => revealed ? "#FFFFFF" : inkFor(host);
 
-    const versePens = {};
+    // versePens = ce que chaque famille re-verse aux retraites SANS cotiser
+    // (contribution d'équilibre + régimes spéciaux : le cramoisi) ; versePensOp =
+    // les cotisations des opérateurs (tag cotisation), qui rejoignent les
+    // cotisations en ③ mais restent dans les budgets bruts en ① et ②.
+    const versePens = {}, versePensOp = {};
     L.filter((l) => l.target === PENS && l.source.indexOf("É · ") === 0)
-      .forEach((l) => (versePens[l.source] = (versePens[l.source] || 0) + l.value));
+      .forEach((l) => {
+        const dst = l.cotisation ? versePensOp : versePens;
+        dst[l.source] = (dst[l.source] || 0) + l.value;
+      });
 
     // — Ministères de l'État —
     // ① CAMOUFLAGE fidèle aux documents budgétaires : chaque famille est BRUTE,
@@ -299,7 +309,8 @@
     let totalVp = 0;
     L.filter((l) => l.source === "État (budget général)" && l.target.indexOf("É · ") === 0)
       .forEach((l) => {
-        const fam = l.target, vp = versePens[fam] || 0, court = fam.replace("É · ", "");
+        const fam = l.target, vp = versePens[fam] || 0, vpOp = versePensOp[fam] || 0,
+              court = fam.replace("É · ", "");
         const famColor = nodeColor[fam];
         totalVp += vp;
         if (vp > 0.01) migSrc.push({ type: "strip", host: court, frac: vp / l.value, value: vp });
@@ -341,13 +352,17 @@
           }
           return;
         }
-        const factor = (l.value - vp) / l.value;
+        // ① : brut = enfants (nets de la seule contribution d'équilibre, les
+        //      cotisations des opérateurs restant dedans) + enfant « CAS Pensions »
+        // ③ : net de TOUT ce qui est re-versé (contribution + cotisations des opérateurs)
+        const factor = official ? (l.value - vp) / l.value : (l.value - vp - vpOp) / l.value;
         const kids = kidsOf(DATA, fam, factor, famColor, 1) || [];
         if (official && vp > 0.01)
           kids.push({ name: "Contribution retraites (CAS Pensions)", value: Math.round(vp * 100) / 100,
             itemStyle: { color: migColor(famColor) }, label: { color: migInk(famColor) }, _est: true,
             _tip: "≈ " + fmt(vp) + " Md€ présentés comme une dépense de cette famille, mais versés " +
-                  "au CAS Pensions : ils financent en réalité les retraites." });
+                  "au CAS Pensions (contribution d'équilibre, subventions aux régimes spéciaux) : ils " +
+                  "financent en réalité les retraites." });
         familles.push({
           name: court, children: kids, _brut: l.value,
           itemStyle: { color: famColor }, upperLabel: { show: true, color: "#1E2430" },
@@ -360,9 +375,11 @@
             ? { value: Math.round(vp * 100) / 100, court: court } : null,
           _tip: official
             ? fmt(l.value) + " Md€ de crédits votés (bruts), dont ≈ " + fmt(vp) +
-              " Md€ de contribution retraites (CAS Pensions) fondue dans le total."
-            : fmt(l.value - vp) + " Md€ de crédits votés, nets des " + fmt(vp) +
-              " Md€ re-versés aux retraites (CAS Pensions).",
+              " Md€ de contribution retraites (CAS Pensions) fondue dans le total" +
+              (vpOp > 0.01 ? " et ≈ " + fmt(vpOp) + " Md€ de cotisations retraite de ses opérateurs." : ".")
+            : fmt(l.value - vp - vpOp) + " Md€ de crédits votés, nets des " + fmt(vp) +
+              " Md€ re-versés aux retraites (CAS Pensions)" +
+              (vpOp > 0.01 ? " et des " + fmt(vpOp) + " Md€ de cotisations de ses opérateurs." : "."),
         });
       });
     // tri par valeur BRUTE (clé STABLE entre les deux modes) : avec sort:false
@@ -400,7 +417,7 @@
     const ctIn = sum((l) => l.target === "Collectivités territoriales");
     const cnracl = sum((l) => l.source === "Collectivités territoriales");
     const ue = sum((l) => l.target === "Union européenne");
-    const ct = official
+    const ct = (official && cnracl > 0.01)
       ? { name: "Collectivités territoriales", value: Math.round(ctIn * 100) / 100,
           itemStyle: { color: COL.ct },
           children: [
@@ -414,78 +431,91 @@
           ], upperLabel: { show: true, color: "#1E2430" } }
       : { name: "Collectivités territoriales", value: Math.round((ctIn - cnracl) * 100) / 100,
           itemStyle: { color: COL.ct }, label: { color: inkFor(COL.ct) },
-          _tip: "Fractions de TVA + prélèvements sur recettes, nets des surcotisations CNRACL (retraites)." };
+          _tip: "Fractions de TVA + prélèvements sur recettes au profit des collectivités." +
+                (cnracl > 0.01 ? " Nets des surcotisations CNRACL (retraites)." : "") };
 
     // — Retraites —
-    const cot = sum((l) => l.target === SYST && l.source.indexOf("Cotisations retraites") === 0);
+    const cotNode = sum((l) => l.target === SYST && l.source.indexOf("Cotisations retraites") === 0);
+    const cotOp = sum((l) => l.target === PENS && l.cotisation);      // opérateurs (hachures)
+    const cot = Math.round((cotNode + cotOp) * 10) / 10;              // 277,0 (COR)
     const impots = sum((l) => l.target === SYST && l.source.indexOf("Cotisations retraites") !== 0);
     let retraites;
     // MIG_SRC : où « vivent » les parts non contributives dans le layout OFFICIEL
     // (bandes ∝ dans les familles + 3 nœuds rendus) — rempli dans les DEUX modes
     // pour que la chorégraphie connaisse valeurs et positions dans chaque sens.
     migSrc.push({ type: "node", host: "Transferts entre branches", value: secuTr });
-    migSrc.push({ type: "node", host: "CNRACL", value: cnracl });
+    if (cnracl > 0.01) migSrc.push({ type: "node", host: "CNRACL", value: cnracl });
     migSrc.push({ type: "node", host: "Impôts affectés & dette", value: impots });
     MIG_SRC = migSrc;
     if (official) {
-      retraites = { name: "Retraites — financées directement (331 Md€)",
+      const pensTot = sum((l) => l.target === PENS);
+      const direct = Math.round((cotNode + impots) * 10) / 10;       // ①② : hors opérateurs
+      retraites = { name: "Retraites — financées directement (" + fmt0(direct) + " Md€)",
         itemStyle: { color: COL.pens }, upperLabel: { show: true, color: "#1E2430" },
-        _tip: "Les retraites coûtent 405 Md€. N'apparaissent ici que les 331 financés « en direct » " +
-              "(cotisations, impôts affectés, dette). Les 74 Md€ restants sont fondus dans les budgets " +
-              "des ministères, de la Sécu et des collectivités : le maquillage comptable.",
+        _tip: "Les retraites coûtent " + fmt(pensTot) + " Md€. N'apparaissent ici que les " + fmt0(direct) +
+              " financés « en direct » (cotisations, impôts affectés, dette). Les " + fmt0(pensTot - direct) +
+              " Md€ restants sont fondus dans les budgets des ministères et de la Sécu : contribution " +
+              "d'équilibre de l'État, subventions aux régimes spéciaux, cotisations des opérateurs, " +
+              "transferts entre branches — le maquillage comptable.",
         children: [
-          { name: "Cotisations", value: Math.round(cot * 100) / 100,
-            itemStyle: { color: COL.pens }, label: { color: inkFor(COL.pens) } },
+          { name: "Cotisations", value: Math.round(cotNode * 100) / 100,
+            itemStyle: { color: COL.pens }, label: { color: inkFor(COL.pens) },
+            _tip: fmt(cotNode) + " Md€ de cotisations — hors les " + fmt(cotOp) + " Md€ versés par les " +
+                  "opérateurs de l'État, ici fondus dans les budgets des ministères (" + fmt(cot) + " au total, COR)." },
           // ① camouflé (rose pâle, comme la présentation) ; ② révélé : cramoisi —
           // c'est de l'argent NON CONTRIBUTIF, il rejoindra le Déficit 136 en ③.
           { name: "Impôts affectés & dette", value: Math.round(impots * 100) / 100,
             itemStyle: revealed ? { color: DEFICIT } : { color: COL.pens, colorAlpha: 0.7 },
             label: { color: revealed ? "#FFFFFF" : inkFor(COL.pens, 0.7) },
-            _tip: "CSG-FSV, fractions de TVA et impôts affectés à la vieillesse, dette : non contributif." },
+            _tip: "CSG-FSV, fractions de TVA et impôts affectés à la vieillesse, dette, produits divers : " +
+                  "non contributif." },
         ] };
     } else {
-      // — bloc RETRAITES : UN SEUL bloc de 405 Md€, dans lequel le DÉSÉQUILIBRE
-      //   (136) est une zone rouge INTÉGRÉE, identifiable et cliquable. Les
-      //   cotisations (269) prennent la couleur du bloc → on lit « 405, dont 136
-      //   en rouge » plutôt que deux rectangles concurrents. Le détail du 136
+      // — bloc RETRAITES : UN SEUL bloc (422,2 Md€ en 2025), dans lequel le DÉSÉQUILIBRE
+      //   (151,9 en 2025) est une zone rouge INTÉGRÉE, identifiable et cliquable. Les
+      //   cotisations (270,3) prennent la couleur du bloc → on lit « 422, dont 152
+      //   en rouge » plutôt que deux rectangles concurrents. Le détail du non contributif
       //   passe en infobulle (plus de sous-tuiles rouge-sur-rouge illisibles).
-      const minCAS = sum((l) => l.target === PENS && l.source.indexOf("É · ") === 0);
-      const deficit = Math.round((impots + minCAS + cnracl + secuTr) * 10) / 10;
-      const brk = "Cliquez pour décomposer : d'où viennent les 136 Md€ qui comblent l'écart " +
-        "entre 269 de cotisations et 405 de pensions (subventions des ministères, impôts " +
+      const minCAS = sum((l) => l.target === PENS && l.source.indexOf("É · ") === 0 && !l.cotisation);
+      const deficit = Math.round((impots + minCAS + cnracl + secuTr) * 10) / 10;   // 145,2 = pensions − 277
+      const pensTot = sum((l) => l.target === PENS);
+      const brk = "Cliquez pour décomposer : d'où viennent les " + fmt0(deficit) + " Md€ qui comblent l'écart " +
+        "entre " + fmt0(cot) + " de cotisations et " + fmt0(pensTot) + " de pensions (subventions des ministères, impôts " +
         "affectés & dette, transferts de la Sécu, CNRACL). Part non contributive.";
       // DÉCOMPOSITION (visible au clic) : chaque provenance dans SA couleur
       // → on voit sur quel budget chaque euro du trou est prélevé.
       const defKids = [];
-      L.filter((l) => l.target === PENS && l.source.indexOf("É · ") === 0).forEach((l) => {
+      L.filter((l) => l.target === PENS && l.source.indexOf("É · ") === 0 && !l.cotisation).forEach((l) => {
         const short = l.source.replace("É · ", ""), col = nodeColor[l.source] || COL.etat;
         defKids.push({ name: "Subvention — " + short, value: Math.round(l.value * 100) / 100,
           itemStyle: { color: col }, label: { color: inkFor(col) },
           _tip: fmt(l.value) + " Md€ prélevés sur le budget « " + short + " » pour financer les " +
-                "retraites (contribution employeur, présentée comme dépense du ministère)." });
+                "retraites (contribution d'équilibre au CAS Pensions, subventions aux régimes spéciaux — " +
+                "présentées comme dépenses du ministère)." });
       });
       defKids.push({ name: "Impôts affectés & dette", value: Math.round(impots * 100) / 100,
         itemStyle: { color: "#7A6A86" }, label: { color: "#FFFFFF" },
-        _tip: fmt(impots) + " Md€ : CSG-FSV, fractions de TVA, impôts affectés à la vieillesse et dette." });
+        _tip: fmt(impots) + " Md€ : CSG-FSV, fractions de TVA, impôts affectés à la vieillesse, dette et produits divers." });
       defKids.push({ name: "Transferts de la Sécu (entre branches)", value: Math.round(secuTr * 100) / 100,
         itemStyle: { color: COL.secu }, label: { color: inkFor(COL.secu) },
         _tip: fmt(secuTr) + " Md€ de transferts des autres branches de la Sécu vers la vieillesse." });
-      defKids.push({ name: "Surcotisations CNRACL (collectivités)", value: Math.round(cnracl * 100) / 100,
+      if (cnracl > 0.01) defKids.push({ name: "Surcotisations CNRACL (collectivités)", value: Math.round(cnracl * 100) / 100,
         itemStyle: { color: COL.ct }, label: { color: inkFor(COL.ct) },
         _tip: fmt(cnracl) + " Md€ de surcotisations retraites des agents territoriaux et hospitaliers." });
       defKids.sort((a, b) => b.value - a.value);
       // Le déséquilibre = APLAT plein cramoisi (pas de hachure : réservée aux
       // estimations). borderWidth 0 → le CRAMOISI SEUL = exactement 136 (aire
       // proportionnelle honnête) ; une légère ombre le décolle du bloc « pensions ».
-      retraites = { name: "Retraites — 405 Md€",
+      retraites = { name: "Retraites — " + fmt(pensTot) + " Md€",
         itemStyle: { color: COL.pens, gapWidth: 0 }, upperLabel: { show: true, color: "#1E2430" },
-        _tip: "405 Md€ de pensions versées (tous régimes). Les cotisations n'en couvrent que 269 : " +
-              "il manque 136 Md€ (la zone cramoisie).",
+        _tip: fmt(pensTot) + " Md€ de pensions versées (tous régimes, COR). Les cotisations n'en couvrent que " +
+              fmt0(cot) + " : il manque " + fmt0(deficit) + " Md€ (la zone cramoisie).",
         children: [
           { name: "Financé par les cotisations", value: Math.round(cot * 100) / 100,
             itemStyle: { color: COL.pens, borderColor: COL.pens, borderWidth: 0, gapWidth: 0 },
             label: { color: inkFor(COL.pens) },
-            _tip: "269 Md€ de cotisations vieillesse tous régimes (≈ 2/3 des ressources — COR)." },
+            _tip: fmt(cot) + " Md€ de cotisations vieillesse tous régimes (≈ 2/3 des ressources — COR), dont " +
+                  fmt(cotOp) + " versés par les opérateurs de l'État depuis les subventions des ministères." },
           { name: "Déséquilibre des retraites", value: deficit, children: defKids,
             itemStyle: { color: DEFICIT, borderColor: DEFICIT, borderWidth: 0, gapWidth: 0,
               shadowBlur: 12, shadowColor: "rgba(74,10,26,.40)" },
@@ -813,16 +843,51 @@
     if (b.dataset.mode !== MODE) setMode(b.dataset.mode);
   }));
 
+  /* ============ références du comparateur recalées sur DATA ============ */
+  // Les « budgets publics » du comparateur sont LUS dans les flux (même donnée
+  // que les blocs) : Défense 60 = le bloc Défense, plus jamais un chiffre concurrent.
+  function refsFromData(DATA) {
+    const L = DATA.links, sum = (p) => L.filter(p).reduce((s, l) => s + l.value, 0);
+    const c = (DATA.meta && DATA.meta.checks) || {};
+    const ch = (DATA.meta && DATA.meta.chiffres) || {};
+    const drillLink = (view, target) => {
+      const v = DATA.drill && DATA.drill[view];
+      return v ? v.links.filter((l) => l.target === target).reduce((s, l) => s + l.value, 0) : null;
+    };
+    const set = (id, md, note) => { const r = refById[id]; if (r && md) { r.md = Math.round(md * 10) / 10; if (note) r.note = note; } };
+    const pens = sum((l) => l.target === PENS);
+    const cot = sum((l) => l.target === SYST && l.source.indexOf("Cotisations retraites") === 0) +
+                sum((l) => l.target === PENS && l.cotisation);
+    set("pensions", pens, fmt(pens) + " Md€/an, tous régimes (COR, " + (ch.cor_millesime || "") + ")");
+    set("cotis", cot);
+    set("deficit", pens - cot, "pensions " + fmt(pens) + " − cotisations " + fmt(cot) + " (COR)");
+    set("sante", sum((l) => l.target === "Santé (maladie)"));
+    set("totdep", c.depenses_totales);
+    set("dette_ch", sum((l) => l.target === "É · Charge de la dette"));
+    set("defense", drillLink("É · Défense, sécurité, justice", "Défense"));
+    set("educ", drillLink("É · Enseignement & recherche", "Éducation nationale"));
+    set("ir", sum((l) => l.source === "Impôt sur le revenu"));
+    // libellés des <option> : on refait les listes en conservant la sélection
+    [selA, selB].forEach((sel) => {
+      const v = sel.value; sel.innerHTML = ""; fillSelect(sel); sel.value = v;
+    });
+  }
+
   /* ============ boot ============ */
   function boot(DATA) {
     DATA_G = DATA;
+    refsFromData(DATA);
     // le mode du hash est fixé AVANT le premier rendu (un double setOption au
     // boot laissait les tuiles à taille zéro) ; setMode ne fera que synchroniser
     MODE = { "#officiel": "officiel", "#revele": "revele" }[location.hash] || "realite";
     const c = (DATA.meta && DATA.meta.checks) || {};
+    const pop = (((DATA.meta || {}).chiffres || {}).population_france || {}).millions;
+    const hab = pop ? Math.round(c.depenses_totales * 1000 / pop / 10) * 10 : null;
     document.getElementById("statband").innerHTML =
       '<span class="stat stat-dep"><b>Dépenses</b> ' + fmt(c.depenses_totales) + " Md€</span>" +
-      '<span class="stat-year">' + (DATA.meta || {}).exercice + "</span>";
+      '<span class="stat-year">' + (DATA.meta || {}).exercice + "</span>" +
+      (hab ? '<span class="stat-hab">≈ <b>' + fmt0(hab) + " €</b> par habitant et par an (" + fmt(pop) +
+             " M hab., INSEE 1er janv. 2026)</span>" : "");
     cur = { name: "Ensemble des dépenses publiques", court: "l'ensemble des dépenses publiques",
             value: c.depenses_totales, color: "#5C7FB8" };
 

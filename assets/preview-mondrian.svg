@@ -13,7 +13,7 @@
     <rect x="334" y="196" width="140" height="64"  fill="#D9A441"/>
     <rect x="334" y="264" width="140" height="30"  fill="#A79BC8"/>
   </g>
-  <!-- encart cramoisi (le déficit 136) flottant dans le bloc Retraites -->
+  <!-- encart cramoisi (le non contributif, 145 en 2025) flottant dans le bloc Retraites -->
   <rect x="176" y="150" width="132" height="126" rx="4" fill="#8E1B38"/>
-  <text x="242" y="219" text-anchor="middle" font-family="Helvetica,Arial" font-size="15" font-weight="800" fill="#FFFFFF">136 Md€</text>
+  <text x="242" y="219" text-anchor="middle" font-family="Helvetica,Arial" font-size="15" font-weight="800" fill="#FFFFFF">145 Md€</text>
 </svg>

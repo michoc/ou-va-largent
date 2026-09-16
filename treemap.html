@@ -4,13 +4,13 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Le Mondrian des dépenses publiques — Où va l'argent public ? 2025</title>
-  <meta name="description" content="Le Mondrian des dépenses publiques françaises 2025 : chaque euro en rectangles proportionnels, le déséquilibre des retraites en évidence, un comparateur d'ordres de grandeur et un switch qui révèle le maquillage comptable.">
+  <meta name="description" content="Le Mondrian des dépenses publiques françaises 2025 : chaque euro en rectangles proportionnels, le déséquilibre des retraites (≈ 145 Md€ non contributifs sur 422) en évidence, un comparateur d'ordres de grandeur et trois lectures qui révèlent le maquillage comptable.">
   <meta name="author" content="Michael Colla">
   <meta property="og:title" content="Le Mondrian des dépenses publiques — 2025">
-  <meta property="og:description" content="Chaque euro en rectangles proportionnels, le déséquilibre des retraites (136 Md€) en évidence, un switch qui révèle le maquillage comptable.">
+  <meta property="og:description" content="Chaque euro en rectangles proportionnels, le déséquilibre des retraites (≈ 145 Md€ non contributifs) en évidence, trois lectures qui révèlent le maquillage comptable.">
   <meta property="og:image" content="https://michoc.github.io/ou-va-largent/assets/og-card.png">
   <link rel="preconnect" href="https://cdnjs.cloudflare.com">
-  <link rel="stylesheet" href="style.css?v=20260713a">
+  <link rel="stylesheet" href="style.css?v=20260916a">
 </head>
 <body class="mondrian" data-mode="realite">
   <header class="masthead">
@@ -22,7 +22,7 @@
         Chaque euro dépensé, en <strong>rectangles proportionnels</strong> — une seule fois.
         Cliquez pour <strong>plonger</strong> (jusqu'au programme et à l'action). Les
         <strong>trois lectures</strong> ci-dessous racontent le
-        <strong style="color:#8E1B38">déséquilibre des retraites</strong> (136&nbsp;Md€)&nbsp;:
+        <strong style="color:#8E1B38">déséquilibre des retraites</strong> (<span data-ch="non_contributif">145</span>&nbsp;Md€)&nbsp;:
         d'abord camouflé dans les budgets, puis révélé en cramoisi, enfin regroupé en un bloc.
       </p>
       <div class="statband" id="statband" aria-label="Total des dépenses"></div>
@@ -81,41 +81,52 @@
 
   <dialog id="mode-dlg" class="report-dlg mode-dlg" aria-label="Le maquillage comptable des retraites">
     <h3>Pourquoi deux budgets&nbsp;?</h3>
-    <p>Les retraites versées coûtent <strong>405&nbsp;Md€</strong> par an. Les cotisations n'en
-      rapportent que <strong>269&nbsp;Md€</strong> : il manque <strong>136&nbsp;Md€</strong>.</p>
-    <p>Une partie de ce trou — <strong>74&nbsp;Md€</strong> — est comblée par des
-      <strong>subventions d'équilibre</strong> que l'État fait passer pour du budget des
-      ministères&nbsp;: la «&nbsp;contribution employeur au CAS Pensions&nbsp;». Elle est adossée à
-      la rémunération des fonctionnaires, alors que ceux-ci l'ignorent&nbsp;: elle
-      <strong>n'augmente pas leur salaire</strong> et <strong>n'ouvre aucun droit</strong>
-      supplémentaire (ligne 411050 sur les bulletins de paie des fonctionnaires).
-      Le reste du trou est pris dans les impôts, taxes affectées et la dette.</p>
+    <p>Les retraites versées coûtent <strong><span data-ch="pensions_versees">422</span>&nbsp;Md€</strong> par an
+      (COR, comptes 2025). Les cotisations n'en rapportent que
+      <strong><span data-ch="cotisations">277</span>&nbsp;Md€</strong> : il manque
+      <strong><span data-ch="non_contributif">145</span>&nbsp;Md€</strong>.</p>
+    <p>Sur ces <span data-ch="non_contributif">145</span>&nbsp;Md€, <strong><span data-ch="subventions_ministeres">57</span>&nbsp;Md€</strong>
+      sont inscrits dans les budgets des ministères comme s'ils payaient des professeurs, des militaires ou des
+      juges&nbsp;: la «&nbsp;contribution employeur au CAS Pensions&nbsp;» (<span data-ch="contribution_etat">49</span>) et les
+      subventions aux régimes spéciaux (<span data-ch="regimes_speciaux">8</span>). La contribution est adossée à la
+      rémunération des fonctionnaires, alors que ceux-ci l'ignorent&nbsp;: elle <strong>n'augmente pas leur salaire</strong>
+      et <strong>n'ouvre aucun droit</strong> supplémentaire (ligne 411050 sur les bulletins de paie).
+      <span data-ch="transferts_secu">13</span>&nbsp;Md€ viennent des autres branches de la Sécurité sociale&nbsp;;
+      le reste des impôts et taxes affectés, de la CSG et de la dette.</p>
     <ul>
-      <li><strong>① Le budget présenté à la nation</strong> — les 136&nbsp;Md€ non contributifs sont
+      <li><strong>① Le budget présenté à la nation</strong> — les <span data-ch="non_contributif">145</span>&nbsp;Md€ non contributifs sont
         <strong>invisibles</strong>, fondus dans les budgets bruts, exactement comme dans les
-        documents budgétaires : les retraites ne «&nbsp;semblent&nbsp;» coûter que 331&nbsp;Md€.</li>
+        documents budgétaires : les retraites ne «&nbsp;semblent&nbsp;» coûter que <span data-ch="direct">346</span>&nbsp;Md€.</li>
       <li><strong>② Les subventions d'équilibre cachées</strong> — le même budget, la même forme,
         mais chaque somme qui finance en réalité les retraites <strong style="color:#8E1B38">apparaît
         en cramoisi</strong> (montant + part du budget), à sa place, dans son budget d'origine.</li>
       <li><strong>③ Le budget réel</strong> — ces sommes quittent les budgets (affichés nets) et
-        forment le bloc <strong style="color:#8E1B38">«&nbsp;Déficit des retraites —
-        136&nbsp;Md€&nbsp;»</strong> ; le bloc Retraites affiche ses vrais 405&nbsp;Md€.</li>
+        forment le bloc <strong style="color:#8E1B38">«&nbsp;Déséquilibre des retraites —
+        <span data-ch="non_contributif">145</span>&nbsp;Md€&nbsp;»</strong> ; le bloc Retraites affiche ses vrais
+        <span data-ch="pensions_versees">422</span>&nbsp;Md€.</li>
     </ul>
-    <p class="dlg-calc-title">Le calcul des 136&nbsp;Md€ non contributifs</p>
+    <p class="dlg-calc-title">Le calcul des <span data-ch="non_contributif">145</span>&nbsp;Md€ non contributifs (2025, COR)</p>
     <table class="dlg-calc">
-      <tr><td>Contributions « employeur » des ministères au CAS Pensions</td><td>51,9</td></tr>
-      <tr><td>Impôts affectés &amp; dette (CSG-FSV, fractions de TVA…)</td><td>62,4</td></tr>
-      <tr><td>Transferts des autres branches de la Sécu vers la vieillesse</td><td>12,9</td></tr>
-      <tr><td>Surcotisations CNRACL des collectivités (agents territoriaux/hospitaliers)</td><td>8,8</td></tr>
-      <tr class="dlg-calc-tot"><td>Déséquilibre du système de retraites</td><td>136&nbsp;Md€</td></tr>
+      <tr><td>Contribution « employeur » de l'État au CAS Pensions pour ses fonctionnaires — dans les budgets des ministères</td><td><span data-ch="contribution_etat">49,3</span></td></tr>
+      <tr><td>Subventions d'équilibre aux régimes spéciaux (SNCF, RATP, marins, mines…)</td><td><span data-ch="regimes_speciaux">7,7</span></td></tr>
+      <tr><td>Impôts et taxes affectés, CSG, Unédic, dette et produits financiers</td><td><span data-ch="impots_affectes_et_dette">75,6</span></td></tr>
+      <tr><td>Transferts des autres branches de la Sécu vers la vieillesse</td><td><span data-ch="transferts_secu">12,6</span></td></tr>
+      <tr class="dlg-calc-tot"><td>Déséquilibre du système de retraites</td><td><span data-ch="non_contributif">145</span>&nbsp;Md€</td></tr>
     </table>
+    <p class="dlg-note">Convention du COR (rapport annuel juin 2026)&nbsp;: les cotisations (<span data-ch="cotisations">277</span>&nbsp;Md€,
+      dont <span data-ch="cotisations_operateurs">7</span> versés par les opérateurs de l'État — universités, CNRS — depuis les subventions
+      des ministères, tracés en hachures) comprennent celles des employeurs privés, des collectivités et hôpitaux (CNRACL) et des
+      opérateurs&nbsp;; l'intégralité de la contribution de l'État pour ses fonctionnaires est une contribution d'équilibre.
+      Quelle part en serait une cotisation «&nbsp;normale&nbsp;»&nbsp;? Au taux du privé (16,58&nbsp;%), 9,5&nbsp;Md€ — les 39,8 restants
+      sont une subvention&nbsp;; la direction du Budget (Jaune Pensions 2026) arrive à 41 sur 52, le Conseil d'analyse économique à
+      21,5 à assiette corrigée.</p>
     <div class="report-actions">
       <button type="button" class="crumb report-send" id="mode-dlg-close">Compris</button>
     </div>
   </dialog>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/echarts/5.5.0/echarts.min.js"></script>
-  <script src="treemap.js?v=20260713a"></script>
+  <script src="treemap.js?v=20260916a"></script>
   <script>
     // légende dynamique du switch + dialogue d'explication
     (function () {
@@ -124,14 +135,34 @@
         'background:#8E1B38;vertical-align:-2px;margin-right:5px"></span>';
       const go = (m, t) => '<a class="phase-link" data-goto="' + m + '" role="button" tabindex="0">' + t + '</a>';
       const info = '<a class="phase-link" data-info="1" role="button" tabindex="0">le calcul détaillé</a>';
-      const texts = {
-        officiel: "① Le budget tel qu'il est présenté à la nation : les 136 Md€ qui financent les retraites sans cotisation sont <strong>fondus dans les budgets bruts</strong>, invisibles. Les retraites semblent ne coûter que 331 Md€. &nbsp;" + go("revele", "→ Révéler ces sommes"),
-        revele: SW + "② En cramoisi, les <strong>subventions d'équilibre des retraites</strong> — prélevées sur les budgets sans le dire, à leur place. <strong>136 Md€</strong> au total (" + info + "). &nbsp;" + go("realite", "→ Voir le budget réel"),
-        realite: "③ Le budget réel : ces sommes ont quitté les budgets (affichés <strong>nets</strong>) et forment le bloc « Déficit des retraites — 136 Md€ ». Le bloc Retraites affiche ses vrais 405 Md€. &nbsp;" + go("officiel", "◀ D'où sort ce chiffre&nbsp;?"),
-      };
-      function refresh() { cap.innerHTML = texts[document.body.dataset.mode] || texts.realite; }
+      // chiffres transverses (meta.chiffres) : remplis dès que la donnée est chargée
+      const CH = { non_contributif: 145, pensions_versees: 422, direct: 346 };
+      const f0 = (v) => Math.round(Number(v)).toLocaleString("fr-FR");
+      const f1 = (v) => Number(v).toLocaleString("fr-FR", { maximumFractionDigits: 1 });
+      const texts = () => ({
+        officiel: "① Le budget tel qu'il est présenté à la nation : les " + f0(CH.non_contributif) + " Md€ qui financent les retraites sans cotisation sont <strong>fondus dans les budgets bruts</strong>, invisibles. Les retraites semblent ne coûter que " + f0(CH.direct) + " Md€. &nbsp;" + go("revele", "→ Révéler ces sommes"),
+        revele: SW + "② En cramoisi, les <strong>subventions d'équilibre des retraites</strong> — prélevées sur les budgets sans le dire, à leur place. <strong>" + f0(CH.non_contributif) + " Md€</strong> au total (" + info + "). &nbsp;" + go("realite", "→ Voir le budget réel"),
+        realite: "③ Le budget réel : ces sommes ont quitté les budgets (affichés <strong>nets</strong>) et forment le bloc « Déséquilibre des retraites — " + f0(CH.non_contributif) + " Md€ ». Le bloc Retraites affiche ses vrais " + f0(CH.pensions_versees) + " Md€. &nbsp;" + go("officiel", "◀ D'où sort ce chiffre&nbsp;?"),
+      });
+      function refresh() { const t = texts(); cap.innerHTML = t[document.body.dataset.mode] || t.realite; }
       new MutationObserver(refresh).observe(document.body, { attributes: true, attributeFilter: ["data-mode"] });
       refresh();
+      fetch("data/unified_finances.json", { cache: "no-cache" }).then((r) => r.json()).then((d) => {
+        const ch = (d.meta && d.meta.chiffres) || {};
+        Object.assign(CH, ch);
+        // part « directe » du bloc Retraites en ① : tout ce qui n'est pas fondu dans les
+        // budgets (subventions des ministères, transferts Sécu, cotisations des opérateurs)
+        CH.direct = Math.round(((ch.pensions_versees || 0) - (ch.subventions_ministeres || 0) - (ch.transferts_secu || 0)
+                    - (ch.cnracl || 0) - (ch.cotisations_operateurs || 0)) * 10) / 10;
+        document.querySelectorAll("[data-ch]").forEach((el) => {
+          const k = el.dataset.ch, v = CH[k];
+          if (v == null) return;
+          const entier = /^(pensions_versees|cotisations|non_contributif|direct|cotisations_operateurs)$/.test(k) ||
+                         el.closest("p") && !el.closest(".dlg-calc") && !el.closest(".dlg-note");
+          el.textContent = entier ? f0(v) : f1(v);
+        });
+        refresh();
+      }).catch(() => {});
       const dlg = document.getElementById("mode-dlg");
       document.getElementById("mode-info-btn").addEventListener("click", () => dlg.showModal());
       document.getElementById("mode-dlg-close").addEventListener("click", () => dlg.close());

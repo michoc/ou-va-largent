@@ -647,4 +647,10 @@ body[data-mode="realite"] .mode-lbl:first-of-type { opacity: .5; }
 .dlg-calc td { padding: 4px 0; border-bottom: 1px dashed var(--rule); vertical-align: top; }
 .dlg-calc td:last-child { text-align: right; font-weight: 700; white-space: nowrap; padding-left: 14px; }
 .dlg-calc .dlg-calc-tot td { border-bottom: 0; border-top: 2px solid var(--ink); padding-top: 7px; }
+.dlg-note { font-size: 12.5px; color: var(--ink-soft); margin: 10px 0 0; line-height: 1.5; }
+/* bandeau : ligne « par habitant » (échelle humaine, INSEE) */
+.stat-hab { flex-basis: 100%; font-size: 12.5px; color: var(--ink-soft); }
+.stat-hab b { color: var(--ink); }
+/* panneau retraites : part au-delà du taux privé, en second dans la même cellule */
+.ret-sub { display: block; font-size: 11.5px; color: var(--ink-soft); font-weight: 400; }
 .dlg-calc .dlg-calc-tot td:last-child { color: #8E1B38; font-size: 15px; }

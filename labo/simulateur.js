@@ -16,7 +16,7 @@
  *
  * Ton NEUTRE et factuel partout (pas de « vous » pour le retraité, pas
  * d'idiomes). Euros d'aujourd'hui ; salaires nets saisis (÷ 0,78 → brut) ;
- * pensions nettes (× 0,909). Calage : salaire moyen par tête → 269 Md€ de
+ * pensions nettes (× 0,909). Calage : salaire moyen par tête → 277 Md€ de
  * cotisations réelles. Heures cotisées = Σ taux(an) × heures travaillées(an).
  * ========================================================================== */
 
@@ -42,13 +42,14 @@
     taux: [[1970, 0.13], [1980, 0.185], [1990, 0.23], [2000, 0.255],
            [2010, 0.267], [2017, 0.279], [2025, 0.281], [2110, 0.281]],
     ratio: [[1970, 3.0], [1980, 2.6], [1990, 2.3], [2000, 2.05],
-            [2005, 2.0], [2010, 1.85], [2020, 1.71], [2025, 1.67],
-            [2040, 1.5], [2055, 1.35], [2070, 1.2], [2120, 1.2]],
+            [2005, 2.0], [2010, 1.9], [2020, 1.8], [2025, 1.76],
+            [2040, 1.55], [2055, 1.42], [2070, 1.3], [2120, 1.3]],
+    // ratio COR juin 2026 : 2,1 (2002) → 1,8 (2025 : 30,6 M cotisants / 17,4 M retraités) → 1,3 (2070)
     heuresAn: [[1970, 1850], [1982, 1745], [2000, 1715], [2002, 1610], [2120, 1607]],
     NET2BRUT: 0.78, PNET: 0.909,
-    salBase: { moyen: 2620, median: 2120 },   // bruts PAR TÊTE ; moyen calé sur 269 Md€
-    subvParActif: 4470,                       // 136 Md€/an ÷ 30,4 M cotisants
-    nbCotisants: 30.4e6,
+    salBase: { moyen: 2685, median: 2175 },   // bruts PAR TÊTE ; moyen calé sur 277 Md€ de cotisations (COR 2025)
+    subvParActif: 4750,                       // 145,2 Md€/an (non contributif, COR 2025) ÷ 30,6 M cotisants
+    nbCotisants: 30.6e6,
     loyersMdAn: 95,                           // loyers versés en France (Md€/an)
     smicNetAnnuel: 17900,
     // fin de vie (à 65 ans) : 86,5 en 2025, pente ≈ +1 mois/an ; plancher −6
@@ -102,7 +103,7 @@
              s0: profil.s0, s1: profil.s1 };
   }
   // opts : maintenir (pension aux règles actuelles) · ardoise (dette héritée à
-  // rembourser, € sur la carrière) · detteSysteme (part des 136 Md€/an après 2025)
+  // rembourser, € sur la carrière) · detteSysteme (part des 145 Md€/an après 2025)
   function computeLife(L, opts) {
     opts = opts || {};
     const ardoise = opts.ardoise || 0;
@@ -223,7 +224,7 @@
       " € nets par mois), montants en euros d’aujourd’hui — seule l’année de naissance change." +
       (legs[1950]
         ? " <b>La dette léguée se paie en impôts</b> — aujourd’hui, elle est comblée en prenant " +
-          "ailleurs dans le budget : 136 Md€ par an, près de 2 fois le budget de l’Éducation nationale."
+          "ailleurs dans le budget : 145 Md€ par an (2025), 1,6 fois le budget de l’Éducation nationale."
         : "") +
       (resteEnfants > 0 && legs[2026]
         ? " <b>Dette finale laissée aux enfants : ≈ " +
@@ -268,7 +269,7 @@
     '<label class="adv-dette" id="lbl-maintenir"><input type="checkbox" id="in-maintenir"> ' +
     "maintenir la pension au niveau actuel — la différence est financée par la dette (léguée)</label>" +
     '<label class="adv-dette" id="lbl-dette"><input type="checkbox" id="in-dette"> ' +
-    "rembourser la dette actuelle du système — part des 136 Md€/an, en impôts, années travaillées après 2025</label>" +
+    "rembourser la dette actuelle du système — part des 145 Md€/an, en impôts, années travaillées après 2025</label>" +
     ADV.map((c) =>
       '<div class="ctl"><label for="in-' + c.id + '">' + c.lab +
       ' <output id="out-' + c.id + '"></output></label>' +
@@ -299,13 +300,13 @@
     $("in-maintenir").checked = custom ? !!custom.maintenir : !!legs[selGen];
     $("in-dette").checked = !!(custom && custom.dette);
     // sans effet pour une vie déjà partie : le passé a eu les règles réelles,
-    // et la part des 136 Md€ ne concerne que les années travaillées après 2025
+    // et la part des 145 Md€ ne concerne que les années travaillées après 2025
     $("in-maintenir").disabled = passe;
     $("in-dette").disabled = passe;
     $("lbl-maintenir").classList.toggle("off", passe);
     $("lbl-dette").classList.toggle("off", passe);
     $("lbl-maintenir").title = passe ? "Départ avant 2026 : les pensions ont été servies aux règles réelles." : "";
-    $("lbl-dette").title = passe ? "Aucune année travaillée après 2025 : pas de part des 136 Md€/an." : "";
+    $("lbl-dette").title = passe ? "Aucune année travaillée après 2025 : pas de part des 145 Md€/an." : "";
   }
   ADV.forEach((c) => {
     $("in-" + c.id).addEventListener("input", (e) => {
@@ -392,7 +393,7 @@
           ? "Dont ≈ <b>" + fmt0(enImpotsMois(r.ardoise, r.L.depart - r.L.entree)) +
             " €/mois</b> de cotisations supplémentaires, toute la carrière, pour compenser la dette laissée par les aînés."
           : (r.impotsSys > 0
-            ? "Dont ≈ <b>" + fmtK(r.impotsSys) + " €</b> d'impôts (années après 2025) — la part des 136 Md€/an de dettes du système."
+            ? "Dont ≈ <b>" + fmtK(r.impotsSys) + " €</b> d'impôts (années après 2025) — la part des 145 Md€/an de dettes du système."
             : "Pension ajustée au niveau que la démographie finance — aucune dette laissée.")));
 
     $("mini-stats").innerHTML =
@@ -474,9 +475,11 @@
   const INV = { annee: 2050, ciblePct: 72, cible: 1470, tauxPct: 28.1, age: 64,
                 natal: false, base: "moyen" };
   // âge légal : 65 → 60 (réforme 1982, effective 1983) → montée 60→62
-  // (réforme 2010, effective 2017) → montée 62→64 (réforme 2023, effective 2030)
+  // (réforme 2010, effective 2017) → montée 62→64 (réforme 2023) SUSPENDUE par la
+  // LFSS 2026 (art. 105) : 62 ans 9 mois gelés jusqu'au 1er janvier 2028, puis
+  // reprise à +3 mois par génération → 64 ans vers 2032 (si la réforme reprend)
   const ageHisto = (an) => an < 1983 ? 65 : an < 2011 ? 60 : an < 2017 ? 61
-    : an < 2023 ? 62 : an < 2030 ? 63 : 64;
+    : an < 2023 ? 62 : an < 2028 ? 62.75 : an < 2030 ? 63 : an < 2032 ? 63.5 : 64;
   const estPasse = () => INV.annee <= 2025;
   const effTauxPct = () => estPasse() ? interp(P.taux, INV.annee) * 100 : INV.tauxPct;
   const effAge = () => estPasse() ? ageHisto(INV.annee) : INV.age;
@@ -526,7 +529,8 @@
     '<div class="ctl" id="ctl-inv-age"><label for="inv-age">LEVIER 2 — âge de départ à la retraite ' +
     '<output id="out-inv-age"></output></label>' +
     '<input type="range" id="inv-age" min="60" max="95" step="1">' +
-    REP + "Situation actuelle : " + rep("data-age", 64, "<b>64 ans</b> (âge légal, réforme 2023 — pleinement effective en 2030)") +
+    REP + "Aujourd'hui : <b>62 ans 9 mois</b> (âge légal gelé jusqu'en 2028, LFSS 2026) · projection COR : " +
+    rep("data-age", 64, "<b>64 ans</b> (cible de la réforme 2023, vers 2032 si elle reprend)") +
     " · départ moyen constaté ≈ 62,8 ans</div></div>" +
     '<div class="sal-fixe" id="sal-fixe"></div>';
 
@@ -537,7 +541,7 @@
       chip("moyen", "salaire moyen") + " · " + chip("median", "salaire médian") +
       " — soit " + fmt0(salBrutRef()) + " € bruts (≈ " + fmt0(salNetRef()) + " € nets) par mois. " +
       (INV.base === "moyen"
-        ? "Le salaire moyen est calculé pour retrouver les 269 Md€ de cotisations retraite encaissées chaque année."
+        ? "Le salaire moyen est calculé pour retrouver les 277 Md€ de cotisations retraite encaissées en 2025 (COR)."
         : "Le salaire médian (≈ 81 % du moyen) décrit mieux le cotisant type : la moitié des salariés gagne moins.");
   }
 
@@ -742,7 +746,7 @@
             fmt0(INV.cible - finance) + " €" +
             (INV.annee >= 2000
               ? " — un manque comblé par les <b>impôts et la dette</b> : " +
-                "aujourd’hui <b>136 Md€ par an</b>, <a href=\"../treemap.html#realite\">le bloc " +
+                "aujourd’hui <b>145 Md€ par an</b> (2025), <a href=\"../treemap.html#realite\">le bloc " +
                 "cramoisi du Mondrian</a>"
               : "") + ".");
     } else if (atteint) {
