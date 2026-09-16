@@ -606,7 +606,9 @@
     // — carrés proportionnels reliés + ratio —
     const k = 96 / Math.sqrt(Math.max(A.md, B.md));
     const sA = Math.max(12, Math.sqrt(A.md) * k), sB = Math.max(12, Math.sqrt(B.md) * k);
-    const GAP = 96, PAD = 6, LABEL_H = 40;
+    // PAD 30 : l'étiquette « 145,2 Md€ » (≈ 60 px) est centrée sous un carré qui peut
+    // ne faire que 12 px — sans marge, le « 1 » sortait du cadre (« 45,2 Md€ »)
+    const GAP = 96, PAD = 30, LABEL_H = 40;
     const H = Math.max(sA, sB) + 12, W = PAD + sA + GAP + sB + PAD;
     const yA = H - sA, yB = H - sB, xB = PAD + sA + GAP;
     const big = Math.max(A.md, B.md) / Math.min(A.md, B.md);
