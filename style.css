@@ -31,6 +31,33 @@ html, body {
   line-height: 1.5;
 }
 
+/* ---------- navigation commune aux pages ---------- */
+.site-nav {
+  position: sticky; top: 0; z-index: 40;
+  display: flex; align-items: center; justify-content: space-between; gap: 16px;
+  height: 48px; padding: 0 20px;
+  background: var(--bg);
+  border-bottom: 1px solid var(--rule);
+  box-shadow: inset 0 4px 0 0 var(--etat);
+  background-image: linear-gradient(90deg, var(--etat) 0 25%, var(--secu) 25% 50%, var(--ct) 50% 75%, var(--dette) 75% 100%);
+  background-size: 100% 4px; background-repeat: no-repeat; background-position: top;
+}
+.site-brand { font: 700 17px/1 var(--serif); color: var(--ink); text-decoration: none; letter-spacing: .01em; white-space: nowrap; }
+.site-links { display: flex; gap: 4px; }
+.site-links a {
+  font: 700 12px/1 var(--sans); letter-spacing: .12em; text-transform: uppercase;
+  color: var(--ink-soft); text-decoration: none; padding: 9px 10px; border-radius: 999px;
+}
+.site-links a:hover { color: var(--ink); background: var(--paper); }
+.site-links a[aria-current="page"] { color: var(--ink); background: linear-gradient(transparent 60%, #F5E663 60%, #F5E663 92%, transparent 92%); }
+.site-links a { white-space: nowrap; }
+@media (max-width: 560px) {
+  .site-nav { padding: 0 12px; gap: 8px; }
+  .site-brand { font-size: 15px; }
+  .site-links a { padding: 9px 8px; letter-spacing: .08em; font-size: 11px; }
+  .site-links .art { display: none; }
+}
+
 /* ---------- page d'accueil (landing) ---------- */
 .home-link { color: var(--accent); font-weight: 700; text-decoration: none; }
 .home-link:hover { text-decoration: underline; }
@@ -113,12 +140,9 @@ html, body {
 
 /* ---------- entête éditorial ---------- */
 .masthead {
-  border-bottom: 3px solid var(--ink);
-  background:
-    linear-gradient(90deg, var(--etat) 0 25%, var(--secu) 25% 50%,
-                    var(--ct) 50% 75%, var(--dette) 75% 100%) top/100% 6px no-repeat,
-    var(--bg);
-  padding: 34px 20px 22px;
+  border-bottom: 2px solid var(--ink);
+  background: var(--bg);
+  padding: 22px 20px 16px;
 }
 .masthead-inner { max-width: 1180px; margin: 0 auto; }
 .kicker {
@@ -131,8 +155,9 @@ html, body {
 }
 h1 {
   font-family: var(--serif);
-  font-size: clamp(30px, 5vw, 56px);
-  margin: 0 0 10px;
+  font-size: clamp(26px, 3.6vw, 40px);
+  line-height: 1.15;
+  margin: 0 0 8px;
   font-weight: 700;
   letter-spacing: 0.01em;
   text-transform: uppercase;
@@ -142,35 +167,27 @@ h1 .hl {
   padding: 0 4px;
 }
 .standfirst {
-  max-width: 860px;
+  max-width: 760px;
   margin: 0;
   color: var(--ink-soft);
-  font-size: 15px;
-  font-style: italic;
-  font-family: var(--serif);
+  font-size: 15.5px;
+  line-height: 1.5;
+  font-style: normal;
+  font-family: var(--sans);
 }
 
 /* bande de totaux — écho de la bande jaune « RECETTES » du poster */
+/* ligne de totaux (ex-bandeau jaune) : discrète, sans fond, nombres en gras */
 .statband {
-  display: inline-flex;
-  align-items: center;
-  gap: 10px;
-  flex-wrap: wrap;
-  margin-top: 16px;
-  background: #FAF3A0;
-  border: 1.5px solid #1E2430;
-  border-radius: 999px;
-  padding: 7px 18px;
-  font-size: 14px;
+  display: block;
+  margin-top: 10px;
+  font-size: 13.5px;
+  color: var(--ink-soft);
+  line-height: 1.6;
 }
-.statband .stat b { text-transform: uppercase; font-size: 11px; letter-spacing: .06em; margin-right: 4px; }
-.statband .stat-dette b { color: var(--dette); }
-.statband .stat-dep b { color: #D94F26; }
-.statband .stat-eq { font-weight: 800; }
-.statband .stat-year {
-  background: #1E2430; color: #FAF3A0; border-radius: 999px;
-  padding: 2px 10px; font-weight: 800; font-size: 12px;
-}
+.statband b { color: var(--ink); font-variant-numeric: tabular-nums; }
+.statband .sep { color: var(--rule); margin: 0 6px; }
+.statband .stat-year { display: none; }
 
 /* ---------- section « pensions » (étage permanent) ---------- */
 .pensions-section { max-width: 1220px; margin: 30px auto 0; padding: 0 12px; }
@@ -305,7 +322,49 @@ main { max-width: 1220px; margin: 0 auto; padding: 6px 12px 8px; }
 .histo-card .histo-alert { color: var(--accent); font-weight: 700; }
 .histo-card text { font: 700 10px var(--sans); fill: var(--ink); }
 .histo-card .axis-year { font-weight: 400; fill: var(--ink-soft); }
+/* rail d'étages (U6) à gauche du canvas + scène */
+.stage-wrap { display: grid; grid-template-columns: 96px minmax(0, 1fr); gap: 10px; align-items: start; }
+.stage-wrap > #chart-stage { grid-column: 2; }      /* la scène reste en colonne 2 même rail masqué */
+.stage-rail { grid-column: 1; position: relative; height: 100%; min-height: 200px; }
+.stage-rail[hidden] { display: block; visibility: hidden; }
+.stage-lbl {
+  position: absolute; right: 0; transform: translateY(-50%);
+  width: 96px; text-align: right; padding-right: 10px;
+  font: 700 10.5px/1.25 var(--sans); letter-spacing: .12em; text-transform: uppercase; color: var(--ink-soft);
+  border-right: 2px solid var(--rule);
+}
+.stage-lbl::after { content: ""; position: absolute; right: -6px; top: 50%; width: 10px; height: 2px; background: var(--rule); }
+@media (max-width: 900px) {
+  .stage-wrap { grid-template-columns: 1fr; gap: 0; }
+  .stage-wrap > #chart-stage { grid-column: 1; }
+  .stage-rail, .stage-rail[hidden] { display: none; }
+}
 #chart-stage { position: relative; overflow: hidden; border-radius: 10px; }
+/* consigne dans le graphique (U10), en haut à droite */
+.chart-hint {
+  position: absolute; bottom: 12px; right: 12px; z-index: 4; margin: 0;
+  font: 500 11.5px/1 var(--sans); color: var(--ink-soft);
+  background: rgba(255,255,255,.85); border: 1px solid var(--rule); border-radius: 999px; padding: 6px 10px;
+  pointer-events: none;
+}
+.chart-hint kbd { font: 700 10px/1 var(--sans); border: 1px solid var(--rule); border-radius: 4px; padding: 1px 4px; background: var(--paper); }
+/* bandeau « thèse » (U5) posé sur le graphique */
+.these-banner {
+  position: absolute; z-index: 5; left: 12px; right: 12px; top: 10px;
+  display: flex; align-items: center; gap: 14px; flex-wrap: wrap;
+  background: var(--paper); border: 1px solid var(--ink); border-left: 6px solid #8E1B38; border-radius: 10px;
+  padding: 10px 14px; box-shadow: 0 8px 24px rgba(30,36,48,.12);
+}
+.these-banner[hidden] { display: none; }
+.these-text { margin: 0; flex: 1 1 380px; font-size: 14px; line-height: 1.45; color: var(--ink); }
+.these-text b { color: #8E1B38; font-size: 15px; }
+.these-banner .crumb { flex: none; background: var(--ink); color: var(--bg); border-color: var(--ink); }
+.these-banner .crumb:hover { background: #8E1B38; border-color: #8E1B38; }
+@media (max-width: 700px) {
+  .these-banner { left: 6px; right: 6px; top: 6px; padding: 8px 10px; }
+  .these-text { font-size: 13px; }
+  .chart-hint { display: none; }
+}
 #chart {
   width: 100%;
   height: 640px;               /* ajusté dynamiquement par app.js */
@@ -589,8 +648,7 @@ body[data-mode="realite"] .mode-lbl:first-of-type { opacity: .5; }
 .mondrian .masthead { padding: 22px 20px 14px; }
 .mondrian h1 { font-size: clamp(26px, 3.2vw, 38px); margin-bottom: 6px; }
 .mondrian .standfirst { font-size: 14px; max-width: 940px; }
-.mondrian .statband { margin-top: 10px; padding: 6px 14px; }
-.mondrian .statband .stat { font-size: 13px; }
+.mondrian .statband { margin-top: 8px; }
 
 @media (max-width: 640px) {
   /* le switch en pile : libellé / interrupteur / libellé, centrés */
@@ -648,9 +706,8 @@ body[data-mode="realite"] .mode-lbl:first-of-type { opacity: .5; }
 .dlg-calc td:last-child { text-align: right; font-weight: 700; white-space: nowrap; padding-left: 14px; }
 .dlg-calc .dlg-calc-tot td { border-bottom: 0; border-top: 2px solid var(--ink); padding-top: 7px; }
 .dlg-note { font-size: 12.5px; color: var(--ink-soft); margin: 10px 0 0; line-height: 1.5; }
-/* bandeau : ligne « par habitant » (échelle humaine, INSEE) */
-.stat-hab { flex-basis: 100%; font-size: 12.5px; color: var(--ink-soft); }
-.stat-hab b { color: var(--ink); }
+/* (ancienne ligne « par habitant » du bandeau : intégrée à la ligne de totaux) */
+.stat-hab { font-size: 13.5px; color: var(--ink-soft); }
 /* panneau retraites : part au-delà du taux privé, en second dans la même cellule */
 .ret-sub { display: block; font-size: 11.5px; color: var(--ink-soft); font-weight: 400; }
 .dlg-calc .dlg-calc-tot td:last-child { color: #8E1B38; font-size: 15px; }
@@ -660,8 +717,8 @@ body[data-mode="realite"] .mode-lbl:first-of-type { opacity: .5; }
    Une section par temps : texte à gauche (question → réponse), figure à droite
    (le chiffre, la vignette SVG, la légende). Tout en tokens du site.
    ========================================================================== */
-.fil .masthead .standfirst.fil-these { max-width: 900px; font-size: 17.5px; line-height: 1.6; color: var(--ink); font-style: normal; }
-.fil .masthead .standfirst.fil-these strong { color: var(--accent); }
+.fil .masthead .standfirst.fil-these { max-width: 860px; font: 400 19px/1.55 var(--serif); color: var(--ink); }
+.fil .masthead .standfirst.fil-these strong { color: var(--accent); font-weight: 700; }
 .fil-main { max-width: 1180px; margin: 0 auto; padding: 8px 20px 20px; }
 
 .temps {

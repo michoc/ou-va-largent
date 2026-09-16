@@ -10,21 +10,25 @@
   <meta property="og:description" content="Chaque euro en rectangles proportionnels, le déséquilibre des retraites (≈ 145 Md€ non contributifs) en évidence, trois lectures qui révèlent le maquillage comptable.">
   <meta property="og:image" content="https://michoc.github.io/ou-va-largent/assets/og-card.png">
   <link rel="preconnect" href="https://cdnjs.cloudflare.com">
-  <link rel="stylesheet" href="style.css?v=20260917c">
+  <link rel="stylesheet" href="style.css?v=20260918i">
 </head>
 <body class="mondrian" data-mode="realite">
+  <nav class="site-nav" aria-label="Navigation du site">
+    <a class="site-brand" href="index.html">Où va l'argent public&nbsp;?</a>
+    <span class="site-links">
+      <a href="index.html"><span class="art">Le </span>fil</a>
+      <a href="sankey.html"><span class="art">Les </span>flux</a>
+      <a href="treemap.html" aria-current="page"><span class="art">Les </span>masses</a>
+    </span>
+  </nav>
   <header class="masthead">
     <div class="masthead-inner">
-      <p class="kicker"><a class="home-link" href="index.html">← Accueil</a>
-        &nbsp;·&nbsp; Le Mondrian · dépenses · exercice 2025</p>
-      <h1><span class="hl">Le Mondrian des dépenses publiques</span></h1>
-      <p class="standfirst">
-        Chaque euro dépensé, en <strong>rectangles proportionnels</strong> — une seule fois.
-        Cliquez pour <strong>plonger</strong> (jusqu'au programme et à l'action). Les
-        <strong>trois lectures</strong> ci-dessous racontent le
-        <strong style="color:#8E1B38">déséquilibre des retraites</strong> (<span data-ch="non_contributif">145</span>&nbsp;Md€)&nbsp;:
-        d'abord camouflé dans les budgets, puis révélé en cramoisi, enfin regroupé en un bloc.
-      </p>
+      <p class="kicker">Les masses · exercice 2025</p>
+      <h1><span class="hl">Ce qu'on ne montre pas</span></h1>
+      <p class="standfirst">Chaque euro dépensé en rectangles proportionnels, une seule fois. Trois lectures
+        du même budget&nbsp;: ce qu'on montre, ce qui s'y cache, ce que ça coûte vraiment — les
+        <strong style="color:#8E1B38"><span data-ch="non_contributif">145</span>&nbsp;Md€</strong> de retraites
+        sans cotisation, d'abord fondus dans les budgets, puis révélés en cramoisi, enfin regroupés.</p>
       <div class="statband" id="statband" aria-label="Total des dépenses"></div>
     </div>
   </header>
@@ -65,9 +69,8 @@
       <div id="tm-crumb" class="tm-crumb" role="navigation" aria-label="Fil d'Ariane du Mondrian" hidden></div>
       <div id="treemap" role="img" aria-label="Mondrian des dépenses publiques françaises 2025"></div>
     </div>
-    <p class="hint">Somme des rectangles = <strong>dépenses totales</strong> du bandeau, sans double
-      compte, quel que soit le mode.
-      <a class="alt-view" href="sankey.html">↔ Voir le flux (Sankey)</a></p>
+    <p class="hint">Somme des rectangles = <strong>dépenses totales</strong>, sans double compte, quelle
+      que soit la lecture. <a class="alt-view" href="sankey.html">→ Les flux</a></p>
   </main>
 
   <footer class="metho">
@@ -126,7 +129,7 @@
   </dialog>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/echarts/5.5.0/echarts.min.js"></script>
-  <script src="treemap.js?v=20260917c"></script>
+  <script src="treemap.js?v=20260918i"></script>
   <script>
     // légende dynamique du switch + dialogue d'explication
     (function () {
@@ -175,6 +178,6 @@
       });
     })();
   </script>
-  <script src="lexique.js?v=20260917c"></script>
+  <script src="lexique.js?v=20260918i"></script>
 </body>
 </html>

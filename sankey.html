@@ -11,20 +11,24 @@
   <meta property="og:image" content="https://michoc.github.io/ou-va-largent/assets/og-card.png">
   <link rel="preconnect" href="https://cdnjs.cloudflare.com">
   <!-- ?v= : cache-busting — incrémenter à chaque déploiement de style/app -->
-  <link rel="stylesheet" href="style.css?v=20260917c">
+  <link rel="stylesheet" href="style.css?v=20260918i">
 </head>
 <body>
+  <nav class="site-nav" aria-label="Navigation du site">
+    <a class="site-brand" href="index.html">Où va l'argent public&nbsp;?</a>
+    <span class="site-links">
+      <a href="index.html"><span class="art">Le </span>fil</a>
+      <a href="sankey.html" aria-current="page"><span class="art">Les </span>flux</a>
+      <a href="treemap.html"><span class="art">Les </span>masses</a>
+    </span>
+  </nav>
   <header class="masthead">
     <div class="masthead-inner">
-      <p class="kicker"><a class="home-link" href="index.html">← Accueil</a>
-        &nbsp;·&nbsp; Le flux (Sankey) · exercice <span id="exercice">2025</span></p>
-      <h1><span class="hl">Où va l'argent public&nbsp;?</span></h1>
-      <p class="standfirst">
-        Pour comprendre en (presque) un clin d'œil d'où vient l'argent public et comment il est
-        dépensé. Chaque flux est en <strong>milliards d'euros</strong>&nbsp;; les données sont
-        sourcées dans l'open data officielle (État&nbsp;: LOLF&nbsp;· Sécu&nbsp;: LFSS) et le
-        diagramme est <strong>comptablement équilibré</strong>&nbsp;: recettes + dette = dépenses.
-      </p>
+      <p class="kicker">Les flux · exercice <span id="exercice">2025</span></p>
+      <h1><span class="hl">D'où vient l'argent, où il va</span></h1>
+      <p class="standfirst">Chaque euro rattaché à la recette qui le finance et à la dépense qui le
+        reçoit — et, en bas à gauche, ce qui finance les retraites sous un autre nom. Cliquer un bloc
+        pour plonger jusqu'au programme et à l'action.</p>
       <div class="statband" id="statband" aria-label="Totaux de l'exercice"></div>
     </div>
   </header>
@@ -43,14 +47,19 @@
       flux).</span>
       <span class="legend-more">Détail dans «&nbsp;Méthodologie&nbsp;».</span></p>
     <aside id="histo-card" class="histo-card" hidden aria-live="polite"></aside>
-    <div id="chart-stage">
-      <div id="chart" role="img" aria-label="Diagramme de Sankey des finances publiques françaises"></div>
+    <div class="stage-wrap">
+      <div class="stage-rail" id="stage-rail" aria-hidden="true"></div>
+      <div id="chart-stage">
+        <div class="these-banner" id="these-banner" hidden>
+          <p class="these-text"></p>
+          <button type="button" class="crumb" id="these-all">Voir tout le poster →</button>
+        </div>
+        <p class="chart-hint" id="chart-hint">Cliquer un bloc pour plonger · <kbd>Échap</kbd> pour revenir</p>
+        <div id="chart" role="img" aria-label="Diagramme de Sankey des finances publiques françaises"></div>
+      </div>
     </div>
-    <p class="hint" id="hint">Cliquez sur une famille de dépenses, une branche de la Sécu ou le nœud
-      <strong>« Pensions versées »</strong> — ou directement sur un flux — pour <strong>zoomer</strong>
-      dessus. <kbd>Échap</kbd> ou clic sur le fond pour dézoomer.
-      <a class="alt-view" href="treemap.html">➕ Voir aussi&nbsp;: le <strong>Mondrian des
-      dépenses</strong> (chaque euro en rectangles)</a></p>
+    <p class="hint" id="hint">Le même budget en rectangles, avec les retraites en évidence&nbsp;:
+      <a class="alt-view" href="treemap.html#realite">→ Les masses</a></p>
     <aside id="panel-retraites" class="panel-retraites" aria-live="polite"></aside>
   </main>
 
@@ -88,7 +97,7 @@
   </dialog>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/echarts/5.5.0/echarts.min.js"></script>
-  <script src="app.js?v=20260917c"></script>
-  <script src="lexique.js?v=20260917c"></script>
+  <script src="app.js?v=20260918i"></script>
+  <script src="lexique.js?v=20260918i"></script>
 </body>
 </html>

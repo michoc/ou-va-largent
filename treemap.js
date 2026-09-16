@@ -38,9 +38,9 @@
   el.style.height = stageH() + "px";
   const chart = echarts.init(el, null, { renderer: "canvas" });
 
-  // séparateur de milliers = ESPACE FINE INSÉCABLE (U+202F), forcé nous-mêmes
+  // séparateur de milliers = ESPACE INSÉCABLE (U+00A0 — la fine U+202F disparaît en gras), forcé nous-mêmes
   // (certains moteurs ne groupent pas via toLocaleString) → « 7 597 765 »
-  const group = (s) => s.replace(/\B(?=(\d{3})+(?!\d))/g, " ");
+  const group = (s) => s.replace(/\B(?=(\d{3})+(?!\d))/g, "\u00A0");
   const fmt = (v) => group(Number(v).toLocaleString("fr-FR", { maximumFractionDigits: 1 }).replace(/\s/g, ""));
   const fmt2 = (v) => group(Number(v).toLocaleString("fr-FR", { maximumFractionDigits: 2 }).replace(/\s/g, ""));
   const fmt0 = (v) => group(Math.round(Number(v)).toString());
@@ -886,10 +886,8 @@
     const pop = (((DATA.meta || {}).chiffres || {}).population_france || {}).millions;
     const hab = pop ? Math.round(c.depenses_totales * 1000 / pop / 10) * 10 : null;
     document.getElementById("statband").innerHTML =
-      '<span class="stat stat-dep"><b>Dépenses</b> ' + fmt(c.depenses_totales) + " Md€</span>" +
-      '<span class="stat-year">' + (DATA.meta || {}).exercice + "</span>" +
-      (hab ? '<span class="stat-hab">≈ <b>' + fmt0(hab) + " €</b> par habitant et par an (" + fmt(pop) +
-             " M hab., INSEE 1er janv. 2026)</span>" : "");
+      "<b>" + fmt(c.depenses_totales) + " Md€</b> de dépenses publiques en " + (DATA.meta || {}).exercice +
+      (hab ? '<span class="sep">·</span><b>' + fmt0(hab) + " €</b> par habitant" : "");
     cur = { name: "Ensemble des dépenses publiques", court: "l'ensemble des dépenses publiques",
             value: c.depenses_totales, color: "#5C7FB8" };
 

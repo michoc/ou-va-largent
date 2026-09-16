@@ -10,7 +10,7 @@
   "use strict";
 
   // fr-FR ne groupe pas les nombres à 4 chiffres (« 1300 ») : on force « 1 300 » (espace fine insécable)
-  const group = (s) => s.replace(/\s/g, "").replace(/\B(?=(\d{3})+(?!\d))/g, "\u202F");
+  const group = (s) => s.replace(/\s/g, "").replace(/\B(?=(\d{3})+(?!\d))/g, "\u00A0");
   const loc = (v, d) => Number(v).toLocaleString("fr-FR", { maximumFractionDigits: d });
   const fx = (v, d) => { const t = loc(v, d), i = t.search(/[,]/); return i < 0 ? group(t) : group(t.slice(0, i)) + t.slice(i); };
   const f0 = (v) => fx(v, 0);
@@ -53,13 +53,9 @@
     document.getElementById("exercice").textContent = meta.exercice || "2025";
     const hab = pop ? round100(dep * 1000 / pop) : null;
     document.getElementById("statband").innerHTML =
-      '<span class="stat"><b>Recettes</b> ' + f1(rec) + " Md€</span>" +
-      '<span class="stat stat-dette"><b>+ Dette</b> ' + f1(dette) + " Md€</span>" +
-      '<span class="stat-eq">=</span>' +
-      '<span class="stat stat-dep"><b>Dépenses</b> ' + f1(dep) + " Md€</span>" +
-      '<span class="stat-year">' + (meta.exercice || "2025") + "</span>" +
-      (hab ? '<span class="stat-hab">≈ <b>' + f0(hab) + " €</b> par habitant et par an (" + f1(pop) +
-             " M hab., INSEE 1er janv. 2026)</span>" : "");
+      "<b>" + f1(dep) + " Md€</b> de dépenses publiques en " + (meta.exercice || "2025") +
+      (hab ? '<span class="sep">·</span><b>' + f0(hab) + " €</b> par habitant" : "") +
+      '<span class="sep">·</span>' + f1(rec) + " de recettes, " + f1(dette) + " empruntés";
 
     // ---- chiffres transverses ----
     set("pensions", f0(pens)); set("pensions_1", f1(pens));

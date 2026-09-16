@@ -37,11 +37,21 @@
 
   let DATA = null;
   let viewStack = [];          // [] = vue d'ensemble ; sinon [{key,label,rect}, …]
+  // État « thèse » (U5) : au premier affichage, seuls les flux qui financent les
+  // retraites SOUS UN AUTRE NOM (ministères → pensions, Sécu → régimes) sont en
+  // cramoisi ; tout le reste est estompé. « Voir tout le poster » ou une plongée
+  // rendent le poster complet.
+  let THESE = true;
+  const REG_N = "Régimes de base & complémentaires";
+  const SECU_N = "Sécurité sociale (hors retraites)";
+  const isTheseLink = (l) => (l.target === PENS && l.source.indexOf("É · ") === 0) ||
+                             (l.source === SECU_N && l.target === REG_N);
 
   const PENS = "Pensions versées";
   const DETTE_NAMES = ["Émission de dette (Déficit)", "Déficit résiduel (dette sociale)"];
   // nœuds de la voie retraites (bord gauche) — pastilles rentrées sur mobile
   const LANE_NODES = {   // valeur = sens du décalage mobile (vers l'intérieur)
+    "Cotisations retraites (tous régimes)": 1,   // F11 : coupée au bord gauche sinon
     "Système de retraites (tous régimes)": 1,
     "Régimes de base & complémentaires": 1,
     "Pensions versées": 1,
@@ -52,10 +62,13 @@
 
   /* ---------------- utilitaires ---------------- */
 
+  // fr-FR ne groupe pas les nombres à 4 chiffres (« 1144,1 ») : groupement forcé
+  const group = (t) => { const i = t.search(/,/); const e = i < 0 ? t : t.slice(0, i), d = i < 0 ? "" : t.slice(i);
+    return e.replace(/\s/g, "").replace(/\B(?=(\d{3})+(?!\d))/g, "\u00A0") + d; };
   const fmt = (v) =>
-    Number(v).toLocaleString("fr-FR", { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + " Mds €";
-  const fmt0 = (v) => Number(v).toLocaleString("fr-FR", { maximumFractionDigits: 1 });
-  const fmt2 = (v) => Number(v).toLocaleString("fr-FR", { maximumFractionDigits: 2 });
+    group(Number(v).toLocaleString("fr-FR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })) + " Mds €";
+  const fmt0 = (v) => group(Number(v).toLocaleString("fr-FR", { maximumFractionDigits: 1 }));
+  const fmt2 = (v) => group(Number(v).toLocaleString("fr-FR", { maximumFractionDigits: 2 }));
   // chiffres transverses (meta.chiffres, un seul endroit : retraites_2025.json > cadrage_2025)
   const CH = () => (DATA && DATA.meta && DATA.meta.chiffres) || {};
   const tauxCas = (y) => { const t = CH().taux_cas_civils || {}; return t[String(y)] || null; };
@@ -196,7 +209,8 @@
       const short = shortLabel(n.name);
       const drillable = !!(DATA.drill && DATA.drill[n.name]) && !opts.noDrill;
       const col = colOf(n);
-      const show = !n.noLabel && v >= labelThreshold;
+      const involved = !opts.these || opts.theseNodes.has(n.name);
+      const show = !n.noLabel && v >= labelThreshold && involved;
       const isRoot = !!opts.rootWide && col === 0;   // racine d'une plongée : pastille large
       let offset = [0, 0];
       if (show && !isRoot) {
@@ -204,7 +218,9 @@
         labIdx[col] = k + 1;
         const st = opts.stagger || 28;   // écart du quinconce (plus grand sur mobile)
         if (col === 0) {
-          if (k % 2) offset = [0, -(st + 8)];
+          // recettes : quinconce à 3 niveaux vers le haut (la rangée est dense à droite)
+          offset = opts.col0Levels === 3 ? [[0, 0], [0, -(st + 8)], [0, -2 * (st + 8)]][k % 3]
+                                         : (k % 2 ? [0, -(st + 8)] : [0, 0]);
         } else if (col === opts.lastCol) {
           if (k % 2) offset = [0, st + 8];
         } else {
@@ -224,17 +240,21 @@
           color: isDette ? "#FDFCF8" : n.color,
           borderColor: isDette ? "#1E2430" : n.color,
           borderWidth: isDette ? 1.6 : 0,
+          opacity: involved ? 1 : 0.28,
         },
         label: {
           show: show,
           offset: offset,
           formatter: "{t|" + wrapText(short, isRoot ? 34 : opts.wrapChars || 14) +
-                     "}\n{v|" + fmt0(v) + " Md€}",
+                     "}\n{v|" + fmt0(v) + " Md€}" +
+                     // la glose du nœud de dette (F7) : le contour vide = l'argent qu'on n'a pas
+                     (isDette && col === 0 && !opts.noGlose ? "\n{g|l'argent qu'on n'a pas}" : ""),
           rich: {
-            t: { color: isDette ? "#1E2430" : "#FFFFFF", fontSize: isRoot ? 13 : 11,
-                 fontWeight: 700, lineHeight: isRoot ? 15 : 13, align: "center" },
-            v: { color: isDette ? "#1E2430" : "rgba(255,255,255,.92)", fontSize: isRoot ? 11 : 10,
+            t: { color: isDette ? "#1E2430" : "#FFFFFF", fontSize: isRoot ? 13.5 : (opts.fontSize || 12.5),
+                 fontWeight: 700, lineHeight: isRoot ? 16 : 15, align: "center" },
+            v: { color: isDette ? "#1E2430" : "rgba(255,255,255,.92)", fontSize: isRoot ? 11.5 : (opts.fontSizeV || 11),
                  fontWeight: 700, align: "center" },
+            g: { color: "#8E1B38", fontSize: 10, fontStyle: "italic", align: "center", lineHeight: 14 },
           },
           backgroundColor: isDette ? "#FFFFFF" : n.color,
           borderColor: isDette ? "#1E2430" : "rgba(0,0,0,.14)",
@@ -270,12 +290,17 @@
         links: links.map((l) => ({
           source: l.source, target: l.target, value: l.value, tooltip: l.tooltip,
           // part CAS Pensions : GRIS UNI = contribution directe sourcée ;
-          // HACHURES = part opérateurs estimée (cf. légende sous le fil d'ariane)
-          lineStyle: l.est
-            ? { color: HATCH, opacity: 0.85, curveness: 0.5 }
-            : l.cas
-              ? { color: "#9CA3B0", opacity: 0.62, curveness: 0.5 }
-              : { color: "gradient", opacity: 0.34, curveness: 0.5 },
+          // HACHURES = part opérateurs estimée (cf. légende sous le fil d'ariane).
+          // État « thèse » : les flux non contributifs en cramoisi, le reste estompé.
+          lineStyle: opts.these
+            ? (isTheseLink(l)
+                ? { color: l.est ? HATCH : "#8E1B38", opacity: l.est ? 0.9 : 0.82, curveness: 0.5 }
+                : { color: "#9CA3B0", opacity: 0.09, curveness: 0.5 })
+            : l.est
+              ? { color: HATCH, opacity: 0.85, curveness: 0.5 }
+              : l.cas
+                ? { color: "#9CA3B0", opacity: 0.62, curveness: 0.5 }
+                : { color: "gradient", opacity: 0.34, curveness: 0.5 },
         })),
         orient: "vertical",
         nodeAlign: "justify",
@@ -326,14 +351,45 @@
     { name: "Autres branches Sécu", col: 2, color: "#F2A9C4",
       tooltip: "Regroupé sur mobile : Famille, Autonomie, Accidents du travail. Détail sur grand écran." },
   ];
-  function mobileAggregate(nodes, links) {
-    const gnames = new Set(MOBILE_GROUP_NODES.map((n) => n.name));
-    const outNodes = nodes.filter((n) => !MOBILE_GROUPS[n.name])
-      .concat(MOBILE_GROUP_NODES);
+  /* Vue d'ensemble DESKTOP (U8) : les trois plus petites familles de l'État
+   * (Administration, Culture, Économie — 53 Md€ à elles trois) et l'Unédic sont
+   * regroupées ; le groupe reste PLONGEABLE (vue synthétique = leurs missions). */
+  const DESKTOP_GROUPS = {
+    "É · Administration & autres missions": "É · Autres missions",
+    "É · Culture, médias, sport": "É · Autres missions",
+    "É · Économie & investissements d'avenir": "É · Autres missions",
+    "Unédic (assurance chômage)": "Autres recettes Sécu",
+  };
+  const DESKTOP_GROUP_NODES = [
+    { name: "É · Autres missions", col: 2, color: "#E5A07A",
+      tooltip: "Administration générale, Culture & médias, Économie & investissements d'avenir — " +
+               "regroupées pour la lisibilité ; cliquer pour voir leurs missions." },
+  ];
+  // plongée synthétique d'un groupe = les missions de ses familles, en une vue
+  function ensureGroupDrill(gname, groups, color) {
+    if (!DATA.drill || DATA.drill[gname]) return;
+    const members = Object.keys(groups).filter((k) => groups[k] === gname && DATA.drill[k]);
+    if (!members.length) return;
+    const nodes = [{ name: gname, depth: 0, color: color }], links = [];
+    members.forEach((fam) => {
+      const v = DATA.drill[fam];
+      v.nodes.filter((n) => n.depth > 0).forEach((n) => {
+        if (!nodes.some((x) => x.name === n.name)) nodes.push(n);
+      });
+      v.links.forEach((l) => links.push(Object.assign({}, l, { source: l.source === fam ? gname : l.source })));
+    });
+    DATA.drill[gname] = { title: shortLabel(gname), nodes: nodes, links: links,
+      note: "Regroupement : " + members.map(shortLabel).join(", ") + "." };
+  }
+  function aggregate(nodes, links, GROUPS, GROUP_NODES) {
+    const gnames = new Set(GROUP_NODES.map((n) => n.name));
+    GROUP_NODES.forEach((g) => ensureGroupDrill(g.name, GROUPS, g.color));
+    const outNodes = nodes.filter((n) => !GROUPS[n.name])
+      .concat(GROUP_NODES.filter((g) => !nodes.some((n) => n.name === g.name)));
     const merged = {};
     for (const l of links) {
-      const s = MOBILE_GROUPS[l.source] || l.source;
-      const t = MOBILE_GROUPS[l.target] || l.target;
+      const s = GROUPS[l.source] || l.source;
+      const t = GROUPS[l.target] || l.target;
       if (s === t) continue;
       const k = s + "→" + t + (l.cas ? "|c" : "") + (l.est ? "|e" : "");
       if (!merged[k]) {
@@ -346,35 +402,79 @@
     }
     return { nodes: outNodes, links: Object.values(merged) };
   }
+  const mobileAggregate = (nodes, links) => aggregate(nodes, links, MOBILE_GROUPS, MOBILE_GROUP_NODES);
 
   function renderMacro() {
     viewStack = [];
-    // Mobile : poster plus HAUT + vue AGRÉGÉE (cf. mobileAggregate).
+    // Mobile : poster plus HAUT + vue AGRÉGÉE ; desktop : 0,52 × largeur (U9),
+    // petites familles regroupées (U8), étiquettes 12,5 px.
     const narrow = window.innerWidth < 700;
-    chartEl.style.height = (narrow
-      ? Math.max(1000, Math.round(window.innerHeight * 1.25))
-      : Math.max(820, Math.min(1080, window.innerWidth * 0.74))) + "px";
+    const H = narrow
+      ? Math.max(900, Math.round(window.innerHeight * 1.15))
+      : Math.max(560, Math.min(760, Math.round(window.innerWidth * 0.52)));
+    chartEl.style.height = H + "px";
     chart.resize();
     let nodes = macroSorted(DATA.nodes), links = DATA.links;
-    if (narrow) {
-      const agg = mobileAggregate(nodes, links);
-      nodes = macroSorted(agg.nodes);
-      links = agg.links;
-    }
+    const agg = narrow ? mobileAggregate(nodes, links) : aggregate(nodes, links, DESKTOP_GROUPS, DESKTOP_GROUP_NODES);
+    nodes = macroSorted(agg.nodes);
+    links = agg.links;
+    const theseNodes = new Set();
+    links.forEach((l) => { if (isTheseLink(l)) { theseNodes.add(l.source); theseNodes.add(l.target); } });
+    theseNodes.add(REG_N);
+    const top = narrow ? 168 : 138, bottom = narrow ? 60 : 56;
     chart.setOption(buildOption(nodes, links,
-      { lastCol: lastCol(nodes), iterations: 0, top: narrow ? 122 : 88,
-        wrapChars: narrow ? 11 : 14, labelMin: narrow ? 58 : undefined,
-        left: narrow ? 8 : 16, right: narrow ? 8 : 22,
-        stagger: narrow ? 42 : 28, laneNudge: narrow ? 30 : 0 }), true);
+      { lastCol: lastCol(nodes), iterations: 0, top: top, bottom: bottom,
+        wrapChars: narrow ? 11 : 15, labelMin: narrow ? 58 : 20,
+        left: narrow ? 8 : 16, right: narrow ? 8 : 44,
+        stagger: narrow ? 44 : 30, laneNudge: narrow ? 52 : 0, col0Levels: 3,
+        fontSize: narrow ? 11 : 12.5, fontSizeV: narrow ? 10 : 11, noGlose: narrow,
+        these: THESE, theseNodes: theseNodes }), true);
     retPanel.classList.remove("open");
     casLegendEl.hidden = true;
     histoEl.hidden = true;
     renderBreadcrumb();
+    renderStageRail(H, top, bottom);
+    renderTheseBanner(links);
   }
+
+  /* ---------- repères d'étage (U6) : à gauche du canvas, un libellé par rangée ---------- */
+  function renderStageRail(H, top, bottom) {
+    const rail = document.getElementById("stage-rail");
+    if (!rail) return;
+    const rows = [["D'où vient l'argent", 0], ["Qui le reçoit", 1], ["Ce qu'il finance", 2], ["Les retraites versées", 3]];
+    const inner = H - top - bottom;
+    rail.innerHTML = rows.map((r) => '<span class="stage-lbl" style="top:' +
+      Math.round(top + inner * r[1] / 3 + 10) + 'px">' + r[0] + "</span>").join("");
+    rail.hidden = false;
+  }
+  function hideStageRail() { const rail = document.getElementById("stage-rail"); if (rail) rail.hidden = true; }
+
+  /* ---------- bandeau « thèse » (U5) ---------- */
+  function renderTheseBanner(links) {
+    const b = document.getElementById("these-banner");
+    if (!b) return;
+    if (!THESE) { b.hidden = true; return; }
+    const tot = links.filter(isTheseLink).reduce((s, l) => s + l.value, 0);
+    const minist = links.filter((l) => isTheseLink(l) && l.target === PENS && !l.cotisation && !l.est).reduce((s, l) => s + l.value, 0);
+    const oper = links.filter((l) => isTheseLink(l) && l.target === PENS && (l.cotisation || l.est)).reduce((s, l) => s + l.value, 0);
+    const secu = links.filter((l) => isTheseLink(l) && l.source === SECU_N).reduce((s, l) => s + l.value, 0);
+    b.querySelector(".these-text").innerHTML =
+      "<b>" + fmt0(Math.round(tot)) + " milliards</b> sortent des budgets des ministères et de la Sécurité " +
+      "sociale pour payer des retraites — comptés comme des dépenses d'éducation, de défense, de santé. " +
+      "Ministères " + fmt0(Math.round(minist)) + " · leurs opérateurs " + fmt0(Math.round(oper)) +
+      " (hachures) · autres branches de la Sécu " + fmt0(Math.round(secu)) + ".";
+    b.hidden = false;
+  }
+  document.addEventListener("click", (e) => {
+    if (e.target && e.target.id === "these-all") { THESE = false; renderMacro(); }
+  });
 
   function renderDrill() {
     const key = viewStack[viewStack.length - 1].key;
     const d = DATA.drill[key];
+    THESE = false;                       // une plongée = le lecteur explore ; poster complet au retour
+    hideStageRail();
+    const tb = document.getElementById("these-banner"); if (tb) tb.hidden = true;
     if (d.kind === "retraites") {
       // Plongée retraites : décomposition verticale façon poster (COR, comptes 2025),
       // financeurs (ministères CAS Pensions + sources) → régimes → pensions versées.
@@ -664,13 +764,9 @@
     const c = meta.checks || {};
     const hab = parHabitant(c.depenses_totales);
     statEl.innerHTML =
-      '<span class="stat"><b>Recettes</b> ' + fmt0(c.recettes_hors_dette) + " Md€</span>" +
-      '<span class="stat stat-dette"><b>+ Dette</b> ' + fmt0(c.dette) + " Md€</span>" +
-      '<span class="stat-eq">=</span>' +
-      '<span class="stat stat-dep"><b>Dépenses</b> ' + fmt0(c.depenses_totales) + " Md€</span>" +
-      '<span class="stat-year">' + meta.exercice + "</span>" +
-      (hab ? '<span class="stat-hab">≈ <b>' + fmt0(hab) + " €</b> par habitant et par an (" +
-             fmt0(population()) + " M hab., INSEE 1er janv. 2026)</span>" : "");
+      "<b>" + fmt0(c.recettes_hors_dette) + " Md€</b> de recettes + <b>" + fmt0(c.dette) +
+      " Md€</b> empruntés = <b>" + fmt0(c.depenses_totales) + " Md€</b> dépensés en " + meta.exercice +
+      (hab ? '<span class="sep">·</span><b>' + fmt0(hab) + " €</b> par habitant" : "");
   }
 
   /* ---------------- panneau pensions (explication) ---------------- */
@@ -698,22 +794,15 @@
       '<p class="ret-big"><b>' + fmt0(r.cotisations_directes) + " Md€</b> de cotisations pour <b>" +
       fmt0(P) + " Md€</b> de pensions : <b>" + fmt0(r.ecart) + " Md€</b> financés autrement" +
       (hab ? " — ≈ " + fmt0(hab) + " € par habitant et par an" : "") + ".</p>" +
-      "<p>Le diagramme ci-dessus décompose ces ressources d'après le <b>COR</b> (" + esc(ch.cor_millesime || "rapport annuel") + ") : " +
-      "cotisations ≈ " + pct(r.cotisations_directes) + " % (dont " + fmt0(f.cotisations_operateurs) +
-      " Md€ versés par les opérateurs de l'État — universités, CNRS… — depuis les subventions des ministères, en hachures), " +
-      "contribution d'équilibre de l'État pour ses fonctionnaires ≈ " + pct(f.contribution_etat || 0) + " % (<b>" +
-      fmt0(f.contribution_etat) + " Md€</b>, la « contribution employeur » au CAS Pensions inscrite dans les budgets des ministères), " +
-      "impôts &amp; taxes affectés dont CSG ≈ " + pct(f.itaf || 0) + " % (" + fmt0(f.itaf) + " Md€), " +
-      "subventions aux régimes spéciaux, transferts, dette et produits financiers ≈ " + pct(reste) + " % (" + fmt0(reste) + " Md€).</p>" +
-      (tp.surcotisation_etat_fpe ? "<p>Quelle part de ces " + fmt0(f.contribution_etat) + " Md€ serait une cotisation « normale » ? " +
-        "Au taux employeur du privé (" + fmt2(tp.taux_prive_employeur) + " %), " + fmt0(tp.part_etat_au_taux_prive) +
-        " Md€ ; les " + fmt0(tp.surcotisation_etat_fpe) + " restants sont une subvention d'équilibre. La direction du Budget " +
-        "(Jaune Pensions 2026) arrive à " + fmt0(four.dg_budget_jaune_2026) + " Md€ sur 52 ; le Conseil d'analyse économique, à " +
-        "assiette corrigée, à " + fmt0(four.cae) + " ; l'IPP chiffre le seul déséquilibre démographique à " +
-        fmt0(four.ipp_desequilibre_demographique) + ".</p>" : "") +
-      "<p>Le canal budgétaire de l'État est le <b>CAS Pensions</b> : une contribution d'équilibre " +
-      "prélevée sur le budget de chaque ministère pour le système de retraites (déjà comprise dans ses " +
-      "crédits — part grisée des flux) :</p>" +
+      "<p>D'après le <b>COR</b> (" + esc(ch.cor_millesime || "rapport annuel") + ") : cotisations " +
+      pct(r.cotisations_directes) + " % · contribution d'équilibre de l'État pour ses fonctionnaires " +
+      pct(f.contribution_etat || 0) + " % (<b>" + fmt0(f.contribution_etat) + " Md€</b>, la « contribution employeur » " +
+      "au CAS Pensions, inscrite dans les budgets des ministères) · impôts et taxes affectés " + pct(f.itaf || 0) +
+      " % · régimes spéciaux, transferts et solde " + pct(reste) + " %." +
+      (tp.surcotisation_etat_fpe ? " Au taux du privé, " + fmt0(tp.surcotisation_etat_fpe) + " des " + fmt0(f.contribution_etat) +
+        " Md€ de l'État sont une subvention (de " + fmt0(four.cae) + " à " + fmt0(four.dg_budget_jaune_2026) +
+        " selon la convention — détail dans la Méthodologie)." : "") + "</p>" +
+      "<p>Ce que chaque ministère verse au CAS Pensions, déjà compris dans ses crédits (le gris des plongées) :</p>" +
       "<table>" + rows + "</table>" +
       '<p class="ret-src">Sources : COR (' + esc(ch.cor_millesime || "") + "), Cour des comptes (budget de l'État en 2025), " +
       "Sénat (avis PLF 2026, CAS Pensions), PLFSS 2026 — détail et calculs dans data/reference/retraites_2025.json.</p>";
