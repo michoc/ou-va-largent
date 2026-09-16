@@ -1,5 +1,5 @@
 {
-  "_comment": "Couche lexicale du site (F4). Chaque entrée : ce que c'est (court), combien ça pèse (poids, chiffres 2025 — COR juin 2026, LFI 2025, Cour des comptes), pourquoi ça compte ici (ici). `variantes` = formes reconnues dans le texte (la plus longue gagne) ; `sigle: true` = casse exacte, souligné à CHAQUE occurrence ; sinon première occurrence par zone. Rendu par lexique.js.",
+  "_comment": "Couche lexicale du site (F4). Chaque entrée : ce que c'est (court), combien ça pèse (poids, chiffres 2025 — COR juin 2026, LFI 2025, Cour des comptes), pourquoi ça compte ici (ici). `variantes` = formes reconnues dans le texte (la plus longue gagne) ; `sigle: true` = casse exacte, souligné à CHAQUE occurrence ; sinon première occurrence par zone. Rendu par lexique.js. `souligne: false` = entrée du glossaire non soulignée dans les textes (mot qui ne bloque personne).",
   "millesime": "chiffres 2025",
   "entrees": [
     {
@@ -12,7 +12,8 @@
       ],
       "court": "Milliard d'euros — mille millions. C'est l'unité de tout le site.",
       "poids": "1 Md€ ≈ 14,50 € par habitant (69,1 millions d'habitants).",
-      "ici": "Les dépenses publiques du poster : 1 300 Md€ par an."
+      "ici": "Les dépenses publiques du poster : 1 300 Md€ par an.",
+      "souligne": false
     },
     {
       "id": "cotisation",
@@ -198,7 +199,8 @@
       ],
       "court": "Les trois étages du budget de l'État : une mission (Enseignement scolaire) contient des programmes (Premier degré), qui contiennent des actions.",
       "poids": "Enseignement scolaire : 88,8 Md€ de crédits votés en 2025, dont 25,5 de contribution au CAS Pensions.",
-      "ici": "Le site descend jusqu'à l'action ; la part retraites est grisée à chaque étage."
+      "ici": "Le site descend jusqu'à l'action ; la part retraites est grisée à chaque étage.",
+      "souligne": false
     },
     {
       "id": "dette",
@@ -211,7 +213,8 @@
       ],
       "court": "La différence entre ce qui est dépensé et ce qui est encaissé, empruntée sur les marchés.",
       "poids": "156 Md€ en 2025 — un euro sur huit ; déficit de l'État exécuté : 124 Md€ (Cour des comptes).",
-      "ici": "Le contour vide du poster : « l'argent qu'on n'a pas »."
+      "ici": "Le contour vide du poster : « l'argent qu'on n'a pas ».",
+      "souligne": false
     },
     {
       "id": "repartition",

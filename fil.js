@@ -249,6 +249,22 @@
     SVG("svg-t6", W, 100, s);
   }
 
+  /* ---------- rail 1-7 : le temps courant ---------- */
+  const rail = document.getElementById("fil-rail");
+  if (rail && "IntersectionObserver" in window) {
+    const links = {};
+    rail.querySelectorAll("a[data-t]").forEach((a) => (links[a.dataset.t] = a));
+    const io = new IntersectionObserver((entries) => {
+      entries.forEach((e) => {
+        if (!e.isIntersecting) return;
+        const t = e.target.id.replace("t", "");
+        Object.values(links).forEach((a) => a.classList.toggle("is-current", a.dataset.t === t));
+      });
+    }, { rootMargin: "-40% 0px -50% 0px", threshold: 0 });
+    document.querySelectorAll(".temps[id]").forEach((sec) => io.observe(sec));
+    if (links["1"] && !rail.querySelector(".is-current")) links["1"].classList.add("is-current");
+  }
+
   /* ---------- partage ---------- */
   const shareBtn = document.getElementById("share-btn"), toast = document.getElementById("share-toast");
   if (shareBtn) shareBtn.addEventListener("click", () => {

@@ -10,7 +10,7 @@
   <meta property="og:description" content="Chaque euro en rectangles proportionnels, le déséquilibre des retraites (≈ 145 Md€ non contributifs) en évidence, trois lectures qui révèlent le maquillage comptable.">
   <meta property="og:image" content="https://michoc.github.io/ou-va-largent/assets/og-card.png">
   <link rel="preconnect" href="https://cdnjs.cloudflare.com">
-  <link rel="stylesheet" href="style.css?v=20260918i">
+  <link rel="stylesheet" href="style.css?v=20260919c">
 </head>
 <body class="mondrian" data-mode="realite">
   <nav class="site-nav" aria-label="Navigation du site">
@@ -34,23 +34,6 @@
   </header>
 
   <main>
-    <aside id="compare-panel" class="histo-card compare-panel" aria-live="polite">
-      <div class="histo-text">
-        <h3>⚖ Comparateur d'ordres de grandeur</h3>
-        <div class="cmp-selects">
-          <label class="cmp-label">Comparer&nbsp;:
-            <select id="compare-a"></select></label>
-          <button type="button" class="cmp-swap" id="compare-swap" title="Inverser">⇄</button>
-          <label class="cmp-label">avec&nbsp;:
-            <select id="compare-b"></select></label>
-        </div>
-        <div id="compare-body"></div>
-        <p class="histo-note"><strong>Cliquez un bloc</strong> du Mondrian (à n'importe quelle
-          profondeur) pour le placer dans le comparateur. Aires proportionnelles&nbsp;; ordres de
-          grandeur externes indicatifs (compilation de l'auteur).</p>
-      </div>
-    </aside>
-
     <div class="mode-bar">
       <p class="steps-lead">Le même budget, <strong>trois lectures</strong> — cliquez pour dérouler&nbsp;:</p>
       <div class="mode-steps" role="group" aria-label="Trois lectures du même budget">
@@ -60,7 +43,7 @@
           <span class="step-n">2</span> Ce qui s'y cache</button>
         <button type="button" class="mode-step" data-mode="realite" aria-pressed="false">
           <span class="step-n">3</span> Ce que ça coûte vraiment</button>
-        <button type="button" class="mode-info" id="mode-info-btn" aria-label="Comprendre ces trois lectures">?</button>
+        <button type="button" class="mode-info" id="mode-info-btn">Comprendre le calcul</button>
       </div>
       <p class="mode-caption" id="mode-caption"></p>
     </div>
@@ -69,6 +52,31 @@
       <div id="tm-crumb" class="tm-crumb" role="navigation" aria-label="Fil d'Ariane du Mondrian" hidden></div>
       <div id="treemap" role="img" aria-label="Mondrian des dépenses publiques françaises 2025"></div>
     </div>
+    <section class="calc-block" id="calc-block" aria-label="Le calcul des sommes non contributives">
+      <p class="dlg-calc-title">Le calcul des <span data-ch="non_contributif">145</span>&nbsp;Md€ non contributifs (2025, COR)</p>
+      <div id="calc-table"></div>
+      <p class="dlg-note">Convention du COR&nbsp;: les cotisations comprennent celles des employeurs privés, des collectivités
+        et hôpitaux et des opérateurs de l'État&nbsp;; l'intégralité de la contribution de l'État pour ses fonctionnaires
+        est une contribution d'équilibre. <a class="phase-link" data-info="1" role="button" tabindex="0">Comprendre le calcul</a></p>
+    </section>
+
+    <details id="compare-panel" class="histo-card compare-panel">
+      <summary><span class="cmp-title">⚖ Comparer à un ordre de grandeur</span>
+        <span class="cmp-hint">cliquer un bloc du Mondrian pour le placer ici</span></summary>
+      <div class="histo-text">
+        <div class="cmp-selects">
+          <label class="cmp-label">Comparer&nbsp;:
+            <select id="compare-a"></select></label>
+          <button type="button" class="cmp-swap" id="compare-swap" title="Inverser">⇄</button>
+          <label class="cmp-label">avec&nbsp;:
+            <select id="compare-b"></select></label>
+        </div>
+        <div id="compare-body"></div>
+        <p class="histo-note">Aires proportionnelles&nbsp;; ordres de grandeur externes indicatifs
+          (compilation de l'auteur).</p>
+      </div>
+    </details>
+
     <p class="hint">Somme des rectangles = <strong>dépenses totales</strong>, sans double compte, quelle
       que soit la lecture. <a class="alt-view" href="sankey.html">→ Les flux</a></p>
   </main>
@@ -129,7 +137,7 @@
   </dialog>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/echarts/5.5.0/echarts.min.js"></script>
-  <script src="treemap.js?v=20260918i"></script>
+  <script src="treemap.js?v=20260919c"></script>
   <script>
     // légende dynamique du switch + dialogue d'explication
     (function () {
@@ -138,14 +146,17 @@
         'background:#8E1B38;vertical-align:-2px;margin-right:5px"></span>';
       const go = (m, t) => '<a class="phase-link" data-goto="' + m + '" role="button" tabindex="0">' + t + '</a>';
       const info = '<a class="phase-link" data-info="1" role="button" tabindex="0">le calcul détaillé</a>';
+      // le tableau des 145 est écrit une fois (dans le dialogue) et cloné sous le graphique (lecture ②)
+      const calcTable = document.querySelector("#mode-dlg .dlg-calc");
+      if (calcTable) document.getElementById("calc-table").appendChild(calcTable.cloneNode(true));
       // chiffres transverses (meta.chiffres) : remplis dès que la donnée est chargée
       const CH = { non_contributif: 145, pensions_versees: 422, direct: 346 };
       const f0 = (v) => Math.round(Number(v)).toLocaleString("fr-FR");
       const f1 = (v) => Number(v).toLocaleString("fr-FR", { maximumFractionDigits: 1 });
       const texts = () => ({
-        officiel: "① Ce qu'on montre — le budget tel qu'il est présenté à la nation : les " + f0(CH.non_contributif) + " Md€ qui financent les retraites sans cotisation sont <strong>fondus dans les budgets bruts</strong>, invisibles. Les retraites semblent ne coûter que " + f0(CH.direct) + " Md€. &nbsp;" + go("revele", "→ Révéler ces sommes"),
-        revele: SW + "② Ce qui s'y cache — en cramoisi, les <strong>subventions d'équilibre des retraites</strong> : prélevées sur les budgets sans le dire, à leur place. <strong>" + f0(CH.non_contributif) + " Md€</strong> au total (" + info + "). &nbsp;" + go("realite", "→ Voir le budget réel"),
-        realite: "③ Ce que ça coûte vraiment — ces sommes ont quitté les budgets (affichés <strong>nets</strong>) et forment le bloc « Déséquilibre des retraites — " + f0(CH.non_contributif) + " Md€ ». Le bloc Retraites affiche ses vrais " + f0(CH.pensions_versees) + " Md€. &nbsp;" + go("officiel", "◀ D'où sort ce chiffre&nbsp;?"),
+        officiel: "Le budget tel qu'il est présenté : les <strong>" + f0(CH.non_contributif) + " Md€</strong> de retraites sans cotisation sont fondus dans les budgets. Les retraites semblent coûter " + f0(CH.direct) + " Md€. &nbsp;" + go("revele", "→ Révéler ces sommes"),
+        revele: SW + "En cramoisi, à leur place dans chaque budget : les <strong>" + f0(CH.non_contributif) + " Md€</strong> qui financent les retraites sous un autre nom (détail sous le graphique). &nbsp;" + go("realite", "→ Ce que ça coûte vraiment"),
+        realite: "Budgets nets, et le bloc « Déséquilibre des retraites — <strong>" + f0(CH.non_contributif) + " Md€</strong> » : les retraites coûtent " + f0(CH.pensions_versees) + " Md€. &nbsp;" + go("officiel", "◀ D'où sort ce chiffre&nbsp;?"),
       });
       function refresh() { const t = texts(); cap.innerHTML = t[document.body.dataset.mode] || t.realite; }
       new MutationObserver(refresh).observe(document.body, { attributes: true, attributeFilter: ["data-mode"] });
@@ -170,6 +181,9 @@
       document.getElementById("mode-info-btn").addEventListener("click", () => dlg.showModal());
       document.getElementById("mode-dlg-close").addEventListener("click", () => dlg.close());
       // liens incitatifs dans la légende : changent de phase (via le bouton) ou ouvrent le calcul
+      document.getElementById("calc-block").addEventListener("click", (e) => {
+        if (e.target.closest("[data-info]")) dlg.showModal();
+      });
       cap.addEventListener("click", (e) => {
         const a = e.target.closest(".phase-link"); if (!a) return;
         if (a.dataset.info) { dlg.showModal(); return; }
@@ -178,6 +192,6 @@
       });
     })();
   </script>
-  <script src="lexique.js?v=20260918i"></script>
+  <script src="lexique.js?v=20260919c"></script>
 </body>
 </html>

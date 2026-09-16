@@ -53,7 +53,7 @@
   const ACCENT = "#C13B55";
   const DEFICIT = "#8E1B38";                    // cramoisi = argent NON CONTRIBUTIF des retraites
   const COL = { etat: "#F09D86", secu: "#EE8FB4", pens: "#C94A6E", ct: "#D9A441", ue: "#A79BC8",
-                cot: "#8C79C0" };
+                cot: "#8C79C0", cotis: "#E9BBC8" };   // cotis = rose pâle : seul le cramoisi est saturé
 
   // hachures ROUGES (déséquilibre des retraites) et GRISES (contributions
   // retraites logées dans les administrations, mode « tel que présenté »)
@@ -459,7 +459,7 @@
               "transferts entre branches — le maquillage comptable.",
         children: [
           { name: "Cotisations", value: Math.round(cotNode * 100) / 100,
-            itemStyle: { color: COL.pens }, label: { color: inkFor(COL.pens) },
+            itemStyle: { color: COL.cotis }, label: { color: inkFor(COL.cotis) },
             _tip: fmt(cotNode) + " Md€ de cotisations — hors les " + fmt(cotOp) + " Md€ versés par les " +
                   "opérateurs de l'État, ici fondus dans les budgets des ministères (" + fmt(cot) + " au total, COR)." },
           // ① camouflé (rose pâle, comme la présentation) ; ② révélé : cramoisi —
@@ -512,8 +512,8 @@
               fmt0(cot) + " : il manque " + fmt0(deficit) + " Md€ (la zone cramoisie).",
         children: [
           { name: "Financé par les cotisations", value: Math.round(cot * 100) / 100,
-            itemStyle: { color: COL.pens, borderColor: COL.pens, borderWidth: 0, gapWidth: 0 },
-            label: { color: inkFor(COL.pens) },
+            itemStyle: { color: COL.cotis, borderColor: COL.cotis, borderWidth: 0, gapWidth: 0 },
+            label: { color: inkFor(COL.cotis) },
             _tip: fmt(cot) + " Md€ de cotisations vieillesse tous régimes (≈ 2/3 des ressources — COR), dont " +
                   fmt(cotOp) + " versés par les opérateurs de l'État depuis les subventions des ministères." },
           { name: "Déséquilibre des retraites", value: deficit, children: defKids,
@@ -570,7 +570,8 @@
     });
   }
   fillSelect(selA); fillSelect(selB);
-  selA.value = "deficit"; selB.value = "CLICK";
+  selA.value = "deficit"; selB.value = "defense";   // amorce : 145 contre le budget de la Défense
+  if (cmpPanel && "open" in cmpPanel) cmpPanel.open = !isPhone();
 
   function resolve(sel) {
     if (sel.value === "CLICK")
@@ -752,7 +753,23 @@
   const crumbEl = document.getElementById("tm-crumb");
   let navPath = [];
 
-  function topData() { return DATA_G ? build(DATA_G, MODE) : []; }
+  // Étiquettes : une tuile n'a un nom que si elle a la place de ≈ 3 lignes (≈ 2 600 px²)
+  // — sinon rien (le survol suffit) : fini les « Cult… média… ». Seuil en Md€ = 2 600 px²
+  // × total / aire du canvas, recalculé au resize.
+  let LABEL_MIN = 4;
+  function computeLabelMin() {
+    const c = (DATA_G && DATA_G.meta && DATA_G.meta.checks) || {};
+    const area = Math.max(1, el.clientWidth * el.clientHeight);
+    LABEL_MIN = Math.round(2600 * (c.depenses_totales || 1300) / area * 10) / 10;
+  }
+  function withLabels(nodes) {
+    (nodes || []).forEach((n) => {
+      if (n.children && n.children.length) { withLabels(n.children); return; }
+      if (n.value != null && n.value < LABEL_MIN) n.label = Object.assign({}, n.label, { show: false });
+    });
+    return nodes;
+  }
+  function topData() { return DATA_G ? withLabels(build(DATA_G, MODE)) : []; }
   // enfants du nœud courant ; RE-RÉSOLU depuis un build frais → la plongée
   // survit aux changements de phase (et se replie si le nœud n'existe plus)
   function viewData() {
@@ -837,7 +854,7 @@
     navPath = [];   // un changement de phase repart de la vue d'ensemble
     clearPatches(); // efface un éventuel contour pointillé de plongée
     // ② montre 3 niveaux (Ministères → famille → net/cramoisi scindés) ; ①/③ 2.
-    chart.setOption({ series: [{ data: build(DATA_G, mode), leafDepth: mode === "revele" ? 3 : 2,
+    chart.setOption({ series: [{ data: withLabels(build(DATA_G, mode)), leafDepth: mode === "revele" ? 3 : 2,
       animationDurationUpdate: animate === false ? 0 : 800 }] });
     renderCrumb();
   }
@@ -878,6 +895,7 @@
   /* ============ boot ============ */
   function boot(DATA) {
     DATA_G = DATA;
+    computeLabelMin();
     refsFromData(DATA);
     // le mode du hash est fixé AVANT le premier rendu (un double setOption au
     // boot laissait les tuiles à taille zéro) ; setMode ne fera que synchroniser
@@ -904,7 +922,8 @@
         },
       },
       series: [{
-        type: "treemap", name: "Vue d'ensemble", data: build(DATA, MODE),
+        type: "treemap", name: "Vue d'ensemble", data: withLabels(build(DATA, MODE)),
+        drillDownIcon: "",            // plus de « ▶ » devant chaque nom (U14)
         leafDepth: MODE === "revele" ? 3 : 2, roam: false,
         // ⚠ on PILOTE nous-mêmes le drill (nodeClick:false) : le zoom natif
         // plongeait dans les FEUILLES (nœuds sans enfant) → grand espace blanc
@@ -960,6 +979,9 @@
         cur = { name: p.name, value: Array.isArray(p.value) ? p.value[0] : p.value,
                 color: (p.data.itemStyle && p.data.itemStyle.color) || p.color || "#5C7FB8" };
         if (typeof cur.color !== "string") cur.color = "#5C7FB8";   // motif hachuré → couleur neutre
+        // le bloc cliqué remplace l'amorce, et le comparateur s'ouvre (replié sur mobile)
+        if (selB.value !== "CLICK" && selA.value !== "CLICK") selB.value = "CLICK";
+        if (cmpPanel && "open" in cmpPanel) cmpPanel.open = true;
         renderCompare();
       }
       // 2) plongée : SEULEMENT les blocs ayant des enfants (jamais une feuille →
@@ -989,9 +1011,9 @@
 
   window.addEventListener("resize", () => {
     el.style.height = stageH() + "px";
-    // le seuil de tuiles visibles dépend du format → on reconstruit au besoin
-    if (DATA_G) chart.setOption({ series: [{ visibleMin: isPhone() ? 24 : 8 }] });
+    // le seuil de tuiles visibles et celui des étiquettes dépendent du format
     chart.resize();
+    if (DATA_G) { computeLabelMin(); chart.setOption({ series: [{ visibleMin: isPhone() ? 24 : 8, data: viewData() }] }); }
     // le contour pointillé du rappel suit le nouveau layout
     if (stageEl.querySelector(".mig-ghost")) setTimeout(showGhostOutline, 150);
   });

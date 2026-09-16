@@ -180,7 +180,7 @@
     .then((g) => {
       window.lexique.millesime = g.millesime || "";
       (g.entrees || []).forEach((e) => (entries[e.id] = e));
-      const list = Object.values(entries);
+      const list = Object.values(entries).filter((e) => e.souligne !== false);   // U24
       reSigle = build(list.filter((e) => e.sigle), "gu");
       reMot = build(list.filter((e) => !e.sigle), "giu");
       apply(document.body);
