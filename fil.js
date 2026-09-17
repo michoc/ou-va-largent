@@ -150,7 +150,26 @@
     svgT4(taux, tPriv);
     if (esrData) svgT5(esrData);
     svgT6(ratio, rgHist);
-    svgT6b(recup, pens && nc ? nc / pens : 0);
+    // part financée par les cotisations aujourd'hui (277/422) et sa projection à taux
+    // constant : proportionnelle au nombre de cotisants par retraité (COR : 1,8 → 1,3)
+    const partCot = pens && cot ? cot / pens : 0;
+    const ratioKeys = Object.keys(ratio).map(Number).sort((a, b) => a - b);
+    const ratioAt = (y) => {
+      if (!ratioKeys.length) return null;
+      if (y <= ratioKeys[0]) return ratio[ratioKeys[0]];
+      if (y >= ratioKeys[ratioKeys.length - 1]) return ratio[ratioKeys[ratioKeys.length - 1]];
+      for (let i = 1; i < ratioKeys.length; i++) if (y <= ratioKeys[i]) {
+        const a = ratioKeys[i - 1], b = ratioKeys[i];
+        return ratio[a] + (ratio[b] - ratio[a]) * (y - a) / (b - a);
+      }
+      return null;
+    };
+    const r2025 = ratioAt(2025);
+    const partCotAt = (y) => (partCot && r2025 ? partCot * ratioAt(y) / r2025 : partCot);
+    const futurs = {};
+    Object.keys(recup).forEach((g) => { if (+g + 64 > 2025) futurs[g] = recup[g] * partCotAt(+g + 64); });
+    ["1980", "2000"].forEach((g) => { if (futurs[g]) set("cot_" + g, f2(futurs[g])); });
+    svgT6b(recup, partCot, partCotAt);
   }
 
   /* ---------- 1 · recettes et emprunt ---------- */
@@ -266,40 +285,48 @@
   }
 
   /* ---------- 6b · ce qu'on verse à une génération pour 1 € cotisé ---------- */
-  /* Pour les générations qui partent après 2025 (nées à partir de 1970), la barre est
-   * la pension PROMISE par les règles : elle n'est versée que si l'argent qui manque
-   * continue d'être pris ailleurs. Cette part (non contributif ÷ pensions, 34 % en 2025)
-   * est hachurée en cramoisi — la même génération la paie aussi, en impôts et en dette. */
-  function svgT6b(rec, partAilleurs) {
+  /* Générations déjà à la retraite (départ avant 2025) : la barre entière est la pension
+   * versée, scindée en part financée par les cotisations (violet, 66 % aujourd'hui) et part
+   * financée autrement (hachures cramoisies : impôts, dette, budgets). Générations futures :
+   * SEULE la part que les cotisations financent, au taux d'aujourd'hui, avec de moins en
+   * moins de cotisants par retraité (1,8 → 1,3) — le crash. */
+  function svgT6b(rec, partCot, partCotAt) {
     const gens = Object.keys(rec).sort();
     if (!gens.length) return;
-    const W = 300, H = 138, colW = W / gens.length, bw = Math.min(26, colW - 8);
+    const W = 300, H = 142, colW = W / gens.length, bw = Math.min(26, colW - 8);
     const base = 100, hMax = 62, vMax = Math.max.apply(null, gens.map((g) => rec[g])), sc = hMax / vMax;
     let s = '<defs><pattern id="hachT6" width="4" height="4" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">' +
             '<rect width="4" height="4" fill="' + C.paper + '"/><line x1="0" y1="0" x2="0" y2="4" stroke="' + C.cram + '" stroke-width="1.6"/></pattern></defs>';
     const y1 = base - 1 * sc;
-    const fx1 = (v) => (Math.round(v * 20) / 20).toFixed(2).replace(/0$/, "").replace(".", ",");
-    let hachDrawn = false;
+    const fx = (v) => (v >= 2 ? v.toFixed(1) : v.toFixed(2).replace(/0$/, "")).replace(".", ",");
+    let xSplit = null;
     gens.forEach((g, i) => {
-      const v = rec[g], x = i * colW + (colW - bw) / 2, h = v * sc, key = i === 0 || g === "1960" || g === "1980";
-      s += R(x, base - h, bw, h, C.pens, ' rx="2"' + (key ? "" : ' opacity=".5"'));
-      if (partAilleurs > 0 && +g >= 1970) {   // départ après 2025 : promesse, dont la part prise ailleurs
-        const hh = h * partAilleurs;
-        s += R(x, base - h, bw, hh, "url(#hachT6)", ' rx="2" stroke="' + C.cram + '" stroke-width=".6"');
-        hachDrawn = true;
+      const x = i * colW + (colW - bw) / 2, futur = +g + 64 > 2025;
+      if (futur && xSplit == null) xSplit = i * colW;
+      const key = i === 0 || g === "1960" || g === "1980" || g === "2000";
+      if (!futur) {
+        const v = rec[g], h = v * sc, hc = h * (partCot || 1);
+        s += R(x, base - hc, bw, hc, C.pens, ' rx="2"' + (key ? "" : ' opacity=".55"'));
+        if (partCot) s += R(x, base - h, bw, h - hc, "url(#hachT6)", ' rx="2" stroke="' + C.cram + '" stroke-width=".6"');
+        s += T(x + bw / 2, base - h - 4, fx(v) + (key ? " €" : ""), { a: "middle", s: key ? 9 : 7, c: key ? C.ink : C.soft, w: key ? 700 : 400 });
+      } else {
+        const v = rec[g] * partCotAt(+g + 64), h = v * sc;
+        s += R(x, base - h, bw, h, C.pens, ' rx="2"' + (key ? "" : ' opacity=".55"'));
+        s += T(x + bw / 2, base - h - 4, fx(v) + (key ? " €" : ""), { a: "middle", s: key ? 9 : 7, c: key ? C.cram : C.soft, w: key ? 700 : 400 });
       }
-      s += T(x + bw / 2, base - h - 4, fx1(v) + (key ? " €" : ""), { a: "middle", s: key ? 9 : 7, c: key ? C.ink : C.soft, w: key ? 700 : 400 });
       s += T(x + bw / 2, base + 12, g, { a: "middle", s: 7.5, c: key ? C.ink : C.soft, w: key ? 700 : 400 });
     });
     s += '<line x1="6" y1="' + y1 + '" x2="' + (W - 6) + '" y2="' + y1 + '" stroke="' + C.ink + '" stroke-width="1" stroke-dasharray="3 3"/>';
-    s += TAG(W - 6, y1 - 1, "1 € cotisé", C.ink, 7);
-    s += T(6, 10, "génération (année de naissance)", { s: 7, c: C.soft });
-    if (hachDrawn) {
-      s += R(6, base + 19, 9, 6, "url(#hachT6)", ' stroke="' + C.cram + '" stroke-width=".6"') +
-           T(19, base + 24.5, "dès 1970, pension promise par les règles : la part que les cotisations ne couvrent pas (" +
-             f0(partAilleurs * 100) + " % aujourd'hui)", { s: 6.4, c: C.cram }) +
-           T(19, base + 33, "vient des impôts et de la dette — que ces générations paient aussi", { s: 6.4, c: C.cram });
+    s += TAG(6 + ("1 € cotisé".length * 7 * 0.56 + 8), y1 - 1, "1 € cotisé", C.ink, 7);   // à gauche : la droite est encombrée
+    if (xSplit != null) {
+      s += '<line x1="' + xSplit + '" y1="14" x2="' + xSplit + '" y2="' + (base + 16) + '" stroke="' + C.rule + '" stroke-width="1"/>';
+      s += T(xSplit - 5, 10, "déjà à la retraite", { a: "end", s: 6.5, c: C.soft }) + T(xSplit + 5, 10, "partent après 2025", { s: 6.5, c: C.soft });
     }
+    // légende
+    s += R(6, base + 20, 9, 6, C.pens) + T(19, base + 25.5, "financé par les cotisations", { s: 6.4, c: C.ink }) +
+         R(112, base + 20, 9, 6, "url(#hachT6)", ' stroke="' + C.cram + '" stroke-width=".6"') +
+         T(125, base + 25.5, "financé autrement : impôts, dette, budgets (" + f0((1 - partCot) * 100) + " % aujourd'hui)", { s: 6.4, c: C.cram }) +
+         T(6, base + 35, "à droite : ce que financeraient les cotisations seules, au taux d'aujourd'hui, avec 1,6 puis 1,3 cotisant par retraité", { s: 6.4, c: C.soft });
     SVG("svg-t6b", W, H, s);
   }
 
