@@ -184,11 +184,16 @@
     const milieuRetraite = (g) => g + departDe(g) + 12;
     const estFutur = (g) => +g + departDe(+g) > 2025;
     // passé : la pension versée (France Stratégie) et sa part non contributive estimée au
-    // milieu de la retraite ; futur : EN GARDANT LES PARAMÈTRES ACTUELS (même taux de
-    // cotisation, même âge de départ, même part non contributive), ce que le système peut
-    // verser suit le nombre de cotisants par retraité → promesse × ratio(t) / ratio(2025)
+    // milieu de la retraite ; futur : EN GARDANT LES PARAMÈTRES ACTUELS — l'arithmétique
+    // directe, sans croissance des salaires : chaque année de retraite, le système verse
+    // (cotisants par retraité × taux ÷ part contributive) salaires ; chaque année de carrière,
+    // la personne cotise (taux) salaire → versé/cotisé = ratio × durée de retraite ÷ (part
+    // contributive × durée de carrière) ; le taux s'annule.
+    const pcst = ch.parametres_constants || {};
+    const dRet = pcst.duree_retraite_ans || 25, dCar = pcst.duree_carriere_ans || 43;
     const partCotGen = (g) => (estFutur(g) ? partCot : 1 - ncAt(milieuRetraite(+g)));
-    const valGen = (g) => (estFutur(g) && r2025 ? recup[g] * ratioAt(milieuRetraite(+g)) / r2025 : recup[g]);
+    const valGen = (g) => (estFutur(g) && partCot ? ratioAt(milieuRetraite(+g)) * dRet / (partCot * dCar) : recup[g]);
+    set("param_2025", f2(r2025 * dRet / (partCot * dCar)));
     Object.keys(recup).forEach((g) => {
       set("nc_" + g, f0((1 - partCotGen(g)) * 100));
       if (estFutur(g)) { set("fut_" + g, f2(valGen(g))); set("cot_" + g, f2(valGen(g) * partCotGen(g))); }
@@ -341,9 +346,10 @@
     }
     s += R(6, base + 20, 9, 6, C.pens) + T(19, base + 25.5, "financé par les cotisations", { s: 6.4, c: C.ink }) +
          R(112, base + 20, 9, 6, "url(#hachT6)", ' stroke="' + C.cram + '" stroke-width=".6"') +
-         T(125, base + 25.5, "recettes non contributives : impôts, dette, budgets (" + f0((ncNow || 0) * 100) + " % aujourd'hui, estimé avant)", { s: 6.4, c: C.cram }) +
-         T(6, base + 35, "à droite : même taux de cotisation, même âge de départ, même part non contributive — avec 1,8 puis 1,3 cotisant par retraité", { s: 6.4, c: C.soft });
-    SVG("svg-t6b", W, H, s);
+         T(125, base + 25.5, "recettes non contributives : impôts, dette, budgets (" + f0((ncNow || 0) * 100) + " % aujourd'hui)", { s: 6.4, c: C.cram }) +
+         T(6, base + 35, "à droite : cotisants par retraité (1,5 → 1,3) × 25 ans de retraite ÷ (66 % × 43 ans de carrière) —", { s: 6.4, c: C.soft }) +
+         T(6, base + 43, "même taux de cotisation, même âge, même part non contributive, sans croissance des salaires", { s: 6.4, c: C.soft });
+    SVG("svg-t6b", W, H + 8, s);
   }
 
   /* ---------- la scène : le vrai graphique, dans l'état du temps en cours ----------

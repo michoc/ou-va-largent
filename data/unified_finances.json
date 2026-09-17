@@ -2,7 +2,7 @@
  "meta": {
   "exercice": 2025,
   "unit": "Md€",
-  "generated_at": "2026-09-17T12:21:25+00:00",
+  "generated_at": "2026-09-17T12:40:20+00:00",
   "sources": {
    "etat_depenses": "plf25-depenses-2025-selon-destination (PLF (crédits demandés))",
    "etat_recettes": "plf25-recettes-du-budget-general + Voies & moyens (partages TVA/PSR, cf. data/reference)",
@@ -185,6 +185,13 @@
      "2025": 0.344
     },
     "source": "COR, « État des lieux du financement du système de retraite », doc. 2, séance plénière du 21 novembre 2019 (A. Marino), figure 2 « Le financement du système de retraite de 1987 à 2018 » ; rapports à la CCSS ; COR juin 2026 tableau 2.2"
+   },
+   "parametres_constants": {
+    "_comment": "Paramètres du calcul « en gardant les paramètres actuels » du temps 6 : ce qu'une génération future se voit verser pour 1 € cotisé = cotisants par retraité (au milieu de sa retraite) × durée de retraite ÷ (part contributive × durée de carrière). Le taux de cotisation est le même des deux côtés et s'annule ; pas de croissance des salaires (euros d'aujourd'hui) ; part contributive = 277/422 = 66 %.",
+    "taux_cotisation_pct": 28.1,
+    "duree_carriere_ans": 43,
+    "duree_retraite_ans": 25,
+    "source": "durée d'assurance requise 172 trimestres (43 ans) à partir de la génération 1965-1971 (réforme 2023, LFSS 2026) ; durée de retraite ≈ 24 ans pour les générations nées à la fin des années 1950, en hausse ensuite avec l'espérance de vie (COR juin 2026, partie 3 ch. 1, fig. 3.6) → 25 ans retenus pour 1970-2000"
    },
    "pensions_versees": 422.2,
    "cotisations": 277.0,
@@ -12757,29 +12764,29 @@
   }
  },
  "surco": {
-  "Défense": 8.46,
+  "Immigration & asile": 0.06,
+  "Justice": 2.2,
   "Écologie & transports": 1.26,
-  "Éducation nationale": 25.52,
-  "Santé": 0.01,
-  "Logement & territoires": 0.03,
   "Enseignement sup. & recherche (ESR)": 5.6,
   "Agriculture": 0.33,
-  "Travail & emploi": 0.95,
-  "Économie": 0.27,
-  "Sport & jeunesse": 0.14,
-  "Conseil et contrôle de l'État": 0.19,
+  "Santé": 0.01,
   "Outre-mer": 0.06,
-  "Diplomatie (Quai d'Orsay)": 0.28,
+  "Anciens combattants": 0.01,
+  "Finances publiques (Bercy)": 2.6,
+  "Services du Premier ministre": 0.09,
+  "Économie": 0.27,
+  "Culture": 0.38,
   "Police, gendarmerie & sécurité civile": 7.04,
+  "Travail & emploi": 0.95,
+  "Éducation nationale": 25.52,
+  "Sport & jeunesse": 0.14,
   "Transformation et fonction publiques": 0.02,
   "Administration territoriale (Intérieur)": 0.86,
-  "Culture": 0.38,
-  "Anciens combattants": 0.01,
-  "Services du Premier ministre": 0.09,
-  "Immigration & asile": 0.06,
-  "Finances publiques (Bercy)": 2.6,
-  "Justice": 2.2,
-  "Médias & livre": 0.04
+  "Conseil et contrôle de l'État": 0.19,
+  "Défense": 8.46,
+  "Médias & livre": 0.04,
+  "Diplomatie (Quai d'Orsay)": 0.28,
+  "Logement & territoires": 0.03
  },
  "retraites_view": {
   "title": "Qui paie les 422 Md€ de retraites ?",
@@ -13533,12 +13540,12 @@
     },
     "op25": 0.07,
     "cas": {
-     "2020": 3.71,
+     "2021": 3.69,
      "2023": 3.8,
-     "2024": 3.86,
      "2022": 3.69,
-     "2025": 4.02,
-     "2021": 3.69
+     "2024": 3.86,
+     "2020": 3.71,
+     "2025": 4.02
     }
    },
    "É · Écologie, territoires & agriculture": {
@@ -13552,12 +13559,12 @@
     },
     "op25": 0.39,
     "cas": {
-     "2020": 1.38,
+     "2021": 1.48,
      "2023": 1.77,
-     "2024": 1.58,
      "2022": 1.48,
-     "2025": 1.65,
-     "2021": 1.48
+     "2024": 1.58,
+     "2020": 1.38,
+     "2025": 1.65
     }
    },
    "É · Solidarités, travail & santé": {
@@ -13571,12 +13578,12 @@
     },
     "op25": 0.66,
     "cas": {
-     "2020": 0.71,
+     "2021": 0.66,
      "2023": 0.88,
-     "2024": 0.93,
      "2022": 0.69,
-     "2025": 0.96,
-     "2021": 0.66
+     "2024": 0.93,
+     "2020": 0.71,
+     "2025": 0.96
     }
    },
    "É · Culture, médias, sport": {
@@ -13590,12 +13597,12 @@
     },
     "op25": 0.27,
     "cas": {
-     "2020": 0.43,
+     "2021": 0.45,
      "2023": 0.51,
-     "2024": 0.52,
      "2022": 0.48,
-     "2025": 0.52,
-     "2021": 0.45
+     "2024": 0.52,
+     "2020": 0.43,
+     "2025": 0.52
     }
    },
    "É · Défense, sécurité, justice": {
@@ -13609,12 +13616,12 @@
     },
     "op25": 0.14,
     "cas": {
-     "2020": 15.41,
+     "2021": 15.48,
      "2023": 16.61,
-     "2024": 17.4,
      "2022": 15.68,
-     "2025": 17.74,
-     "2021": 15.48
+     "2024": 17.4,
+     "2020": 15.41,
+     "2025": 17.74
     }
    },
    "É · Charge de la dette": {
@@ -13639,12 +13646,12 @@
     },
     "op25": 5.38,
     "cas": {
-     "2020": 26.37,
+     "2021": 26.6,
      "2023": 28.31,
-     "2024": 29.34,
      "2022": 27.01,
-     "2025": 31.09,
-     "2021": 26.6
+     "2024": 29.34,
+     "2020": 26.37,
+     "2025": 31.09
     }
    },
    "É · Économie & investissements d'avenir": {
@@ -13657,12 +13664,12 @@
      "2020": 2.36
     },
     "cas": {
-     "2025": 0.24,
-     "2020": 0.23,
-     "2023": 0.23,
-     "2021": 0.23,
+     "2022": 0.23,
      "2024": 0.24,
-     "2022": 0.23
+     "2020": 0.23,
+     "2025": 0.24,
+     "2021": 0.23,
+     "2023": 0.23
     }
    }
   }
