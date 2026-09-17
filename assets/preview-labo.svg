@@ -1,15 +1,15 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 300" width="480" height="300" role="img" aria-label="Aperçu du labo">
   <rect width="480" height="300" fill="#FFFFFF"/>
   <g>
-    <rect x="30"  y="60"  width="46" height="200" rx="4" fill="#6E5BAE"/>
-    <rect x="90"  y="95"  width="46" height="165" rx="4" fill="#6E5BAE" opacity=".55"/>
-    <rect x="150" y="112" width="46" height="148" rx="4" fill="#6E5BAE" opacity=".55"/>
-    <rect x="210" y="124" width="46" height="136" rx="4" fill="#6E5BAE" opacity=".55"/>
-    <rect x="270" y="135" width="46" height="125" rx="4" fill="#6E5BAE" opacity=".55"/>
-    <rect x="330" y="139" width="46" height="121" rx="4" fill="#6E5BAE" opacity=".55"/>
-    <rect x="390" y="141" width="46" height="119" rx="4" fill="#6E5BAE"/>
+    <rect x="30"  y="40"  width="46" height="220" rx="4" fill="#6E5BAE"/>
+    <rect x="90"  y="80"  width="46" height="180" rx="4" fill="#6E5BAE" opacity=".55"/>
+    <rect x="150" y="131" width="46" height="129" rx="4" fill="#6E5BAE" opacity=".55"/>
+    <rect x="210" y="158" width="46" height="102" rx="4" fill="#6E5BAE"/>
+    <rect x="270" y="174" width="46" height="86"  rx="4" fill="#6E5BAE" opacity=".55"/>
+    <rect x="330" y="185" width="46" height="75"  rx="4" fill="#6E5BAE" opacity=".55"/>
+    <rect x="390" y="188" width="46" height="72"  rx="4" fill="#6E5BAE"/>
   </g>
-  <line x1="20" y1="170" x2="460" y2="170" stroke="#1E2430" stroke-width="2" stroke-dasharray="8 6"/>
-  <text x="53" y="48" text-anchor="middle" font-family="Helvetica,Arial" font-size="20" font-weight="800" fill="#1E2430">1,75 €</text>
-  <text x="413" y="129" text-anchor="middle" font-family="Helvetica,Arial" font-size="20" font-weight="800" fill="#1E2430">1,27 €</text>
+  <line x1="20" y1="206" x2="460" y2="206" stroke="#1E2430" stroke-width="2" stroke-dasharray="8 6"/>
+  <text x="53" y="30" text-anchor="middle" font-family="Helvetica,Arial" font-size="20" font-weight="800" fill="#1E2430">4,1 €</text>
+  <text x="413" y="178" text-anchor="middle" font-family="Helvetica,Arial" font-size="20" font-weight="800" fill="#1E2430">1,35 €</text>
 </svg>

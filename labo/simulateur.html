@@ -3,9 +3,9 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Le labo — la même vie née quatre fois, et l'équilibre de 2050</title>
-  <meta name="description" content="Deux questions sur les retraites : que rend le système à chaque génération, pour la même vie ? Et comment équilibrer les pensions en 2050 — qui paie ?">
-  <link rel="stylesheet" href="../style.css?v=20260921j">
+  <title>Le labo — la même vie née quatre fois, et qui paie l'équilibre</title>
+  <meta name="description" content="Deux questions sur les retraites : que verse le système à chaque génération, pour la même vie ? Et comment équilibrer les pensions, une année au choix jusqu'en 2070 — qui paie ?">
+  <link rel="stylesheet" href="../style.css?v=20260921l">
   <style>
     /* ---- styles propres au labo ---- */
     .sim-wrap { max-width: 1240px; margin: 0 auto; padding: 0 16px 60px; }
@@ -83,7 +83,8 @@
     .mini { background: #FBF7EE; border: 1px solid var(--rule); border-radius: 9px; padding: 10px 12px; }
     .mini b { display: block; font-size: 16px; color: var(--ink); font-variant-numeric: tabular-nums; }
     .mini span { font-size: 11px; color: var(--ink-soft); }
-    #sim-chart { width: 100%; height: 280px; margin-top: 8px; }
+    #sim-chart { width: 100%; margin-top: 10px; background: var(--paper); border: 1px solid var(--rule); border-radius: 10px; padding: 8px 10px 4px; box-sizing: border-box; }
+    #sim-chart svg { display: block; width: 100%; height: auto; }
     .cohr { margin-top: 2px; padding: 12px 14px; background: #FBF7EE; border: 1px solid var(--rule);
       border-left: 5px solid #A2683A; border-radius: 10px; font-size: 12.5px; line-height: 1.6; }
     .cohr h4 { margin: 0 0 6px; font-size: 12.5px; color: #A2683A; }
@@ -192,12 +193,12 @@
   <header class="masthead">
     <div class="masthead-inner">
       <p class="kicker">Le labo · retraites · deux questions</p>
-      <h1><span class="hl">La même vie, née quatre fois. Et l'équilibre de 2050.</span></h1>
+      <h1><span class="hl">La même vie, née quatre fois. Et qui paie l'équilibre.</span></h1>
       <p class="standfirst">
-        <strong>①</strong> Même métier, même salaire, même carrière&nbsp;: que rend le système à chacune des générations&nbsp;?
-        <strong>②</strong> En 2050, il y aura <span data-ch="ratio_2050">1,46</span> cotisant par retraité au lieu de
-        <span data-ch="ratio_2025">1,8</span>, et les cotisations ne couvrent déjà que <span data-ch="part_cot">66</span>&nbsp;% de la
-        dépense de retraite&nbsp;: comment équilibrer — et qui paie&nbsp;?
+        <strong>①</strong> Même métier, même salaire, même carrière&nbsp;: que verse le système à chacune des générations&nbsp;?
+        <strong>②</strong> Les cotisations ne couvrent que <span data-ch="part_cot">66</span>&nbsp;% de la dépense de retraite, et il
+        y aura <span data-ch="ratio_2050">1,46</span> cotisant par retraité en 2050 au lieu de <span data-ch="ratio_2025">1,8</span>&nbsp;:
+        quatre leviers pour équilibrer, l'année au choix — et à chaque fois, quelqu'un qui paie.
       </p>
     </div>
   </header>
@@ -206,16 +207,16 @@
     <nav class="labo-crumb" aria-label="Fil d'Ariane du labo">
       <a class="back" href="../index.html#t6">◀ Retour au récit</a>
       <a href="#vies" data-crumb="vies">① Les quatre vies</a>
-      <a href="#equilibre" data-crumb="equilibre">② Équilibrer 2050</a>
+      <a href="#equilibre" data-crumb="equilibre">② Qui paie l'équilibre</a>
     </nav>
 
     <!-- ═══════════ ACTE 1 ═══════════ -->
     <section class="acte" id="vies" aria-labelledby="vies-h">
     <h2 class="acte-titre" id="vies-h"><span class="n">①</span> La même vie, née quatre fois</h2>
-    <p class="acte-question">Pour la même carrière, combien chaque génération reçoit-elle en retraite pour un euro versé&nbsp;?</p>
+    <p class="acte-question">Pour la même carrière, combien lui verse-t-on en retraite pour un euro cotisé&nbsp;?</p>
     <p class="acte-sous">Choisir un métier. Les quatre cartes vivent la <b>même carrière</b> — seule l'année de naissance,
-      et les règles qu'elle subit, change. Chaque euro est compté relativement au salaire moyen de son année, comme
-      le fait l'INSEE&nbsp;: pour la génération 1950, on retrouve son <b>1,75&nbsp;€ reçu pour 1&nbsp;€ cotisé</b>.</p>
+      et les règles qu'elle subit, change. Montants en euros constants, comme le « <b>deux fois ce qu'elle a cotisé</b> »
+      de la génération 1960 (France Stratégie).</p>
     <div class="bar">
       <span id="profils"></span>
     </div>
@@ -245,9 +246,10 @@
 
     <!-- ═══════════ ACTE 2 : le jeu ═══════════ -->
     <section class="acte" id="equilibre" aria-labelledby="equilibre-h">
-    <h2 class="acte-titre" id="equilibre-h"><span class="n">②</span> Équilibrer <span id="jeu-annee-titre">2050</span></h2>
+    <h2 class="acte-titre" id="equilibre-h"><span class="n">②</span> Équilibrer le système — et choisir qui paie</h2>
     <p class="acte-question">Une pension n'est pas de l'argent mis de côté&nbsp;: elle est prélevée chaque mois sur les salaires
-      des cotisants du moment. Quatre leviers existent, chacun a un prix et quelqu'un qui le paie.</p>
+      des cotisants du moment. Quatre leviers existent, chacun a un prix et quelqu'un qui le paie. L'année est un réglage
+      — <span id="jeu-annee-titre">2050</span> pour commencer, de 2026 à 2070 au choix.</p>
 
     <div class="mission" id="mission"></div>
 
@@ -255,7 +257,7 @@
       <div>
         <div class="verdict" id="verdict" aria-live="polite"></div>
         <div class="annee-ctl">
-          <label for="inv-annee">Année</label>
+          <label for="inv-annee">Année à équilibrer</label>
           <input type="range" id="inv-annee" min="2026" max="2070" step="1">
           <output id="out-inv-annee">2050</output>
         </div>
@@ -279,7 +281,7 @@
       <summary>Méthodologie, hypothèses &amp; sources</summary>
       <ul>
         <li><b>Tous les montants sont en euros d'aujourd'hui</b> (euros constants 2025), sans actualisation financière. <b>Salaires saisis en net</b> (÷ 0,78 → brut pour les cotisations, approximation privé)&nbsp;; <b>pensions affichées nettes</b> (−9,1 % CSG-CRDS-Casa).</li>
-        <li><b>Les quatre cartes (①)</b> : même carrière (salaires constants 2025), âge de départ réaliste par génération (61 · 64 · 65 · 66), fin de vie = espérance de vie de la cohorte (à 65 ans : ≈ 81-82 ans vers 1980, 86,5 en 2025, +≈ 1 mois par an ensuite, plafonné à +5 ans&nbsp;; variantes cadre/ouvrier). Le ratio « reçu / versé » est un <b>taux de récupération</b> au sens de l'INSEE (Dubois &amp; Marino, <em>Retraite et société</em> n°&nbsp;73, 2016 — Destinie&nbsp;2) : chaque flux est compté relativement au salaire moyen de son année (actualisation « SMPT ») ; la pension, indexée sur les prix, perd donc ≈ 1 % par an face aux salaires (0,7 % en projection, COR). La part du dernier brut servie en pension est calée pour que la génération 1950 au salaire médian récupère <b>1,75&nbsp;€ par euro cotisé</b>, comme l'INSEE (cotisations seules ; 1,59 en comptant aussi les impôts affectés). Le « 200 % » souvent cité (France Stratégie, 2016, génération 1960) vient du même modèle mais en euros constants, sans rapporter chaque flux au salaire de son année : les cotisations des années 1970-80, prélevées sur des salaires réels bien plus bas, pèsent alors peu face aux pensions d'aujourd'hui — la croissance des salaires se retrouve dans le ratio. Les deux conventions sont légitimes ; le site retient celle du COR et de l'INSEE, qui compare chaque génération au salaire de son temps. Pour les générations parties après 2025, l'INSEE applique la pension promise par la loi, financée par n'importe quoi ; le labo applique la pension que les cotisations seules financent — d'où des ratios plus bas (0,9 au lieu de 1,27 pour la génération 1980). <span class="flag">Ordres de grandeur.</span></li>
+        <li><b>Les quatre cartes (①)</b> : même carrière (salaires constants 2025), âge de départ réaliste par génération (61 · 64 · 65 · 66), fin de vie = espérance de vie de la cohorte (à 65 ans : ≈ 81-82 ans vers 1980, 86,5 en 2025, +≈ 1 mois par an ensuite, plafonné à +5 ans&nbsp;; variantes cadre/ouvrier). Le ratio « reçu / versé » est un <b>taux de récupération</b> en <b>euros constants</b> — la convention de France Stratégie (Chojnicki, Navaux, Ragot, modèle MELETE, 2016 : plus de 4 € pour la génération 1930, ≈ 1,9 € pour 1960, ≈ 1,4 € après 1975), celle du « deux fois ce qu'elle a cotisé ». La part du dernier brut servie en pension est ≈ 77 % du dernier net pour le salaire médian (DREES) ; la génération 1950 du labo se voit alors verser ≈ 2 € pour 1 € cotisé. L'autre convention, celle de l'INSEE et du COR (Dubois &amp; Marino, <em>Retraite et société</em> n°&nbsp;73, 2016), rapporte chaque flux au salaire moyen de son année : les cotisations des années 1950-80, prélevées sur des salaires réels bien plus bas, y pèsent davantage, et la génération 1950 ne reçoit plus que 1,75 € pour 1 € cotisé (1,27 pour 1980). Le paramètre <code>gSmpt</code> du code permet de basculer. Pour les générations parties après 2025, le labo applique la pension que les cotisations seules financent (grand chiffre) et montre aussi la pension maintenue aux règles d'aujourd'hui, dette léguée (petite ligne). Pour les générations parties après 2025, l'INSEE applique la pension promise par la loi, financée par n'importe quoi ; le labo applique la pension que les cotisations seules financent — d'où des ratios plus bas (0,9 au lieu de 1,27 pour la génération 1980). <span class="flag">Ordres de grandeur.</span></li>
         <li><b>Heures de travail pour cotiser</b> : pour chaque année de carrière, taux de cotisation × durée annuelle du travail de l'époque (≈ 1 850 h/an vers 1970 → ≈ 1 610 h après les 35 heures) — méthode S. Catherine. <span class="flag">Série des heures : estimation.</span></li>
         <li><b>Ce que chacun verse</b> = salaire brut × taux de cotisation vieillesse de chaque année (série ≈ 13 % en 1970 — régime général 8,5 % + complémentaires naissantes — → 28,1 % en 2025, calée sur les moyennes générationnelles 22 % / 28 %, estimation S. Catherine). Âges légaux historiques : 65 ans → 60 (réforme 1982, effective 1983) → 62 (réforme 2010, montée achevée en 2017) → 62 ans 9 mois en 2025 (réforme 2023 en montée) — <b>montée suspendue par la LFSS 2026</b> (art. 105) : 62 ans 9 mois et 170 trimestres gelés jusqu'au 1er janvier 2028&nbsp;; 64 ans atteints vers 2032 si la réforme reprend (hypothèse de référence du COR, retenue ici pour le futur).</li>
         <li><b>Départs ≤ 2025</b> : règles réelles (taux de remplacement observé, dégressif). <b>Départs &gt; 2025 : jeu à somme nulle</b> — pension = taux × ratio cotisants/retraité de la génération (COR juin 2026 : 1,8 en 2025 → ≈ 1,55 en 2040 → 1,3 en 2070) × salaire brut fin.</li>
@@ -298,8 +300,7 @@
       <a href="../sankey.html#signaler">signalée</a>.</p>
   </footer>
 
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/echarts/5.5.0/echarts.min.js"></script>
-  <script src="simulateur.js?v=20260921j"></script>
-  <script src="../lexique.js?v=20260921j"></script>
+  <script src="simulateur.js?v=20260921l"></script>
+  <script src="../lexique.js?v=20260921l"></script>
 </body>
 </html>

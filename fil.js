@@ -79,12 +79,13 @@
     if (cotisants) { set("nc_cot", f0(round100(nc * 1000 / cotisants))); set("pens_cot", f0(round100(pens * 1000 / cotisants))); set("cotisants", f1(cotisants)); }
     if (ch.retraites_droit_direct_millions) set("retraites_m", f1(ch.retraites_droit_direct_millions));
     const ratio = ch.ratio_cotisants_retraites || {};
-    const recup = (ch.taux_recuperation || {}).cotisations_seules || {};
-    const recupTout = (ch.taux_recuperation || {}).tout_financement || {};
-    if (recup["1950"]) set("rec_1950", f2(recup["1950"]));
-    if (recup["1980"]) set("rec_1980", f2(recup["1980"]));
-    if (recupTout["1950"]) set("rect_1950", f2(recupTout["1950"]));
-    if (recupTout["1980"]) set("rect_1980", f2(recupTout["1980"]));
+    // euros constants (France Stratégie 2016, modèle MELETE) : la convention du site ;
+    // la série INSEE rapportée au salaire de l'époque reste en légende
+    const recup = ((ch.taux_recuperation || {}).euros_constants || {}).serie || {};
+    const recupSmpt = (ch.taux_recuperation || {}).cotisations_seules || {};
+    ["1930", "1950", "1960", "1980", "2000"].forEach((g) => { if (recup[g]) set("rec_" + g, f1(recup[g])); });
+    if (recupSmpt["1950"]) set("rect_1950", f2(recupSmpt["1950"]));
+    if (recupSmpt["1980"]) set("rect_1980", f2(recupSmpt["1980"]));
     const rgHist = (ch.ratio_regime_general_historique || {}).serie || {};
     if (rgHist["1965"]) set("rg_1965", f1(rgHist["1965"]));
     Object.keys(ratio).forEach((y) => set("ratio_" + y, f1(ratio[y])));
@@ -264,7 +265,7 @@
     SVG("svg-t6", W, H, s);
   }
 
-  /* ---------- 6b · ce qu'une génération récupère pour 1 € versé ---------- */
+  /* ---------- 6b · ce qu'on verse à une génération pour 1 € cotisé ---------- */
   function svgT6b(rec) {
     const gens = Object.keys(rec).sort();
     if (!gens.length) return;
@@ -272,15 +273,15 @@
     const base = 100, hMax = 62, vMax = Math.max.apply(null, gens.map((g) => rec[g])), sc = hMax / vMax;
     let s = "";
     const y1 = base - 1 * sc;
-    const fx2 = (v) => v.toFixed(2).replace(".", ",");
+    const fx1 = (v) => (Math.round(v * 20) / 20).toFixed(2).replace(/0$/, "").replace(".", ",");
     gens.forEach((g, i) => {
-      const v = rec[g], x = i * colW + (colW - bw) / 2, h = v * sc, key = i === 0 || g === "1980";
+      const v = rec[g], x = i * colW + (colW - bw) / 2, h = v * sc, key = i === 0 || g === "1960" || g === "1980";
       s += R(x, base - h, bw, h, C.pens, ' rx="2"' + (key ? "" : ' opacity=".5"'));
-      s += T(x + bw / 2, base - h - 4, fx2(v) + (key ? " €" : ""), { a: "middle", s: key ? 9 : 7, c: key ? C.ink : C.soft, w: key ? 700 : 400 });
+      s += T(x + bw / 2, base - h - 4, fx1(v) + (key ? " €" : ""), { a: "middle", s: key ? 9 : 7, c: key ? C.ink : C.soft, w: key ? 700 : 400 });
       s += T(x + bw / 2, base + 12, g, { a: "middle", s: 7.5, c: key ? C.ink : C.soft, w: key ? 700 : 400 });
     });
     s += '<line x1="6" y1="' + y1 + '" x2="' + (W - 6) + '" y2="' + y1 + '" stroke="' + C.ink + '" stroke-width="1" stroke-dasharray="3 3"/>';
-    s += TAG(W - 6, y1 - 1, "1 € versé", C.ink, 7);
+    s += TAG(W - 6, y1 - 1, "1 € cotisé", C.ink, 7);
     s += T(6, 10, "génération (année de naissance)", { s: 7, c: C.soft });
     SVG("svg-t6b", W, H, s);
   }

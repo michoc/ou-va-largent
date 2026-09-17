@@ -11,7 +11,7 @@
   <meta property="og:image" content="https://michoc.github.io/ou-va-largent/assets/og-card.png">
   <link rel="preconnect" href="https://cdnjs.cloudflare.com">
   <!-- ?v= : cache-busting — incrémenter à chaque déploiement de style/app -->
-  <link rel="stylesheet" href="style.css?v=20260921j">
+  <link rel="stylesheet" href="style.css?v=20260921l">
 </head>
 <body class="landing fil">
   <nav class="site-nav" aria-label="Navigation du site">
@@ -68,13 +68,12 @@
             <div class="fil-svg" id="svg-t6" role="img" aria-label="Cotisants pour un retraité : 2002, 2025, 2070"></div>
           </div>
           <div class="stage-panel">
-            <p class="stage-cap"><b>Ce qu'une génération récupère pour 1&nbsp;€ cotisé</b><span class="cap-more"> — pensions reçues sur toute la retraite,
-              rapportées aux seules cotisations de la carrière, chaque flux compté relativement au salaire moyen de son
-              année. Salariés du privé, règles de 2014, avant la réforme de 2023 (INSEE, Destinie&nbsp;2). En comptant
-              aussi les impôts affectés aux retraites&nbsp;: <span data-ch="rect_1950">1,59</span>&nbsp;€ → <span data-ch="rect_1980">1,17</span>&nbsp;€.
-              En euros constants, sans rapporter au salaire de l'époque, la génération 1960 touche ≈&nbsp;2&nbsp;€ (France Stratégie, 2016)&nbsp;:
-              la croissance des salaires depuis les années 1970 est alors comptée dans le ratio.</span></p>
-            <div class="fil-svg" id="svg-t6b" role="img" aria-label="Ce qu'une génération récupère pour 1 € cotisé, générations 1950 à 1985"></div>
+            <p class="stage-cap"><b>Ce qu'on verse à une génération pour 1&nbsp;€ cotisé</b><span class="cap-more"> — pensions versées sur toute la retraite,
+              rapportées aux cotisations de la carrière, en euros constants (France Stratégie, modèle MELETE, 2016). Les
+              premières générations ont profité de la montée en puissance du système&nbsp;: carrière entière comptée, retraités
+              rares, cotisations prélevées sur des salaires bien plus bas. Rapporté au salaire de chaque époque, l'INSEE trouve
+              <span data-ch="rect_1950">1,75</span>&nbsp;€ pour la génération 1950 et <span data-ch="rect_1980">1,27</span>&nbsp;€ pour la génération 1980.</span></p>
+            <div class="fil-svg" id="svg-t6b" role="img" aria-label="Ce qu'on verse à une génération pour 1 € cotisé, générations 1930 à 2000"></div>
           </div>
         </div>
       </div>
@@ -200,16 +199,17 @@
         <p class="temps-exergue"><span data-ch="ratio_2002">2,1</span> cotisants par retraité en 2002.
           <span data-ch="ratio_2025">1,8</span> aujourd'hui. <span data-ch="ratio_2070">1,3</span> en 2070.</p>
         <p>À la création du régime général, en 1945, les retraités sont rares&nbsp;: au plus haut, en 1965, chaque
-          retraité est porté par <span data-ch="rg_1965">4,3</span>&nbsp;cotisants. Chaque génération récupère donc
-          moins que la précédente. Un salarié du privé né en 1950 reçoit, sur toute sa retraite,
-          <strong><span data-ch="rec_1950">1,75</span>&nbsp;€</strong> pour chaque euro cotisé pendant sa
-          carrière&nbsp;; né en 1980, <strong><span data-ch="rec_1980">1,27</span>&nbsp;€</strong> — et c'était avant la
-          réforme de 2023. En 2025, pour la première fois, la France a compté plus de décès que de naissances.</p>
+          retraité est porté par <span data-ch="rg_1965">4,3</span>&nbsp;cotisants. Chaque génération se voit donc
+          verser moins que la précédente. À une personne née en 1930, le système a versé, sur toute sa retraite, plus de
+          <strong><span data-ch="rec_1930">4</span>&nbsp;€</strong> pour chaque euro cotisé&nbsp;; née en 1960,
+          <strong><span data-ch="rec_1960">1,9</span>&nbsp;€</strong>&nbsp;; née en 1980,
+          <strong><span data-ch="rec_1980">1,4</span>&nbsp;€</strong> — et c'était avant la réforme de 2023.
+          En 2025, pour la première fois, la France a compté plus de décès que de naissances.</p>
         <p>Même métier, même salaire, même carrière&nbsp;: née en 1950, 1975, 2000 ou 2026, la même vie ne reçoit pas la
-          même retraite pour la même somme versée. Et l'équilibre de 2050 reste à trouver&nbsp;: par le taux, par
+          même retraite pour la même somme cotisée. Et l'équilibre reste à trouver, en 2050 comme après&nbsp;: par le taux, par
           l'âge, par le niveau des pensions — ou par ceux qui ne sont pas encore nés.</p>
         <p class="temps-ctas"><a class="temps-cta" href="labo/simulateur.html#vies">Comparer les quatre vies →</a>
-          <a class="temps-cta" href="labo/simulateur.html#equilibre">Équilibrer le système en 2050 →</a></p>
+          <a class="temps-cta" href="labo/simulateur.html#equilibre">Équilibrer le système, et choisir qui paie →</a></p>
       </div>
     </section>
 
@@ -246,16 +246,16 @@
        </div>
        <div class="fil-exit-tools">
          <a class="fil-tool" href="sankey.html">
-           <img src="assets/preview-sankey.svg?v=20260921j" alt="" loading="lazy" onerror="this.style.display='none'">
+           <img src="assets/preview-sankey.svg?v=20260921l" alt="" loading="lazy" onerror="this.style.display='none'">
            <span><b>Voir les flux →</b><small>d'où vient chaque euro, qui le dépense, où il finit</small></span>
          </a>
          <a class="fil-tool" href="treemap.html#realite">
-           <img src="assets/preview-mondrian.svg?v=20260921j" alt="" loading="lazy" onerror="this.style.display='none'">
+           <img src="assets/preview-mondrian.svg?v=20260921l" alt="" loading="lazy" onerror="this.style.display='none'">
            <span><b>Voir les masses →</b><small>les <span data-ch="non_contributif">145</span>&nbsp;milliards, en trois lectures</small></span>
          </a>
          <a class="fil-tool" href="labo/simulateur.html">
-           <img src="assets/preview-labo.svg?v=20260921j" alt="" loading="lazy" onerror="this.style.display='none'">
-           <span><b>Passer au labo →</b><small>comparer les quatre vies, équilibrer le système en 2050</small></span>
+           <img src="assets/preview-labo.svg?v=20260921l" alt="" loading="lazy" onerror="this.style.display='none'">
+           <span><b>Passer au labo →</b><small>comparer les quatre vies, équilibrer le système et choisir qui paie</small></span>
          </a>
        </div>
      </div>
@@ -272,7 +272,7 @@
     </p>
   </footer>
 
-  <script src="fil.js?v=20260921j"></script>
-  <script src="lexique.js?v=20260921j"></script>
+  <script src="fil.js?v=20260921l"></script>
+  <script src="lexique.js?v=20260921l"></script>
 </body>
 </html>
