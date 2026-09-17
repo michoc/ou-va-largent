@@ -2,7 +2,11 @@
  "meta": {
   "exercice": 2025,
   "unit": "Md€",
-  "generated_at": "2026-09-16T17:59:11+00:00",
+<<<<<<< HEAD
+  "generated_at": "2026-09-16T18:00:29+00:00",
+=======
+  "generated_at": "2026-09-17T00:03:10+00:00",
+>>>>>>> 5d55ad4 (Taux de récupération : le « 200 % » (euros constants, France Stratégie 2016) expliqué en légende du temps 6 et dans la méthodo du labo)
   "sources": {
    "etat_depenses": "plf25-depenses-2025-selon-destination (PLF (crédits demandés))",
    "etat_recettes": "plf25-recettes-du-budget-general + Voies & moyens (partages TVA/PSR, cf. data/reference)",
@@ -140,6 +144,12 @@
     "tri_net_cor_2026": {
      "_comment": "Taux de rendement interne net, cas type non-cadre du privé à carrière complète, COR juin 2026 fig. 3.7 (actualisation SMPT) : élevé pour les générations 1940 (croissance forte, prélèvements faibles), en baisse jusqu'aux générations du début des années 1970, quasi stable ensuite",
      "2000": 0.8
+    },
+    "euros_constants": {
+     "_comment": "Même modèle (Destinie 2), même définition, mais flux en euros constants (actualisation sur les prix) au lieu du salaire moyen : la génération 1960 touche ≈ 2 fois ce qu'elle a cotisé, les générations nées après 1975 ≈ 1,2. Plus élevé parce que les cotisations des années 1970-80 étaient prélevées sur des salaires réels bien plus bas qu'aujourd'hui : la croissance des salaires se retrouve dans le ratio (Dubois & Marino 2016, § « L'effet d'une actualisation alternative sur les prix »). C'est le « 200 % » qui circule dans le débat public.",
+     "source": "France Stratégie, 2016, d'après Destinie 2 (INSEE) — cité par franceinfo, « Vrai ou fake : les baby-boomers touchent-ils deux fois plus qu'ils n'ont cotisé ? », 2023",
+     "1960": 2.0,
+     "1975_et_apres": 1.2
     }
    },
    "ratio_regime_general_historique": {
@@ -12732,29 +12742,55 @@
   }
  },
  "surco": {
-  "Culture": 0.38,
+<<<<<<< HEAD
+  "Transformation et fonction publiques": 0.02,
+  "Écologie & transports": 1.26,
+  "Défense": 8.46,
   "Agriculture": 0.33,
   "Anciens combattants": 0.01,
-  "Finances publiques (Bercy)": 2.6,
-  "Médias & livre": 0.04,
+  "Culture": 0.38,
   "Éducation nationale": 25.52,
-  "Défense": 8.46,
-  "Administration territoriale (Intérieur)": 0.86,
-  "Travail & emploi": 0.95,
-  "Économie": 0.27,
-  "Diplomatie (Quai d'Orsay)": 0.28,
-  "Santé": 0.01,
-  "Justice": 2.2,
-  "Logement & territoires": 0.03,
   "Police, gendarmerie & sécurité civile": 7.04,
   "Enseignement sup. & recherche (ESR)": 5.6,
+  "Diplomatie (Quai d'Orsay)": 0.28,
+  "Travail & emploi": 0.95,
+  "Logement & territoires": 0.03,
+  "Économie": 0.27,
+  "Finances publiques (Bercy)": 2.6,
   "Sport & jeunesse": 0.14,
-  "Immigration & asile": 0.06,
   "Outre-mer": 0.06,
+  "Médias & livre": 0.04,
+  "Santé": 0.01,
   "Conseil et contrôle de l'État": 0.19,
   "Services du Premier ministre": 0.09,
+  "Justice": 2.2,
+  "Immigration & asile": 0.06,
+  "Administration territoriale (Intérieur)": 0.86
+=======
+  "Défense": 8.46,
+  "Culture": 0.38,
+  "Sport & jeunesse": 0.14,
+  "Agriculture": 0.33,
+  "Médias & livre": 0.04,
+  "Logement & territoires": 0.03,
+  "Immigration & asile": 0.06,
+  "Outre-mer": 0.06,
+  "Diplomatie (Quai d'Orsay)": 0.28,
+  "Justice": 2.2,
+  "Enseignement sup. & recherche (ESR)": 5.6,
+  "Écologie & transports": 1.26,
+  "Travail & emploi": 0.95,
+  "Santé": 0.01,
   "Transformation et fonction publiques": 0.02,
-  "Écologie & transports": 1.26
+  "Administration territoriale (Intérieur)": 0.86,
+  "Services du Premier ministre": 0.09,
+  "Finances publiques (Bercy)": 2.6,
+  "Police, gendarmerie & sécurité civile": 7.04,
+  "Anciens combattants": 0.01,
+  "Économie": 0.27,
+  "Conseil et contrôle de l'État": 0.19,
+  "Éducation nationale": 25.52
+>>>>>>> 5d55ad4 (Taux de récupération : le « 200 % » (euros constants, France Stratégie 2016) expliqué en légende du temps 6 et dans la méthodo du labo)
  },
  "retraites_view": {
   "title": "Qui paie les 422 Md€ de retraites ?",
@@ -13508,12 +13544,21 @@
     },
     "op25": 0.07,
     "cas": {
-     "2024": 3.86,
-     "2022": 3.69,
+<<<<<<< HEAD
+     "2020": 3.71,
      "2023": 3.8,
      "2025": 4.02,
-     "2020": 3.71,
+     "2024": 3.86,
+     "2022": 3.69,
      "2021": 3.69
+=======
+     "2024": 3.86,
+     "2020": 3.71,
+     "2023": 3.8,
+     "2025": 4.02,
+     "2021": 3.69,
+     "2022": 3.69
+>>>>>>> 5d55ad4 (Taux de récupération : le « 200 % » (euros constants, France Stratégie 2016) expliqué en légende du temps 6 et dans la méthodo du labo)
     }
    },
    "É · Écologie, territoires & agriculture": {
@@ -13527,12 +13572,21 @@
     },
     "op25": 0.39,
     "cas": {
-     "2024": 1.58,
-     "2022": 1.48,
+<<<<<<< HEAD
+     "2020": 1.38,
      "2023": 1.77,
      "2025": 1.65,
-     "2020": 1.38,
+     "2024": 1.58,
+     "2022": 1.48,
      "2021": 1.48
+=======
+     "2024": 1.58,
+     "2020": 1.38,
+     "2023": 1.77,
+     "2025": 1.65,
+     "2021": 1.48,
+     "2022": 1.48
+>>>>>>> 5d55ad4 (Taux de récupération : le « 200 % » (euros constants, France Stratégie 2016) expliqué en légende du temps 6 et dans la méthodo du labo)
     }
    },
    "É · Solidarités, travail & santé": {
@@ -13546,12 +13600,21 @@
     },
     "op25": 0.66,
     "cas": {
-     "2024": 0.93,
-     "2022": 0.69,
+<<<<<<< HEAD
+     "2020": 0.71,
      "2023": 0.88,
      "2025": 0.96,
-     "2020": 0.71,
+     "2024": 0.93,
+     "2022": 0.69,
      "2021": 0.66
+=======
+     "2024": 0.93,
+     "2020": 0.71,
+     "2023": 0.88,
+     "2025": 0.96,
+     "2021": 0.66,
+     "2022": 0.69
+>>>>>>> 5d55ad4 (Taux de récupération : le « 200 % » (euros constants, France Stratégie 2016) expliqué en légende du temps 6 et dans la méthodo du labo)
     }
    },
    "É · Culture, médias, sport": {
@@ -13565,12 +13628,21 @@
     },
     "op25": 0.27,
     "cas": {
-     "2024": 0.52,
-     "2022": 0.48,
+<<<<<<< HEAD
+     "2020": 0.43,
      "2023": 0.51,
      "2025": 0.52,
-     "2020": 0.43,
+     "2024": 0.52,
+     "2022": 0.48,
      "2021": 0.45
+=======
+     "2024": 0.52,
+     "2020": 0.43,
+     "2023": 0.51,
+     "2025": 0.52,
+     "2021": 0.45,
+     "2022": 0.48
+>>>>>>> 5d55ad4 (Taux de récupération : le « 200 % » (euros constants, France Stratégie 2016) expliqué en légende du temps 6 et dans la méthodo du labo)
     }
    },
    "É · Défense, sécurité, justice": {
@@ -13584,12 +13656,21 @@
     },
     "op25": 0.14,
     "cas": {
-     "2024": 17.4,
-     "2022": 15.68,
+<<<<<<< HEAD
+     "2020": 15.41,
      "2023": 16.61,
      "2025": 17.74,
-     "2020": 15.41,
+     "2024": 17.4,
+     "2022": 15.68,
      "2021": 15.48
+=======
+     "2024": 17.4,
+     "2020": 15.41,
+     "2023": 16.61,
+     "2025": 17.74,
+     "2021": 15.48,
+     "2022": 15.68
+>>>>>>> 5d55ad4 (Taux de récupération : le « 200 % » (euros constants, France Stratégie 2016) expliqué en légende du temps 6 et dans la méthodo du labo)
     }
    },
    "É · Charge de la dette": {
@@ -13614,12 +13695,21 @@
     },
     "op25": 5.38,
     "cas": {
-     "2024": 29.34,
-     "2022": 27.01,
+<<<<<<< HEAD
+     "2020": 26.37,
      "2023": 28.31,
      "2025": 31.09,
-     "2020": 26.37,
+     "2024": 29.34,
+     "2022": 27.01,
      "2021": 26.6
+=======
+     "2024": 29.34,
+     "2020": 26.37,
+     "2023": 28.31,
+     "2025": 31.09,
+     "2021": 26.6,
+     "2022": 27.01
+>>>>>>> 5d55ad4 (Taux de récupération : le « 200 % » (euros constants, France Stratégie 2016) expliqué en légende du temps 6 et dans la méthodo du labo)
     }
    },
    "É · Économie & investissements d'avenir": {
@@ -13632,12 +13722,21 @@
      "2020": 2.36
     },
     "cas": {
-     "2024": 0.24,
-     "2021": 0.23,
-     "2022": 0.23,
+<<<<<<< HEAD
+     "2020": 0.23,
      "2023": 0.23,
      "2025": 0.24,
-     "2020": 0.23
+     "2024": 0.24,
+     "2022": 0.23,
+     "2021": 0.23
+=======
+     "2024": 0.24,
+     "2020": 0.23,
+     "2023": 0.23,
+     "2021": 0.23,
+     "2022": 0.23,
+     "2025": 0.24
+>>>>>>> 5d55ad4 (Taux de récupération : le « 200 % » (euros constants, France Stratégie 2016) expliqué en légende du temps 6 et dans la méthodo du labo)
     }
    }
   }

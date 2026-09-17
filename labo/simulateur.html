@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Le labo — la même vie née quatre fois, et l'équilibre de 2050</title>
   <meta name="description" content="Deux questions sur les retraites : que rend le système à chaque génération, pour la même vie ? Et comment équilibrer les pensions en 2050 — qui paie ?">
-  <link rel="stylesheet" href="../style.css?v=20260921i">
+  <link rel="stylesheet" href="../style.css?v=20260921j">
   <style>
     /* ---- styles propres au labo ---- */
     .sim-wrap { max-width: 1240px; margin: 0 auto; padding: 0 16px 60px; }
@@ -279,7 +279,7 @@
       <summary>Méthodologie, hypothèses &amp; sources</summary>
       <ul>
         <li><b>Tous les montants sont en euros d'aujourd'hui</b> (euros constants 2025), sans actualisation financière. <b>Salaires saisis en net</b> (÷ 0,78 → brut pour les cotisations, approximation privé)&nbsp;; <b>pensions affichées nettes</b> (−9,1 % CSG-CRDS-Casa).</li>
-        <li><b>Les quatre cartes (①)</b> : même carrière (salaires constants 2025), âge de départ réaliste par génération (61 · 64 · 65 · 66), fin de vie = espérance de vie de la cohorte (à 65 ans : ≈ 81-82 ans vers 1980, 86,5 en 2025, +≈ 1 mois par an ensuite, plafonné à +5 ans&nbsp;; variantes cadre/ouvrier). Le ratio « reçu / versé » est un <b>taux de récupération</b> au sens de l'INSEE (Dubois &amp; Marino, <em>Retraite et société</em> n°&nbsp;73, 2016 — Destinie&nbsp;2) : chaque flux est compté relativement au salaire moyen de son année (actualisation « SMPT ») ; la pension, indexée sur les prix, perd donc ≈ 1 % par an face aux salaires (0,7 % en projection, COR). La part du dernier brut servie en pension est calée pour que la génération 1950 au salaire médian récupère <b>1,75&nbsp;€ par euro cotisé</b>, comme l'INSEE (cotisations seules ; 1,59 en comptant aussi les impôts affectés). Pour les générations parties après 2025, l'INSEE applique la pension promise par la loi, financée par n'importe quoi ; le labo applique la pension que les cotisations seules financent — d'où des ratios plus bas (0,9 au lieu de 1,27 pour la génération 1980). <span class="flag">Ordres de grandeur.</span></li>
+        <li><b>Les quatre cartes (①)</b> : même carrière (salaires constants 2025), âge de départ réaliste par génération (61 · 64 · 65 · 66), fin de vie = espérance de vie de la cohorte (à 65 ans : ≈ 81-82 ans vers 1980, 86,5 en 2025, +≈ 1 mois par an ensuite, plafonné à +5 ans&nbsp;; variantes cadre/ouvrier). Le ratio « reçu / versé » est un <b>taux de récupération</b> au sens de l'INSEE (Dubois &amp; Marino, <em>Retraite et société</em> n°&nbsp;73, 2016 — Destinie&nbsp;2) : chaque flux est compté relativement au salaire moyen de son année (actualisation « SMPT ») ; la pension, indexée sur les prix, perd donc ≈ 1 % par an face aux salaires (0,7 % en projection, COR). La part du dernier brut servie en pension est calée pour que la génération 1950 au salaire médian récupère <b>1,75&nbsp;€ par euro cotisé</b>, comme l'INSEE (cotisations seules ; 1,59 en comptant aussi les impôts affectés). Le « 200 % » souvent cité (France Stratégie, 2016, génération 1960) vient du même modèle mais en euros constants, sans rapporter chaque flux au salaire de son année : les cotisations des années 1970-80, prélevées sur des salaires réels bien plus bas, pèsent alors peu face aux pensions d'aujourd'hui — la croissance des salaires se retrouve dans le ratio. Les deux conventions sont légitimes ; le site retient celle du COR et de l'INSEE, qui compare chaque génération au salaire de son temps. Pour les générations parties après 2025, l'INSEE applique la pension promise par la loi, financée par n'importe quoi ; le labo applique la pension que les cotisations seules financent — d'où des ratios plus bas (0,9 au lieu de 1,27 pour la génération 1980). <span class="flag">Ordres de grandeur.</span></li>
         <li><b>Heures de travail pour cotiser</b> : pour chaque année de carrière, taux de cotisation × durée annuelle du travail de l'époque (≈ 1 850 h/an vers 1970 → ≈ 1 610 h après les 35 heures) — méthode S. Catherine. <span class="flag">Série des heures : estimation.</span></li>
         <li><b>Ce que chacun verse</b> = salaire brut × taux de cotisation vieillesse de chaque année (série ≈ 13 % en 1970 — régime général 8,5 % + complémentaires naissantes — → 28,1 % en 2025, calée sur les moyennes générationnelles 22 % / 28 %, estimation S. Catherine). Âges légaux historiques : 65 ans → 60 (réforme 1982, effective 1983) → 62 (réforme 2010, montée achevée en 2017) → 62 ans 9 mois en 2025 (réforme 2023 en montée) — <b>montée suspendue par la LFSS 2026</b> (art. 105) : 62 ans 9 mois et 170 trimestres gelés jusqu'au 1er janvier 2028&nbsp;; 64 ans atteints vers 2032 si la réforme reprend (hypothèse de référence du COR, retenue ici pour le futur).</li>
         <li><b>Départs ≤ 2025</b> : règles réelles (taux de remplacement observé, dégressif). <b>Départs &gt; 2025 : jeu à somme nulle</b> — pension = taux × ratio cotisants/retraité de la génération (COR juin 2026 : 1,8 en 2025 → ≈ 1,55 en 2040 → 1,3 en 2070) × salaire brut fin.</li>
@@ -299,7 +299,7 @@
   </footer>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/echarts/5.5.0/echarts.min.js"></script>
-  <script src="simulateur.js?v=20260921i"></script>
-  <script src="../lexique.js?v=20260921i"></script>
+  <script src="simulateur.js?v=20260921j"></script>
+  <script src="../lexique.js?v=20260921j"></script>
 </body>
 </html>
