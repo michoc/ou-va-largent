@@ -11,7 +11,7 @@
   <meta property="og:image" content="https://michoc.github.io/ou-va-largent/assets/og-card.png">
   <link rel="preconnect" href="https://cdnjs.cloudflare.com">
   <!-- ?v= : cache-busting — incrémenter à chaque déploiement de style/app -->
-  <link rel="stylesheet" href="style.css?v=20260921o">
+  <link rel="stylesheet" href="style.css?v=20260921p">
 </head>
 <body class="landing fil">
   <nav class="site-nav" aria-label="Navigation du site">
@@ -72,9 +72,9 @@
               rapportées aux cotisations de la carrière, en euros constants (France Stratégie, modèle MELETE, 2016), scindées
               entre ce que financent les cotisations et ce qui est pris ailleurs. Les premières générations ont profité de la
               montée en puissance du système&nbsp;: carrière entière comptée, retraités rares, cotisations prélevées sur des
-              salaires bien plus bas. La part prise ailleurs est estimée au milieu de la retraite de chaque génération
-              (≈&nbsp;23&nbsp;% en 1990, 31&nbsp;% en 2002, 34&nbsp;% en 2025 — COR). Pour celles qui partent après 2025, seule
-              la part que les cotisations financeraient au taux d'aujourd'hui est dessinée. Rapporté au salaire de chaque époque, l'INSEE trouve
+              salaires bien plus bas. La part non contributive est estimée au milieu de la retraite de chaque génération
+              (≈&nbsp;23&nbsp;% en 1990, 31&nbsp;% en 2002, 34&nbsp;% en 2025 — COR). Après 2025&nbsp;: en gardant les paramètres
+              actuels, ce que le système peut verser suit le nombre de cotisants par retraité (COR, 1,8 → 1,3). Rapporté au salaire de chaque époque, l'INSEE trouve
               <span data-ch="rect_1950">1,75</span>&nbsp;€ pour la génération 1950 et <span data-ch="rect_1980">1,27</span>&nbsp;€ pour 1980.</span></p>
             <div class="fil-svg" id="svg-t6b" role="img" aria-label="Ce qu'on verse à une génération pour 1 € cotisé, générations 1930 à 2000"></div>
           </div>
@@ -206,12 +206,12 @@
           verser moins que la précédente. À une personne née en 1930, le système a versé, sur toute sa retraite, plus de
           <strong><span data-ch="rec_1930">4</span>&nbsp;€</strong> pour chaque euro cotisé — dont
           ≈&nbsp;<span data-ch="nc_1930">31</span>&nbsp;% pris ailleurs que dans les cotisations&nbsp;; née en 1960,
-          <strong><span data-ch="rec_1960">1,9</span>&nbsp;€</strong>, dont ≈&nbsp;<span data-ch="nc_1960">38</span>&nbsp;%
-          pris ailleurs. Pour les générations qui partent après 2025, au même taux de cotisation et avec de moins en moins
-          de cotisants par retraité, les cotisations seules ne financeraient plus que
-          <strong><span data-ch="cot_1980">0,8</span>&nbsp;€</strong> à une personne née en 1980 et
-          <strong><span data-ch="cot_2000">0,7</span>&nbsp;€</strong> à une personne née en 2000. En 2025, pour la
-          première fois, la France a compté plus de décès que de naissances.</p>
+          <strong><span data-ch="rec_1960">1,9</span>&nbsp;€</strong>, dont ≈&nbsp;<span data-ch="nc_1960">34</span>&nbsp;%
+          pris ailleurs. En gardant les paramètres d'aujourd'hui — même taux de cotisation, même âge de départ, même
+          part de recettes non contributives — et avec de moins en moins de cotisants par retraité, le système ne pourrait
+          verser que <strong><span data-ch="fut_1980">1,15</span>&nbsp;€</strong> à une personne née en 1980 et
+          <strong><span data-ch="fut_2000">1,0</span>&nbsp;€</strong> à une personne née en 2000 — dont, chaque fois,
+          un tiers d'impôts et de dette. En 2025, pour la première fois, la France a compté plus de décès que de naissances.</p>
         <p>Même métier, même salaire, même carrière&nbsp;: née en 1950, 1975, 2000 ou 2026, la même vie ne reçoit pas la
           même retraite pour la même somme cotisée. Et l'équilibre reste à trouver, en 2050 comme après&nbsp;: par le taux, par
           l'âge, par le niveau des pensions — ou par ceux qui ne sont pas encore nés.</p>
@@ -253,15 +253,15 @@
        </div>
        <div class="fil-exit-tools">
          <a class="fil-tool" href="sankey.html">
-           <img src="assets/preview-sankey.svg?v=20260921o" alt="" loading="lazy" onerror="this.style.display='none'">
+           <img src="assets/preview-sankey.svg?v=20260921p" alt="" loading="lazy" onerror="this.style.display='none'">
            <span><b>Voir les flux →</b><small>d'où vient chaque euro, qui le dépense, où il finit</small></span>
          </a>
          <a class="fil-tool" href="treemap.html#realite">
-           <img src="assets/preview-mondrian.svg?v=20260921o" alt="" loading="lazy" onerror="this.style.display='none'">
+           <img src="assets/preview-mondrian.svg?v=20260921p" alt="" loading="lazy" onerror="this.style.display='none'">
            <span><b>Voir les masses →</b><small>les <span data-ch="non_contributif">145</span>&nbsp;milliards, en trois lectures</small></span>
          </a>
          <a class="fil-tool" href="labo/simulateur.html">
-           <img src="assets/preview-labo.svg?v=20260921o" alt="" loading="lazy" onerror="this.style.display='none'">
+           <img src="assets/preview-labo.svg?v=20260921p" alt="" loading="lazy" onerror="this.style.display='none'">
            <span><b>Passer au labo →</b><small>comparer les quatre vies, équilibrer le système et choisir qui paie</small></span>
          </a>
        </div>
@@ -279,7 +279,7 @@
     </p>
   </footer>
 
-  <script src="fil.js?v=20260921o"></script>
-  <script src="lexique.js?v=20260921o"></script>
+  <script src="fil.js?v=20260921p"></script>
+  <script src="lexique.js?v=20260921p"></script>
 </body>
 </html>
