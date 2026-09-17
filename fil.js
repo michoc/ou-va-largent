@@ -150,7 +150,7 @@
     svgT4(taux, tPriv);
     if (esrData) svgT5(esrData);
     svgT6(ratio, rgHist);
-    svgT6b(recup);
+    svgT6b(recup, pens && nc ? nc / pens : 0);
   }
 
   /* ---------- 1 · recettes et emprunt ---------- */
@@ -266,23 +266,40 @@
   }
 
   /* ---------- 6b · ce qu'on verse à une génération pour 1 € cotisé ---------- */
-  function svgT6b(rec) {
+  /* Pour les générations qui partent après 2025 (nées à partir de 1970), la barre est
+   * la pension PROMISE par les règles : elle n'est versée que si l'argent qui manque
+   * continue d'être pris ailleurs. Cette part (non contributif ÷ pensions, 34 % en 2025)
+   * est hachurée en cramoisi — la même génération la paie aussi, en impôts et en dette. */
+  function svgT6b(rec, partAilleurs) {
     const gens = Object.keys(rec).sort();
     if (!gens.length) return;
-    const W = 300, H = 120, colW = W / gens.length, bw = Math.min(26, colW - 8);
+    const W = 300, H = 138, colW = W / gens.length, bw = Math.min(26, colW - 8);
     const base = 100, hMax = 62, vMax = Math.max.apply(null, gens.map((g) => rec[g])), sc = hMax / vMax;
-    let s = "";
+    let s = '<defs><pattern id="hachT6" width="4" height="4" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">' +
+            '<rect width="4" height="4" fill="' + C.paper + '"/><line x1="0" y1="0" x2="0" y2="4" stroke="' + C.cram + '" stroke-width="1.6"/></pattern></defs>';
     const y1 = base - 1 * sc;
     const fx1 = (v) => (Math.round(v * 20) / 20).toFixed(2).replace(/0$/, "").replace(".", ",");
+    let hachDrawn = false;
     gens.forEach((g, i) => {
       const v = rec[g], x = i * colW + (colW - bw) / 2, h = v * sc, key = i === 0 || g === "1960" || g === "1980";
       s += R(x, base - h, bw, h, C.pens, ' rx="2"' + (key ? "" : ' opacity=".5"'));
+      if (partAilleurs > 0 && +g >= 1970) {   // départ après 2025 : promesse, dont la part prise ailleurs
+        const hh = h * partAilleurs;
+        s += R(x, base - h, bw, hh, "url(#hachT6)", ' rx="2" stroke="' + C.cram + '" stroke-width=".6"');
+        hachDrawn = true;
+      }
       s += T(x + bw / 2, base - h - 4, fx1(v) + (key ? " €" : ""), { a: "middle", s: key ? 9 : 7, c: key ? C.ink : C.soft, w: key ? 700 : 400 });
       s += T(x + bw / 2, base + 12, g, { a: "middle", s: 7.5, c: key ? C.ink : C.soft, w: key ? 700 : 400 });
     });
     s += '<line x1="6" y1="' + y1 + '" x2="' + (W - 6) + '" y2="' + y1 + '" stroke="' + C.ink + '" stroke-width="1" stroke-dasharray="3 3"/>';
     s += TAG(W - 6, y1 - 1, "1 € cotisé", C.ink, 7);
     s += T(6, 10, "génération (année de naissance)", { s: 7, c: C.soft });
+    if (hachDrawn) {
+      s += R(6, base + 19, 9, 6, "url(#hachT6)", ' stroke="' + C.cram + '" stroke-width=".6"') +
+           T(19, base + 24.5, "dès 1970, pension promise par les règles : la part que les cotisations ne couvrent pas (" +
+             f0(partAilleurs * 100) + " % aujourd'hui)", { s: 6.4, c: C.cram }) +
+           T(19, base + 33, "vient des impôts et de la dette — que ces générations paient aussi", { s: 6.4, c: C.cram });
+    }
     SVG("svg-t6b", W, H, s);
   }
 
