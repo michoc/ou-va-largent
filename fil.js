@@ -79,126 +79,62 @@
     if (cotisants) { set("nc_cot", f0(round100(nc * 1000 / cotisants))); set("pens_cot", f0(round100(pens * 1000 / cotisants))); set("cotisants", f1(cotisants)); }
     if (ch.retraites_droit_direct_millions) set("retraites_m", f1(ch.retraites_droit_direct_millions));
     const ratio = ch.ratio_cotisants_retraites || {};
-    // euros constants (France Stratégie 2016, modèle MELETE) : la convention du site ;
-    // la série INSEE rapportée au salaire de l'époque reste en légende
-    const recup = ((ch.taux_recuperation || {}).euros_constants || {}).serie || {};
-    const recupSmpt = (ch.taux_recuperation || {}).cotisations_seules || {};
-    ["1930", "1950", "1960", "1980", "2000"].forEach((g) => { if (recup[g]) set("rec_" + g, f1(recup[g])); });
-    if (recupSmpt["1950"]) set("rect_1950", f2(recupSmpt["1950"]));
-    if (recupSmpt["1980"]) set("rect_1980", f2(recupSmpt["1980"]));
+    // ---- temps 6a : cotisants par retraité (COR) précédés du régime général à ses débuts (Cnav)
     const rgHist = (ch.ratio_regime_general_historique || {}).serie || {};
     if (rgHist["1965"]) set("rg_1965", f1(rgHist["1965"]));
-    Object.keys(ratio).forEach((y) => set("ratio_" + y, f1(ratio[y])));
-
-    // ---- temps 2 : les masses ----
-    const sante = sum((l) => l.target === "Santé (maladie)");
-    const ecole = drillLink("É · Enseignement & recherche", "Éducation nationale");
-    const armee = drillLink("É · Défense, sécurité, justice", "Défense");
-    const police = drillLink("É · Défense, sécurité, justice", "Police, gendarmerie & sécurité civile");
-    const justice = drillLink("É · Défense, sécurité, justice", "Justice");
-    const interets = sum((l) => l.target === "É · Charge de la dette");
-    const cinq = ecole + armee + police + justice + interets;
-    set("sante", f0(sante)); set("cinq", f0(cinq));
-
-    // ---- temps 3 : les caisses ----
-    const etatTotal = (dec.contribution_etat || 0) + (dec.subventions_regimes_speciaux || 0);
-    set("etat_total", f1(etatTotal)); set("contribution_etat", f0(dec.contribution_etat));
-    set("regimes_speciaux", f0(dec.subventions_regimes_speciaux));
-    set("itaf", f1(dec.itaf)); set("transferts", f1(dec.transferts_branches));
-    set("solde_pf", f1((dec.deficit || 0) + (dec.divers || 0)));
-
-    // ---- temps 4 : le taux ----
-    const taux = ch.taux_cas_civils || {};
-    const t26 = taux["2026"], tPriv = ch.taux_prive_employeur;
-    if (t26) { set("taux_2026", f2(t26)); set("taux_2026_0", f0(t26)); }
-    if (tPriv) set("taux_prive", f2(tPriv));
-    if (ch.taux_cas_militaires) set("taux_mil", f2(ch.taux_cas_militaires));
-    if (tp.part_etat_au_taux_prive) set("part_privee", f0(tp.part_etat_au_taux_prive));
-    if (tp.surcotisation_etat_fpe) { set("surco", f0(tp.surcotisation_etat_fpe)); set("surco_1", f1(tp.surcotisation_etat_fpe)); }
-    if (four.dg_budget_jaune_2026) set("dgb", f0(four.dg_budget_jaune_2026));
-    if (four.cae) set("cae", f1(four.cae));
-
-    // ---- temps 5 : l'enseignement supérieur ----
-    const H = d.historique || {}, HM = H.missions || {};
-    const esr = HM["Enseignement sup. & recherche (ESR)"], edu = HM["Éducation nationale"];
-    let esrData = null;
-    if (esr && esr.cp) {
-      const ys = Object.keys(esr.cp).sort(), y1 = ys[ys.length - 1], y0 = ys[0], yp = ys[ys.length - 2];
-      const cas = esr.cas || {};
-      const dcp = esr.cp[y1] - esr.cp[yp], dcas = (cas[y1] || 0) - (cas[yp] || 0), moyens = dcp - dcas;
-      const cp5 = esr.cp[y1] - esr.cp[y0], cas5 = (cas[y1] || 0) - (cas[y0] || 0);
-      set("esr_y1", y1);
-      set("esr_dcp", (dcp < 0 ? "baisse de " : "augmente de ") + f1(Math.abs(dcp)) + " milliard" + (Math.abs(dcp) >= 2 ? "s" : ""));
-      set("esr_dcas", (dcas < 0 ? "baisse de " : "augmente de ") + f1(Math.abs(dcas)));
-      set("esr_moyens", f1(Math.abs(moyens)) + " milliard" + (Math.abs(moyens) >= 2 ? "s" : ""));
-      set("esr_moyens_md", signed(moyens, true)); set("esr_dcp_s", signed(dcp, true)); set("esr_dcas_s", signed(dcas, true));
-      set("esr_cas5", f1(cas5)); set("esr_cp5", f1(cp5));
-      const part = cp5 > 0 ? cas5 / cp5 : 0;
-      set("esr_part5", part < 0.2 ? "moins d'un cinquième" : part < 0.3 ? "un quart" : part < 0.4 ? "un tiers" :
-                       part < 0.6 ? "la moitié" : f0(part * 100) + " %");
-      esrData = { ys: ys, cp: esr.cp, cas: cas, y1: y1, dcp: dcp, dcas: dcas, moyens: moyens };
-    }
-    if (edu && edu.cp) {
-      const ys = Object.keys(edu.cp).sort(), y1 = ys[ys.length - 1], yp = ys[ys.length - 2];
-      set("edu_dcp", f0(edu.cp[y1] - edu.cp[yp])); set("edu_dcas", f1(((edu.cas || {})[y1] || 0) - ((edu.cas || {})[yp] || 0)));
-    }
-
-    // ---- vignettes ----
-    svgT1(rec, dette, dep);
-    svgT2(pens, sante, { ecole: ecole, armee: armee, police: police, justice: justice, interets: interets });
-    svgT3(pens, cot, nc, pop);
-    svgT4(taux, tPriv);
-    if (esrData) svgT5(esrData);
     svgT6(ratio, rgHist);
-    // part financée par les cotisations aujourd'hui (277/422) et sa projection à taux
-    // constant : proportionnelle au nombre de cotisants par retraité (COR : 1,8 → 1,3)
-    const partCot = pens && cot ? cot / pens : 0;
-    const ratioKeys = Object.keys(ratio).map(Number).sort((a, b) => a - b);
-    const ratioAt = (y) => {
-      if (!ratioKeys.length) return null;
-      if (y <= ratioKeys[0]) return ratio[ratioKeys[0]];
-      if (y >= ratioKeys[ratioKeys.length - 1]) return ratio[ratioKeys[ratioKeys.length - 1]];
-      for (let i = 1; i < ratioKeys.length; i++) if (y <= ratioKeys[i]) {
-        const a = ratioKeys[i - 1], b = ratioKeys[i];
-        return ratio[a] + (ratio[b] - ratio[a]) * (y - a) / (b - a);
+    // INSEE / SMPT (rapporté au salaire de l'époque), gardé en mémoire dans les textes
+    const recupSmpt = (ch.taux_recuperation || {}).cotisations_seules || {};
+    if (recupSmpt["1950"]) set("rect_1950", f2(recupSmpt["1950"]));
+    if (recupSmpt["1980"]) set("rect_1980", f2(recupSmpt["1980"]));
+
+    // ---- temps 6b : le taux de récupération PAR LA FORMULE (« compte d'une année »),
+    // sans croissance des salaires. Passé : la pension versée, calculée avec les paramètres
+    // de l'époque (actifs par retraité, taux de cotisation, part prise ailleurs, durées) ;
+    // futur : paramètres constants — part financée par les 28 % de cotisations, et part
+    // financée autrement à taux inchangé, montrées séparément.
+    const TR = ch.taux_recuperation || {}, FM = TR.formule || {};
+    const partCot = pens && cot ? cot / pens : 0;                      // 66 %
+    const interp = (tbl, y) => {
+      const ks = Object.keys(tbl).map(Number).sort((a, b) => a - b);
+      if (!ks.length) return null;
+      if (y <= ks[0]) return tbl[ks[0]];
+      if (y >= ks[ks.length - 1]) return tbl[ks[ks.length - 1]];
+      for (let i = 1; i < ks.length; i++) if (y <= ks[i]) {
+        const a = ks[i - 1], b = ks[i];
+        return tbl[a] + (tbl[b] - tbl[a]) * (y - a) / (b - a);
       }
       return null;
     };
-    const r2025 = ratioAt(2025);
-    // passé : estimation de la part non contributive (ancres 1990 → 2025, données de référence) ;
-    // futur : à taux constant, la part couverte suit le nombre de cotisants par retraité
+    const ratioTbl = Object.assign({}, ratio);
+    if (FM.ratio_1990_estime && !ratioTbl["1990"]) ratioTbl["1990"] = FM.ratio_1990_estime;
+    const ratioAt = (y) => interp(ratioTbl, y);
+    const tauxAt = (y) => (interp(FM.taux_cotisation_serie || { 2025: 28.1 }, y) || 28.1) / 100;
     const ncHist = (ch.part_non_contributive_historique || {}).ancres || {};
-    const ncKeys = Object.keys(ncHist).map(Number).sort((a, b) => a - b);
-    const ncAt = (y) => {
-      if (!ncKeys.length) return 1 - partCot;
-      if (y <= ncKeys[0]) return ncHist[ncKeys[0]];
-      if (y >= ncKeys[ncKeys.length - 1]) return ncHist[ncKeys[ncKeys.length - 1]];
-      for (let i = 1; i < ncKeys.length; i++) if (y <= ncKeys[i]) {
-        const a = ncKeys[i - 1], b = ncKeys[i];
-        return ncHist[a] + (ncHist[b] - ncHist[a]) * (y - a) / (b - a);
+    const ncAt = (y) => { const v = interp(ncHist, y); return v == null ? 1 - partCot : v; };
+    const tauxNow = tauxAt(2025), ncNow = 1 - partCot;
+    const autreParActifNow = tauxNow * ncNow / (1 - ncNow);              // 14,7 % du salaire
+    const gens = (FM.generations || []).map((G) => {
+      const futur = G.depart > 2025, mid = G.depart + G.duree_retraite / 2;
+      const cotise = (G.taux_moyen_carriere_pct / 100) * G.duree_carriere;
+      const r = ratioAt(mid) || 1.8;
+      let vCot, vAut;
+      if (futur) {                                    // paramètres constants
+        vCot = r * tauxNow * G.duree_retraite / cotise;
+        vAut = r * autreParActifNow * G.duree_retraite / cotise;
+      } else {                                        // paramètres de l'époque, tout est « versé »
+        const t = tauxAt(mid), nc = ncAt(mid);
+        vCot = r * (t / (1 - nc)) * G.duree_retraite / cotise;
+        vAut = 0;
       }
-      return 1 - partCot;
-    };
-    // âge de départ vécu par la génération, et milieu de sa retraite (≈ 12 ans après)
-    const departDe = (g) => (g <= 1950 ? 60 : g <= 1960 ? 62 : 64);
-    const milieuRetraite = (g) => g + departDe(g) + 12;
-    const estFutur = (g) => +g + departDe(+g) > 2025;
-    // passé : la pension versée (France Stratégie) et sa part non contributive estimée au
-    // milieu de la retraite ; futur : EN GARDANT LES PARAMÈTRES ACTUELS — l'arithmétique
-    // directe, sans croissance des salaires : chaque année de retraite, le système verse
-    // (cotisants par retraité × taux ÷ part contributive) salaires ; chaque année de carrière,
-    // la personne cotise (taux) salaire → versé/cotisé = ratio × durée de retraite ÷ (part
-    // contributive × durée de carrière) ; le taux s'annule.
-    const pcst = ch.parametres_constants || {};
-    const dRet = pcst.duree_retraite_ans || 25, dCar = pcst.duree_carriere_ans || 43;
-    const partCotGen = (g) => (estFutur(g) ? partCot : 1 - ncAt(milieuRetraite(+g)));
-    const valGen = (g) => (estFutur(g) && partCot ? ratioAt(milieuRetraite(+g)) * dRet / (partCot * dCar) : recup[g]);
-    set("param_2025", f2(r2025 * dRet / (partCot * dCar)));
-    Object.keys(recup).forEach((g) => {
-      set("nc_" + g, f0((1 - partCotGen(g)) * 100));
-      if (estFutur(g)) { set("fut_" + g, f2(valGen(g))); set("cot_" + g, f2(valGen(g) * partCotGen(g))); }
+      return { g: G.naissance, futur: futur, cot: vCot, aut: vAut, tot: vCot + vAut, ratio: r };
     });
-    svgT6b(recup, valGen, partCotGen, estFutur);
+    gens.forEach((G) => {
+      set("rec_" + G.g, f1(G.tot));
+      if (G.futur) { set("cot_" + G.g, f2(G.cot)); set("aut_" + G.g, f2(G.aut)); set("tot_" + G.g, f2(G.tot)); }
+    });
+    set("autre_actif", f1(autreParActifNow * 100));
+    svgT6b(gens);
   }
 
   /* ---------- 1 · recettes et emprunt ---------- */
@@ -314,42 +250,43 @@
   }
 
   /* ---------- 6b · ce qu'on verse à une génération pour 1 € cotisé ---------- */
-  /* Une seule lecture pour toutes les générations : la barre = ce qui est versé pour 1 € cotisé,
-   * scindée entre ce que financent les cotisations (violet) et les recettes non contributives
-   * (hachures cramoisies). À gauche d'« aujourd'hui », l'historique des pensions réellement
-   * versées ; à droite, la dynamique EN GARDANT LES PARAMÈTRES ACTUELS. */
-  function svgT6b(rec, valGen, partCotGen, estFutur) {
-    const gens = Object.keys(rec).sort();
+  /* Temps 6b : € versés pour 1 € cotisé, par la formule. Passé : une seule barre (la pension
+   * versée, paramètres de l'époque). Futur : part financée par les 28 % de cotisations (violet)
+   * + part financée autrement, à taux inchangé (hachures cramoisies). */
+  function svgT6b(gens) {
     if (!gens.length) return;
-    const W = 300, H = 142, colW = W / gens.length, bw = Math.min(26, colW - 8);
-    const base = 100, hMax = 62, vMax = Math.max.apply(null, gens.map((g) => valGen(g))), sc = hMax / vMax;
+    const W = 300, H = 150, colW = W / gens.length, bw = Math.min(26, colW - 8);
+    const base = 100, hMax = 62, vMax = Math.max.apply(null, gens.map((G) => G.tot)), sc = hMax / vMax;
     let s = '<defs><pattern id="hachT6" width="4" height="4" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">' +
             '<rect width="4" height="4" fill="' + C.paper + '"/><line x1="0" y1="0" x2="0" y2="4" stroke="' + C.cram + '" stroke-width="1.6"/></pattern></defs>';
     const y1 = base - 1 * sc;
     const fx = (v) => (v >= 2 ? v.toFixed(1) : v.toFixed(2).replace(/0$/, "")).replace(".", ",");
-    let xSplit = null, ncNow = null;
-    gens.forEach((g, i) => {
-      const x = i * colW + (colW - bw) / 2, futur = estFutur(g), pc = partCotGen(g), v = valGen(g), h = v * sc, hc = h * pc;
-      if (futur && xSplit == null) { xSplit = i * colW; ncNow = 1 - pc; }
-      const key = i === 0 || g === "1960" || g === "1980" || g === "2000";
+    let xSplit = null;
+    gens.forEach((G, i) => {
+      const x = i * colW + (colW - bw) / 2, key = i === 0 || G.g === 1950 || G.g === 1980 || G.g === 2000;
+      if (G.futur && xSplit == null) xSplit = i * colW;
+      const hc = G.cot * sc, ha = G.aut * sc;
       s += R(x, base - hc, bw, hc, C.pens, ' rx="2"' + (key ? "" : ' opacity=".55"'));
-      s += R(x, base - h, bw, h - hc, "url(#hachT6)", ' rx="2" stroke="' + C.cram + '" stroke-width=".6"');
-      s += T(x + bw / 2, base - h - 4, fx(v) + (key ? " €" : ""), { a: "middle", s: key ? 9 : 7, c: key ? C.ink : C.soft, w: key ? 700 : 400 });
-      if (h - hc > 9) s += T(x + bw / 2, base - h + (h - hc) / 2 + 2.5, f0((1 - pc) * 100) + " %", { a: "middle", s: 6, c: C.cram, w: 700 });
-      s += T(x + bw / 2, base + 12, g, { a: "middle", s: 7.5, c: key ? C.ink : C.soft, w: key ? 700 : 400 });
+      if (G.futur) {
+        s += R(x, base - hc - ha, bw, ha, "url(#hachT6)", ' rx="2" stroke="' + C.cram + '" stroke-width=".6"');
+        s += T(x + bw / 2, base - hc + 4, fx(G.cot), { a: "middle", s: 6.5, c: C.paper, w: 700 });
+        if (ha > 8) s += T(x + bw / 2, base - hc - ha / 2 + 2.2, "+" + fx(G.aut), { a: "middle", s: 5.8, c: C.cram, w: 700 });
+      }
+      s += T(x + bw / 2, base - hc - ha - 4, fx(G.tot) + (key ? " €" : ""), { a: "middle", s: key ? 9 : 7, c: key ? C.ink : C.soft, w: key ? 700 : 400 });
+      s += T(x + bw / 2, base + 12, String(G.g), { a: "middle", s: 7.5, c: key ? C.ink : C.soft, w: key ? 700 : 400 });
     });
     s += '<line x1="6" y1="' + y1 + '" x2="' + (W - 6) + '" y2="' + y1 + '" stroke="' + C.ink + '" stroke-width="1" stroke-dasharray="3 3"/>';
     s += TAG(6 + ("1 € cotisé".length * 7 * 0.56 + 8), y1 - 1, "1 € cotisé", C.ink, 7);
     if (xSplit != null) {
       s += '<line x1="' + xSplit + '" y1="14" x2="' + xSplit + '" y2="' + (base + 16) + '" stroke="' + C.ink + '" stroke-width=".8" stroke-dasharray="2 2"/>';
-      s += T(xSplit - 5, 10, "pensions versées", { a: "end", s: 6.5, c: C.soft }) + T(xSplit + 5, 10, "en gardant les paramètres actuels", { s: 6.5, c: C.soft });
+      s += T(xSplit - 5, 10, "pensions versées, paramètres de l'époque", { a: "end", s: 6.5, c: C.soft }) + T(xSplit + 5, 10, "à paramètres constants", { s: 6.5, c: C.soft });
     }
-    s += R(6, base + 20, 9, 6, C.pens) + T(19, base + 25.5, "financé par les cotisations", { s: 6.4, c: C.ink }) +
-         R(112, base + 20, 9, 6, "url(#hachT6)", ' stroke="' + C.cram + '" stroke-width=".6"') +
-         T(125, base + 25.5, "recettes non contributives : impôts, dette, budgets (" + f0((ncNow || 0) * 100) + " % aujourd'hui)", { s: 6.4, c: C.cram }) +
-         T(6, base + 35, "à droite : cotisants par retraité (1,5 → 1,3) × 25 ans de retraite ÷ (66 % × 43 ans de carrière) —", { s: 6.4, c: C.soft }) +
-         T(6, base + 43, "même taux de cotisation, même âge, même part non contributive, sans croissance des salaires", { s: 6.4, c: C.soft });
-    SVG("svg-t6b", W, H + 8, s);
+    s += R(6, base + 20, 9, 6, C.pens) + T(19, base + 25.5, "financé par les 28 % de cotisations", { s: 6.4, c: C.ink }) +
+         R(140, base + 20, 9, 6, "url(#hachT6)", ' stroke="' + C.cram + '" stroke-width=".6"') +
+         T(153, base + 25.5, "financé autrement, à taux inchangé (impôts, dette, budgets)", { s: 6.4, c: C.cram }) +
+         T(6, base + 35, "versé = actifs par retraité × (cotisation + part prise ailleurs par actif) × années de retraite ;", { s: 6.4, c: C.soft }) +
+         T(6, base + 43, "cotisé = taux moyen de la carrière × années de carrière — en salaires de l'année, sans croissance", { s: 6.4, c: C.soft });
+    SVG("svg-t6b", W, H, s);
   }
 
   /* ---------- la scène : le vrai graphique, dans l'état du temps en cours ----------

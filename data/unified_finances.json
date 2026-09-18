@@ -2,7 +2,7 @@
  "meta": {
   "exercice": 2025,
   "unit": "Md€",
-  "generated_at": "2026-09-17T12:40:20+00:00",
+  "generated_at": "2026-09-18T00:17:01+00:00",
   "sources": {
    "etat_depenses": "plf25-depenses-2025-selon-destination (PLF (crédits demandés))",
    "etat_recettes": "plf25-recettes-du-budget-general + Voies & moyens (partages TVA/PSR, cf. data/reference)",
@@ -154,6 +154,80 @@
       "1990": 1.35,
       "2000": 1.35
      }
+    },
+    "formule": {
+     "_comment": "Convention retenue pour le temps 6 (décision du commanditaire, 2026-09-18) : le taux de récupération est CALCULÉ par la formule du « compte d'une année », sans croissance des salaires. versé = actifs par retraité × (taux de cotisation + part prise ailleurs par actif) × années de retraite ; cotisé = taux moyen de cotisation sur la carrière × années de carrière ; les deux au milieu de la retraite pour le versé. Passé : tout est versé, sans distinguer la part prise ailleurs. Futur (départ après 2025) : paramètres constants — 28,1 % de cotisation, part prise ailleurs à taux inchangé (28,1 × 34,4/65,6 = 14,7 % du salaire par actif), 43 ans de carrière — la part cotisations et la part « autrement » sont montrées séparément, même si le total passe sous la pension promise.",
+     "generations": [
+      {
+       "naissance": 1930,
+       "depart": 1990,
+       "duree_carriere": 40,
+       "duree_retraite": 22,
+       "taux_moyen_carriere_pct": 14.0
+      },
+      {
+       "naissance": 1940,
+       "depart": 2000,
+       "duree_carriere": 40,
+       "duree_retraite": 23,
+       "taux_moyen_carriere_pct": 16.5
+      },
+      {
+       "naissance": 1950,
+       "depart": 2011,
+       "duree_carriere": 41,
+       "duree_retraite": 24,
+       "taux_moyen_carriere_pct": 22.0
+      },
+      {
+       "naissance": 1960,
+       "depart": 2022,
+       "duree_carriere": 42,
+       "duree_retraite": 24,
+       "taux_moyen_carriere_pct": 24.5
+      },
+      {
+       "naissance": 1970,
+       "depart": 2034,
+       "duree_carriere": 43,
+       "duree_retraite": 24,
+       "taux_moyen_carriere_pct": 26.5
+      },
+      {
+       "naissance": 1980,
+       "depart": 2044,
+       "duree_carriere": 43,
+       "duree_retraite": 25,
+       "taux_moyen_carriere_pct": 27.5
+      },
+      {
+       "naissance": 1990,
+       "depart": 2054,
+       "duree_carriere": 43,
+       "duree_retraite": 25,
+       "taux_moyen_carriere_pct": 28.0
+      },
+      {
+       "naissance": 2000,
+       "depart": 2064,
+       "duree_carriere": 43,
+       "duree_retraite": 25,
+       "taux_moyen_carriere_pct": 28.1
+      }
+     ],
+     "taux_cotisation_serie": {
+      "1948": 10.0,
+      "1970": 13.0,
+      "1980": 18.5,
+      "1990": 23.0,
+      "2000": 25.5,
+      "2010": 26.7,
+      "2017": 27.9,
+      "2025": 28.1,
+      "2110": 28.1
+     },
+     "ratio_1990_estime": 2.3,
+     "sources": "Durées de retraite : COR juin 2026, fig. 3.6 (≈ 24 ans pour les générations nées à la fin des années 1950, creux vers 1965-70, hausse ensuite) ; durées de carrière : durée d'assurance requise 37,5 ans (avant 1993) → 40 (réforme 1993) → 41-42 (2003-2010) → 43 ans = 172 trimestres à partir de la génération 1965-71 ; taux de cotisation vieillesse global (salarié + employeur, complémentaires comprises) : ≈ 13 % en 1970 (régime général 8,5 % + Arrco naissante) → 28,1 % en 2025, série calée sur les moyennes générationnelles 22 % (gén. 1950) et 28 % (S. Catherine, 2025) — estimation ; actifs par retraité : 2,1 en 2002 → 1,8 en 2025 → 1,3 en 2070 (COR), 1990 ≈ 2,3 estimé (Cnav 1,88 recalé sur le champ tous régimes) ; part prise ailleurs : ancres part_non_contributive_historique. Âges de départ vécus : 60 (1930-40), 61 (1950), 62 (1960), 64 (à partir de 1970, trajectoire de référence COR)."
     }
    },
    "ratio_regime_general_historique": {
@@ -12764,29 +12838,29 @@
   }
  },
  "surco": {
-  "Immigration & asile": 0.06,
-  "Justice": 2.2,
-  "Écologie & transports": 1.26,
-  "Enseignement sup. & recherche (ESR)": 5.6,
-  "Agriculture": 0.33,
-  "Santé": 0.01,
-  "Outre-mer": 0.06,
-  "Anciens combattants": 0.01,
-  "Finances publiques (Bercy)": 2.6,
-  "Services du Premier ministre": 0.09,
-  "Économie": 0.27,
-  "Culture": 0.38,
-  "Police, gendarmerie & sécurité civile": 7.04,
-  "Travail & emploi": 0.95,
-  "Éducation nationale": 25.52,
-  "Sport & jeunesse": 0.14,
-  "Transformation et fonction publiques": 0.02,
-  "Administration territoriale (Intérieur)": 0.86,
-  "Conseil et contrôle de l'État": 0.19,
+  "Logement & territoires": 0.03,
   "Défense": 8.46,
+  "Éducation nationale": 25.52,
+  "Agriculture": 0.33,
+  "Services du Premier ministre": 0.09,
+  "Anciens combattants": 0.01,
+  "Immigration & asile": 0.06,
+  "Santé": 0.01,
+  "Conseil et contrôle de l'État": 0.19,
+  "Écologie & transports": 1.26,
+  "Travail & emploi": 0.95,
   "Médias & livre": 0.04,
   "Diplomatie (Quai d'Orsay)": 0.28,
-  "Logement & territoires": 0.03
+  "Enseignement sup. & recherche (ESR)": 5.6,
+  "Justice": 2.2,
+  "Finances publiques (Bercy)": 2.6,
+  "Administration territoriale (Intérieur)": 0.86,
+  "Sport & jeunesse": 0.14,
+  "Transformation et fonction publiques": 0.02,
+  "Outre-mer": 0.06,
+  "Économie": 0.27,
+  "Police, gendarmerie & sécurité civile": 7.04,
+  "Culture": 0.38
  },
  "retraites_view": {
   "title": "Qui paie les 422 Md€ de retraites ?",
@@ -13543,9 +13617,9 @@
      "2021": 3.69,
      "2023": 3.8,
      "2022": 3.69,
-     "2024": 3.86,
      "2020": 3.71,
-     "2025": 4.02
+     "2025": 4.02,
+     "2024": 3.86
     }
    },
    "É · Écologie, territoires & agriculture": {
@@ -13562,9 +13636,9 @@
      "2021": 1.48,
      "2023": 1.77,
      "2022": 1.48,
-     "2024": 1.58,
      "2020": 1.38,
-     "2025": 1.65
+     "2025": 1.65,
+     "2024": 1.58
     }
    },
    "É · Solidarités, travail & santé": {
@@ -13581,9 +13655,9 @@
      "2021": 0.66,
      "2023": 0.88,
      "2022": 0.69,
-     "2024": 0.93,
      "2020": 0.71,
-     "2025": 0.96
+     "2025": 0.96,
+     "2024": 0.93
     }
    },
    "É · Culture, médias, sport": {
@@ -13600,9 +13674,9 @@
      "2021": 0.45,
      "2023": 0.51,
      "2022": 0.48,
-     "2024": 0.52,
      "2020": 0.43,
-     "2025": 0.52
+     "2025": 0.52,
+     "2024": 0.52
     }
    },
    "É · Défense, sécurité, justice": {
@@ -13619,9 +13693,9 @@
      "2021": 15.48,
      "2023": 16.61,
      "2022": 15.68,
-     "2024": 17.4,
      "2020": 15.41,
-     "2025": 17.74
+     "2025": 17.74,
+     "2024": 17.4
     }
    },
    "É · Charge de la dette": {
@@ -13649,9 +13723,9 @@
      "2021": 26.6,
      "2023": 28.31,
      "2022": 27.01,
-     "2024": 29.34,
      "2020": 26.37,
-     "2025": 31.09
+     "2025": 31.09,
+     "2024": 29.34
     }
    },
    "É · Économie & investissements d'avenir": {
@@ -13664,12 +13738,12 @@
      "2020": 2.36
     },
     "cas": {
+     "2021": 0.23,
+     "2023": 0.23,
+     "2025": 0.24,
      "2022": 0.23,
      "2024": 0.24,
-     "2020": 0.23,
-     "2025": 0.24,
-     "2021": 0.23,
-     "2023": 0.23
+     "2020": 0.23
     }
    }
   }
