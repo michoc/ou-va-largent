@@ -234,8 +234,10 @@
         } else if (col === opts.lastCol) {
           if (k % 2) offset = [0, st + 8];
         } else {
-          // rangées médianes chargées : quinconce à 3 niveaux
-          offset = [[0, 0], [0, st], [0, -st]][k % 3];
+          // rangées médianes chargées : quinconce à 3 niveaux (4 sur petit écran,
+          // où deux pastilles voisines d'un même niveau se touchaient encore)
+          const lv = opts.midLevels === 4 ? [[0, 0], [0, st], [0, -st], [0, 2 * st]] : [[0, 0], [0, st], [0, -st]];
+          offset = lv[k % lv.length];
         }
         // voie retraites collée au bord gauche : sur écran étroit, on rentre
         // les pastilles vers l'intérieur pour qu'elles ne soient pas rognées.
@@ -437,9 +439,10 @@
     const top = EMBED && narrow ? 124 : narrow ? 168 : 138, bottom = EMBED ? 44 : narrow ? 60 : 56;
     chart.setOption(buildOption(nodes, links,
       { lastCol: lastCol(nodes), iterations: 0, top: top, bottom: bottom,
-        wrapChars: narrow ? 11 : 15, labelMin: narrow ? 58 : 20,
+        wrapChars: narrow ? 12 : 15, labelMin: EMBED && narrow ? 150 : narrow ? 80 : 20,
         left: narrow ? 8 : 16, right: narrow ? 8 : 44,
-        stagger: narrow ? 44 : 30, laneNudge: narrow ? 52 : 0, col0Levels: 3,
+        // petit écran : niveaux espacés de plus qu'une pastille (≈ 50 px) pour ne jamais se recouvrir
+        stagger: narrow ? 56 : 30, laneNudge: narrow ? 52 : 0, col0Levels: 3, midLevels: narrow && !EMBED ? 4 : 3,
         fontSize: narrow ? 11 : 12.5, fontSizeV: narrow ? 10 : 11, noGlose: narrow,
         these: THESE, theseNodes: theseNodes }), true);
     retPanel.classList.remove("open");
@@ -756,9 +759,9 @@
     const c = meta.checks || {};
     const hab = parHabitant(c.depenses_totales);
     statEl.innerHTML =
-      "<b>" + fmt0(c.recettes_hors_dette) + " Md€</b> de recettes + <b>" + fmt0(c.dette) +
-      " Md€</b> empruntés = <b>" + fmt0(c.depenses_totales) + " Md€</b> dépensés en " + meta.exercice +
-      (hab ? '<span class="sep">·</span><b>' + fmt0(hab) + " €</b> par habitant" : "");
+      '<span class="stat"><b>' + fmt0(c.recettes_hors_dette) + " Md€</b> de recettes</span> <span class=\"stat\">+ <b>" + fmt0(c.dette) +
+      " Md€</b> empruntés</span> <span class=\"stat\">= <b>" + fmt0(c.depenses_totales) + " Md€</b> dépensés en " + meta.exercice + "</span>" +
+      (hab ? '<span class="sep">·</span><span class="stat"><b>' + fmt0(hab) + " €</b> par habitant</span>" : "");
   }
 
   /* ---------------- panneau pensions (explication) ---------------- */
@@ -845,7 +848,7 @@
       "des comptes) en « contribution d'équilibre »&nbsp;: c'est le chiffre des flux de la voie retraites et du Mondrian.</p>" +
       "<p><strong>Le CAS Pensions en 2025</strong> (Cour des comptes, avril 2026)&nbsp;: 69,3&nbsp;Md€ de dépenses, 67,3 de recettes, " +
       "solde −2,0&nbsp;Md€ — quatrième déficit consécutif —, solde cumulé ramené à 2,6&nbsp;Md€. Le régime des fonctionnaires " +
-      "de l'État compte 1,1 cotisant par pensionné de droit direct (1,5 au régime général).</p>" +
+      "de l'État compte 1,1 cotisant par pensionné de droit direct, contre 1,5 au régime général (2024).</p>" +
       "<p><strong>Réforme des retraites suspendue</strong> (LFSS 2026, art.&nbsp;105)&nbsp;: l'âge légal est gelé à " +
       "62&nbsp;ans et 9&nbsp;mois et la durée requise à 170&nbsp;trimestres jusqu'au 1er&nbsp;janvier 2028, pour les " +
       "pensions prenant effet à partir du 1er&nbsp;septembre 2026 (générations 1964-1968). Le COR (juin 2026) projette " +

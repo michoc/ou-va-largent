@@ -10,7 +10,7 @@
  * Md€/an et en « fois les loyers versés en France » (95 Md€/an).
  *
  * ACTE ② : le jeu « Équilibrer 2050 ». La pension est une PROMESSE (la pension
- * moyenne réelle par retraité : 422,2 Md€ ÷ 17,4 M ≈ 1 840 € nets) ; les cotisations
+ * moyenne réelle par retraité : 422,2 Md€ ÷ 17,4 M ≈ 2 020 € bruts) ; les cotisations
  * seules en financent 66 % ; l'écart est « pris ailleurs » (impôts, dette, budgets des
  * ministères), le levier réellement utilisé aujourd'hui. Trois leviers le
  * réduisent (taux → cotisants, âge → futurs retraités, promesse → retraités) ;
@@ -515,7 +515,7 @@
 
   /* ---------- ACTE ② : le jeu « Équilibrer 2050 » ----------
    * La pension est une PROMESSE : la pension moyenne réelle par retraité, toutes
-   * pensions comprises (422,2 Md€ ÷ 17,4 M retraités = 2 022 € bruts ≈ 1 840 € nets
+   * pensions comprises (422,2 Md€ ÷ 17,4 M retraités = 2 022 € bruts
    * par mois) ; les cotisations seules en financent 277 Md€, soit 66 % — l'écart
    * (145,2 Md€ en 2025, exactement le non contributif du site) est « pris ailleurs »
    * (impôts, dette, budgets des ministères) — le levier réellement utilisé

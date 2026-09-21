@@ -60,9 +60,9 @@
     document.getElementById("exercice").textContent = meta.exercice || "2025";
     const hab = pop ? round100(dep * 1000 / pop) : null;
     document.getElementById("statband").innerHTML =
-      "<b>" + f1(dep) + " Md€</b> de dépenses publiques en " + (meta.exercice || "2025") +
-      (hab ? '<span class="sep">·</span><b>' + f0(hab) + " €</b> par habitant" : "") +
-      '<span class="sep">·</span>' + f1(rec) + " de recettes, " + f1(dette) + " empruntés";
+      '<span class="stat"><b>' + f1(dep) + " Md€</b> de dépenses publiques en " + (meta.exercice || "2025") + "</span>" +
+      (hab ? '<span class="sep">·</span><span class="stat"><b>' + f0(hab) + " €</b> par habitant</span>" : "") +
+      '<span class="sep">·</span><span class="stat">' + f1(rec) + " de recettes, " + f1(dette) + " empruntés</span>";
 
     // ---- chiffres transverses ----
     set("pensions", f0(pens)); set("pensions_1", f1(pens));
@@ -79,6 +79,58 @@
     if (cotisants) { set("nc_cot", f0(round100(nc * 1000 / cotisants))); set("pens_cot", f0(round100(pens * 1000 / cotisants))); set("cotisants", f1(cotisants)); }
     if (ch.retraites_droit_direct_millions) set("retraites_m", f1(ch.retraites_droit_direct_millions));
     const ratio = ch.ratio_cotisants_retraites || {};
+    Object.keys(ratio).forEach((y) => set("ratio_" + y, f1(ratio[y])));
+
+    // ---- temps 2 : les masses ----
+    const sante = sum((l) => l.target === "Santé (maladie)");
+    const ecole = drillLink("É · Enseignement & recherche", "Éducation nationale");
+    const armee = drillLink("É · Défense, sécurité, justice", "Défense");
+    const police = drillLink("É · Défense, sécurité, justice", "Police, gendarmerie & sécurité civile");
+    const justice = drillLink("É · Défense, sécurité, justice", "Justice");
+    const interets = sum((l) => l.target === "É · Charge de la dette");
+    set("sante", f0(sante)); set("cinq", f0(ecole + armee + police + justice + interets));
+
+    // ---- temps 3 : les caisses ----
+    const etatTotal = (dec.contribution_etat || 0) + (dec.subventions_regimes_speciaux || 0);
+    set("etat_total", f1(etatTotal)); set("contribution_etat", f0(dec.contribution_etat));
+    set("regimes_speciaux", f0(dec.subventions_regimes_speciaux));
+    set("itaf", f1(dec.itaf)); set("transferts", f1(dec.transferts_branches));
+    set("solde_pf", f1((dec.deficit || 0) + (dec.divers || 0)));
+
+    // ---- temps 4 : le taux ----
+    const taux = ch.taux_cas_civils || {};
+    const t26 = taux["2026"], tPriv = ch.taux_prive_employeur;
+    if (t26) { set("taux_2026", f2(t26)); set("taux_2026_0", f0(t26)); }
+    if (tPriv) set("taux_prive", f2(tPriv));
+    if (ch.taux_cas_militaires) set("taux_mil", f2(ch.taux_cas_militaires));
+    if (tp.part_etat_au_taux_prive) set("part_privee", f0(tp.part_etat_au_taux_prive));
+    if (tp.surcotisation_etat_fpe) { set("surco", f0(tp.surcotisation_etat_fpe)); set("surco_1", f1(tp.surcotisation_etat_fpe)); }
+    if (four.dg_budget_jaune_2026) set("dgb", f0(four.dg_budget_jaune_2026));
+    if (four.cae) set("cae", f1(four.cae));
+
+    // ---- temps 5 : l'enseignement supérieur ----
+    const H = d.historique || {}, HM = H.missions || {};
+    const esr = HM["Enseignement sup. & recherche (ESR)"], edu = HM["Éducation nationale"];
+    if (esr && esr.cp) {
+      const ys = Object.keys(esr.cp).sort(), y1 = ys[ys.length - 1], y0 = ys[0], yp = ys[ys.length - 2];
+      const cas = esr.cas || {};
+      const dcp = esr.cp[y1] - esr.cp[yp], dcas = (cas[y1] || 0) - (cas[yp] || 0), moyens = dcp - dcas;
+      const cp5 = esr.cp[y1] - esr.cp[y0], cas5 = (cas[y1] || 0) - (cas[y0] || 0);
+      set("esr_y1", y1);
+      set("esr_dcp", (dcp < 0 ? "baisse de " : "augmente de ") + f1(Math.abs(dcp)) + " milliard" + (Math.abs(dcp) >= 2 ? "s" : ""));
+      set("esr_dcas", (dcas < 0 ? "baisse de " : "augmente de ") + f1(Math.abs(dcas)));
+      set("esr_moyens", f1(Math.abs(moyens)) + " milliard" + (Math.abs(moyens) >= 2 ? "s" : ""));
+      set("esr_moyens_md", signed(moyens, true)); set("esr_dcp_s", signed(dcp, true)); set("esr_dcas_s", signed(dcas, true));
+      set("esr_cas5", f1(cas5)); set("esr_cp5", f1(cp5));
+      const part = cp5 > 0 ? cas5 / cp5 : 0;
+      set("esr_part5", part < 0.2 ? "moins d'un cinquième" : part < 0.3 ? "un quart" : part < 0.4 ? "un tiers" :
+                       part < 0.6 ? "la moitié" : f0(part * 100) + " %");
+    }
+    if (edu && edu.cp) {
+      const ys = Object.keys(edu.cp).sort(), y1 = ys[ys.length - 1], yp = ys[ys.length - 2];
+      set("edu_dcp", f0(edu.cp[y1] - edu.cp[yp])); set("edu_dcas", f1(((edu.cas || {})[y1] || 0) - ((edu.cas || {})[yp] || 0)));
+    }
+
     // ---- temps 6a : cotisants par retraité (COR) précédés du régime général à ses débuts (Cnav)
     const rgHist = (ch.ratio_regime_general_historique || {}).serie || {};
     if (rgHist["1965"]) set("rg_1965", f1(rgHist["1965"]));
@@ -116,7 +168,10 @@
     const autreParActifNow = tauxNow * ncNow / (1 - ncNow);              // 14,7 % du salaire
     const gens = (FM.generations || []).map((G) => {
       const futur = G.depart > 2025, mid = G.depart + G.duree_retraite / 2;
-      const cotise = (G.taux_moyen_carriere_pct / 100) * G.duree_carriere;
+      // taux moyen de la carrière : la série intégrée année par année, de l'entrée au départ
+      let tsum = 0;
+      for (let y = G.depart - G.duree_carriere; y < G.depart; y++) tsum += tauxAt(y);
+      const cotise = tsum;                          // = taux moyen × années de carrière
       const r = ratioAt(mid) || 1.8;
       let vCot, vAut;
       if (futur) {                                    // paramètres constants
@@ -135,157 +190,85 @@
     });
     set("autre_actif", f1(autreParActifNow * 100));
     svgT6b(gens);
+
+    // ---- comparaisons sourcées (chapô, temps 7) ----
+    const cac = (ch.comparaisons || {}).cac40_benefices_2025_md;
+    if (cac) { const x = nc / cac; set("cac40_fois", x >= 1.9 ? "deux fois" : x >= 1.4 ? "une fois et demie" : x >= 1.15 ? "une fois et quart" : "près d'une fois"); }
   }
 
-  /* ---------- 1 · recettes et emprunt ---------- */
-  function svgT1(rec, dette, dep) {
-    const W = 300, x0 = 16, w = 268, wr = Math.round(w * rec / dep), wd = w - wr;
-    SVG("svg-t1", W, 96,
-      R(x0, 30, wr, 26, C.etat, ' opacity=".8"') +
-      R(x0 + wr, 30, wd, 26, "none", ' stroke="' + C.dette + '" stroke-width="1.5" stroke-dasharray="3 2"') +
-      T(x0 + 6, 47, "recettes " + f0(100 * rec / dep) + " %", { c: "#fff", s: 10, w: 600 }) +
-      T(x0 + w, 24, "emprunt " + f0(100 * dette / dep) + " %", { a: "end", s: 8.5 }) +
-      T(x0 + w, 70, "l'argent qu'on n'a pas", { a: "end", s: 8, c: C.cram }) +
-      T(x0, 86, "1 euro sur " + Math.round(dep / dette) + " est emprunté", { s: 8.5, c: C.faint }));
-  }
+  /* ---------- temps 6 : deux panneaux, UN style ----------
+   * viewBox 300 × H ; zone de tracé 0..PLOT (240), marge droite pour l'étiquette de
+   * référence (« 1 retraité », « 1 € cotisé ») qui ne chevauche ainsi aucune barre ;
+   * valeurs en sans 8,5 (clés : 10, encre), années en 7,5 ; légendes ≤ 88 caractères. */
+  const T6 = { W: 300, PLOT: 236, base: 96, hMax: 60, bw: 24 };
+  const refTag = (y, txt) => {                       // étiquette dans la marge droite, sur la ligne
+    const x0 = T6.PLOT + 8;
+    return R(x0, y - 7, T6.W - x0 - 4, 12, C.paper, ' rx="3" stroke="' + C.ink + '" stroke-width=".6"') +
+           T(x0 + (T6.W - x0 - 4) / 2, y + 2.2, txt, { a: "middle", s: 6.6, c: C.ink, w: 700 });
+  };
+  const fxv = (v) => (v >= 2 ? v.toFixed(1) : v.toFixed(2).replace(/0$/, "")).replace(".", ",");
 
-  /* ---------- 2 · trois masses ---------- */
-  function svgT2(pens, sante, p) {
-    const W = 300, x0 = 104, wmax = 176, sc = wmax / pens;
-    const cinq = p.ecole + p.armee + p.police + p.justice + p.interets;
-    let s = "";
-    s += R(x0, 14, Math.round(pens * sc), 18, C.pens) + T(10, 27, "Retraites", {}) + T(x0 + pens * sc - 4, 27, f0(pens), { a: "end", c: "#fff", w: 600 });
-    s += R(x0, 42, Math.round(sante * sc), 18, C.secu, ' opacity=".8"') + T(10, 55, "Assurance maladie", {}) + T(x0 + sante * sc - 4, 55, f0(sante), { a: "end", c: "#fff" });
-    // barre empilée : école, armée, police, justice, intérêts (pointillé)
-    const segs = [["école", p.ecole, .9], ["armée", p.armee, .7], ["police", p.police, .55], ["justice", p.justice, .42]];
-    let x = x0;
-    segs.forEach((sg) => { const ww = sg[1] * sc; s += R(x, 70, ww, 18, C.etat, ' opacity="' + sg[2] + '"'); x += ww; });
-    s += R(x, 70, p.interets * sc, 18, "none", ' stroke="' + C.dette + '" stroke-width="1.2" stroke-dasharray="2 2"');
-    s += T(10, 79, "École, armée, police,", {}) + T(10, 89, "justice, intérêts de la dette", {}) + T(x0 + cinq * sc + 5, 83, f0(cinq), { c: C.ink, w: 600 });
-    s += T(10, 108, "école " + f0(p.ecole) + " · armée " + f0(p.armee) + " · police " + f0(p.police) + " · justice " + f0(p.justice) +
-           " · intérêts de la dette " + f0(p.interets) + " (pointillé)", { s: 7.5, c: C.faint });
-    SVG("svg-t2", W, 118, s);
-  }
-
-  /* ---------- 3 · versé, cotisé, l'écart ---------- */
-  function svgT3(pens, cot, nc, pop) {
-    const W = 300, x0 = 40, wmax = 240, sc = wmax / pens, wc = cot * sc;
-    SVG("svg-t3", W, 110,
-      R(x0, 18, wmax, 22, C.pens) + T(x0 + 6, 33, "VERSÉ " + f0(pens), { c: "#fff", s: 10, w: 600 }) +
-      R(x0, 52, wc, 22, C.pens, ' opacity=".38"') + T(x0 + 6, 67, "COTISÉ " + f0(cot), { c: C.ink, s: 10 }) +
-      R(x0 + wc, 52, wmax - wc, 22, C.cram) +
-      '<line x1="' + (x0 + wc) + '" y1="48" x2="' + (x0 + wc) + '" y2="88" stroke="' + C.cram + '" stroke-width="1" stroke-dasharray="2 2"/>' +
-      '<line x1="' + (x0 + wmax) + '" y1="48" x2="' + (x0 + wmax) + '" y2="88" stroke="' + C.cram + '" stroke-width="1" stroke-dasharray="2 2"/>' +
-      T(x0 + wc + (wmax - wc) / 2, 67, f0(nc), { a: "middle", c: "#fff", s: 10, w: 700 }) +
-      (pop ? T(x0 + wc + (wmax - wc) / 2, 100, f0(round100(nc * 1000 / pop)) + " € par habitant", { a: "middle", s: 8.5, c: C.cram }) : ""));
-  }
-
-  /* ---------- 4 · le taux employeur ---------- */
-  function svgT4(taux, tPriv) {
-    const W = 300, base = 124, hmax = 54;
-    const T2006 = 49.9;                       // taux à la création du CAS (LOLF, 2006)
-    const bars = [["2006", T2006], ["2013-24", taux["2024"]], ["2025", taux["2025"]], ["2026", taux["2026"]]].filter((b) => b[1]);
-    const top = Math.max.apply(null, bars.map((b) => b[1]).concat([tPriv || 0]));
-    let s = T(12, 16, "Cotisation retraite payée par l'EMPLOYEUR", { s: 9, w: 600, c: C.ink }) +
-            T(12, 27, "en % de la paie de l'agent (traitement indiciaire / salaire brut)", { s: 8 }) +
-            '<line x1="12" y1="' + base + '" x2="288" y2="' + base + '" stroke="' + C.rule + '"/>' +
-            T(34, 44, "L'ÉTAT, pour ses fonctionnaires civils", { s: 8, c: C.cram, w: 600 });
-    bars.forEach((b, i) => {
-      const h = hmax * b[1] / top, x = 34 + i * 32;
-      s += R(x, base - h, 24, h, C.cram) + T(x + 12, base - h - 4, f1(b[1]) + " %", { a: "middle", s: 8.5, c: C.cram, w: 600 }) +
-           T(x + 12, base + 12, b[0], { a: "middle", s: 8 });
-    });
-    if (tPriv) {
-      const h = hmax * tPriv / top;
-      s += T(240, 44, "UN EMPLOYEUR PRIVÉ", { s: 8, w: 600, a: "middle" }) + R(228, base - h, 24, h, C.dette) +
-           T(240, base - h - 4, f1(tPriv) + " %", { a: "middle", s: 8.5, c: C.ink, w: 600 }) + T(240, base + 12, "2026", { a: "middle", s: 8 });
-    }
-    SVG("svg-t4", W, 140, s);
-  }
-
-  /* ---------- 5 · l'enseignement supérieur, six ans ---------- */
-  function svgT5(e) {
-    const W = 300, base = 100, hmax = 58, top = Math.max.apply(null, e.ys.map((y) => e.cp[y]));
-    let s = T(24, 18, "Enseignement sup. & recherche, Md€ · gris = part retraites", { s: 8, c: C.faint });
-    e.ys.forEach((y, i) => {
-      const x = 24 + i * 40, h = hmax * e.cp[y] / top, hc = hmax * (e.cas[y] || 0) / top, last = y === e.y1;
-      s += R(x, base - h, 28, h - hc, C.etat, ' opacity=".55"') + R(x, base - hc, 28, hc, last ? C.cram : C.cas) +
-           T(x + 14, base + 12, y, { a: "middle", s: 8 });
-      if (i === 0 || i === e.ys.length - 2 || last)
-        s += T(x + 14, base - h - 5, f1(e.cp[y]), { a: "middle", s: 8.5, c: last ? C.cram : C.soft, w: last ? 600 : 400 });
-    });
-    s += T(268, 60, signed(e.dcp, true), { s: 7.5, c: C.cram, w: 600 }) + T(268, 92, signed(e.dcas, true), { s: 7.5, c: C.cram, w: 600 }) +
-         T(24, 125, e.y1 + " : budget " + signed(e.dcp, true) + ", retraites " + signed(e.dcas, true) + " → moyens réels " + signed(e.moyens, true), { s: 7.5, c: C.faint });
-    SVG("svg-t5", W, 130, s);
-  }
-
-  /* ---------- 6a · cotisants pour un retraité : le régime général à ses débuts (Cnav),
-   * puis tous régimes (COR). Deux séries, deux champs : séparées par un filet. ---------- */
+  /* 6a · cotisants pour un retraité : régime général à ses débuts (Cnav), puis tous régimes (COR) */
   function svgT6(ratio, rgHist) {
     const years = Object.keys(ratio).sort();
     if (!years.length) return;
     const hist = ["1965", "1970"].filter((y) => rgHist && rgHist[y]).map((y) => ({ y: y, v: rgHist[y], rg: true }));
     const cols = hist.concat(years.map((y, i) => ({ y: y, v: ratio[y], last: i === years.length - 1, now: i === 1 })));
-    const W = 300, H = 128, colW = W / cols.length, bw = Math.min(40, colW - 10);
-    const vMax = Math.max.apply(null, cols.map((c) => c.v)), base = 100, hMax = 62, sc = hMax / vMax;
-    let s = "";
+    const W = T6.W, H = 126, colW = T6.PLOT / cols.length, bw = Math.min(T6.bw + 4, colW - 10);
+    const vMax = Math.max.apply(null, cols.map((c) => c.v)), base = T6.base, sc = T6.hMax / vMax;
     const y1 = base - 1 * sc;
-    s += '<line x1="6" y1="' + y1 + '" x2="' + (W - 6) + '" y2="' + y1 + '" stroke="' + C.pens + '" stroke-width="1" stroke-dasharray="3 3"/>';
+    let s = '<line x1="4" y1="' + y1 + '" x2="' + (T6.PLOT + 4) + '" y2="' + y1 + '" stroke="' + C.pens + '" stroke-width="1" stroke-dasharray="3 3"/>';
     cols.forEach((c, i) => {
-      const x = i * colW + (colW - bw) / 2, h = c.v * sc;
-      s += R(x, base - h, bw, h, c.rg ? C.cas : C.etat, ' rx="3"' + (c.last ? ' opacity=".55"' : ""));
-      s += T(x + bw / 2, base - h - 5, f1(c.v), { a: "middle", s: c.rg ? 12 : 15, c: C.ink, w: 700, f: "Georgia, serif" });
-      s += T(x + bw / 2, base + 12, c.y, { a: "middle", s: 7.5, c: C.soft, w: c.now ? 700 : 400 });
-      if (c.now) s += T(x + bw / 2, base + 22, "aujourd'hui", { a: "middle", s: 6.5, c: C.soft });
-      if (c.last) s += T(x + bw / 2, base + 22, "projection", { a: "middle", s: 6.5, c: C.soft });
+      const x = i * colW + (colW - bw) / 2, h = c.v * sc, key = c.rg && i === 0 || c.now || c.last;
+      s += R(x, base - h, bw, h, c.rg ? C.cas : C.etat, ' rx="2"' + (c.last ? ' opacity=".55"' : ""));
+      s += T(x + bw / 2, base - h - 4, f1(c.v), { a: "middle", s: key ? 10 : 8.5, c: C.ink, w: 700 });
+      s += T(x + bw / 2, base + 12, c.y, { a: "middle", s: 7.5, c: key ? C.ink : C.soft, w: key ? 700 : 400 });
+      if (c.now) s += T(x + bw / 2, base + 21, "aujourd'hui", { a: "middle", s: 6.4, c: C.soft });
+      if (c.last) s += T(x + bw / 2, base + 21, "projection", { a: "middle", s: 6.4, c: C.soft });
     });
     if (hist.length) {
       const xs = hist.length * colW;
-      s += '<line x1="' + xs + '" y1="14" x2="' + xs + '" y2="' + (base + 24) + '" stroke="' + C.rule + '" stroke-width="1"/>';
-      s += T(xs - 6, 10, "régime général (Cnav)", { a: "end", s: 6.5, c: C.soft });
-      s += T(xs + 6, 10, "tous régimes (COR)", { s: 6.5, c: C.soft });
+      s += '<line x1="' + xs + '" y1="12" x2="' + xs + '" y2="' + (base + 24) + '" stroke="' + C.ink + '" stroke-width=".8" stroke-dasharray="2 2"/>';
+      s += T(xs - 5, 9, "régime général (Cnav)", { a: "end", s: 6.4, c: C.soft }) + T(xs + 5, 9, "tous régimes (COR)", { s: 6.4, c: C.soft });
     }
-    s += TAG(W - 6, y1 + 11, "pour 1 retraité", C.pens, 7);   // sous la ligne : la valeur 1,3 reste lisible au-dessus
+    s += refTag(y1, "1 retraité");
     SVG("svg-t6", W, H, s);
   }
 
-  /* ---------- 6b · ce qu'on verse à une génération pour 1 € cotisé ---------- */
-  /* Temps 6b : € versés pour 1 € cotisé, par la formule. Passé : une seule barre (la pension
-   * versée, paramètres de l'époque). Futur : part financée par les 28 % de cotisations (violet)
-   * + part financée autrement, à taux inchangé (hachures cramoisies). */
+  /* 6b · € versés pour 1 € cotisé, par la formule : passé = une barre (pension versée,
+   * paramètres de l'époque) ; futur = 28 % de cotisations (violet) + autrement, à taux
+   * inchangé (hachures cramoisies) */
   function svgT6b(gens) {
     if (!gens.length) return;
-    const W = 300, H = 150, colW = W / gens.length, bw = Math.min(26, colW - 8);
-    const base = 100, hMax = 62, vMax = Math.max.apply(null, gens.map((G) => G.tot)), sc = hMax / vMax;
+    const W = T6.W, H = 152, colW = T6.PLOT / gens.length, bw = Math.min(T6.bw, colW - 6);
+    const vMax = Math.max.apply(null, gens.map((G) => G.tot)), base = T6.base, sc = T6.hMax / vMax;
     let s = '<defs><pattern id="hachT6" width="4" height="4" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">' +
             '<rect width="4" height="4" fill="' + C.paper + '"/><line x1="0" y1="0" x2="0" y2="4" stroke="' + C.cram + '" stroke-width="1.6"/></pattern></defs>';
     const y1 = base - 1 * sc;
-    const fx = (v) => (v >= 2 ? v.toFixed(1) : v.toFixed(2).replace(/0$/, "")).replace(".", ",");
     let xSplit = null;
     gens.forEach((G, i) => {
       const x = i * colW + (colW - bw) / 2, key = i === 0 || G.g === 1950 || G.g === 1980 || G.g === 2000;
       if (G.futur && xSplit == null) xSplit = i * colW;
       const hc = G.cot * sc, ha = G.aut * sc;
       s += R(x, base - hc, bw, hc, C.pens, ' rx="2"' + (key ? "" : ' opacity=".55"'));
-      if (G.futur) {
-        s += R(x, base - hc - ha, bw, ha, "url(#hachT6)", ' rx="2" stroke="' + C.cram + '" stroke-width=".6"');
-        s += T(x + bw / 2, base - hc + 4, fx(G.cot), { a: "middle", s: 6.5, c: C.paper, w: 700 });
-        if (ha > 8) s += T(x + bw / 2, base - hc - ha / 2 + 2.2, "+" + fx(G.aut), { a: "middle", s: 5.8, c: C.cram, w: 700 });
-      }
-      s += T(x + bw / 2, base - hc - ha - 4, fx(G.tot) + (key ? " €" : ""), { a: "middle", s: key ? 9 : 7, c: key ? C.ink : C.soft, w: key ? 700 : 400 });
+      if (G.futur) s += R(x, base - hc - ha, bw, ha, "url(#hachT6)", ' rx="2" stroke="' + C.cram + '" stroke-width=".6"');
+      s += T(x + bw / 2, base - hc - ha - 4, fxv(G.tot), { a: "middle", s: key ? 10 : 8.5, c: C.ink, w: 700 });
+      if (G.futur) s += T(x + bw / 2, base - hc + 5.5, fxv(G.cot), { a: "middle", s: 6.2, c: C.paper, w: 700 });
       s += T(x + bw / 2, base + 12, String(G.g), { a: "middle", s: 7.5, c: key ? C.ink : C.soft, w: key ? 700 : 400 });
     });
-    s += '<line x1="6" y1="' + y1 + '" x2="' + (W - 6) + '" y2="' + y1 + '" stroke="' + C.ink + '" stroke-width="1" stroke-dasharray="3 3"/>';
-    s += TAG(6 + ("1 € cotisé".length * 7 * 0.56 + 8), y1 - 1, "1 € cotisé", C.ink, 7);
+    s += '<line x1="4" y1="' + y1 + '" x2="' + (T6.PLOT + 4) + '" y2="' + y1 + '" stroke="' + C.ink + '" stroke-width="1" stroke-dasharray="3 3"/>';
+    s += refTag(y1, "1 € cotisé");
     if (xSplit != null) {
-      s += '<line x1="' + xSplit + '" y1="14" x2="' + xSplit + '" y2="' + (base + 16) + '" stroke="' + C.ink + '" stroke-width=".8" stroke-dasharray="2 2"/>';
-      s += T(xSplit - 5, 10, "pensions versées, paramètres de l'époque", { a: "end", s: 6.5, c: C.soft }) + T(xSplit + 5, 10, "à paramètres constants", { s: 6.5, c: C.soft });
+      s += '<line x1="' + xSplit + '" y1="12" x2="' + xSplit + '" y2="' + (base + 16) + '" stroke="' + C.ink + '" stroke-width=".8" stroke-dasharray="2 2"/>';
+      s += T(xSplit - 5, 9, "à la retraite aujourd'hui", { a: "end", s: 6.4, c: C.soft }) + T(xSplit + 5, 9, "à paramètres constants", { s: 6.4, c: C.soft });
     }
-    s += R(6, base + 20, 9, 6, C.pens) + T(19, base + 25.5, "financé par les 28 % de cotisations", { s: 6.4, c: C.ink }) +
-         R(140, base + 20, 9, 6, "url(#hachT6)", ' stroke="' + C.cram + '" stroke-width=".6"') +
-         T(153, base + 25.5, "financé autrement, à taux inchangé (impôts, dette, budgets)", { s: 6.4, c: C.cram }) +
-         T(6, base + 35, "versé = actifs par retraité × (cotisation + part prise ailleurs par actif) × années de retraite ;", { s: 6.4, c: C.soft }) +
-         T(6, base + 43, "cotisé = taux moyen de la carrière × années de carrière — en salaires de l'année, sans croissance", { s: 6.4, c: C.soft });
+    // légende : une ligne de pastilles, puis la formule en deux lignes courtes
+    const ly = base + 25;
+    s += R(4, ly - 6, 8, 6, C.pens) + T(15, ly, "financé par les 28 % de cotisations", { s: 6.2, c: C.ink }) +
+         R(128, ly - 6, 8, 6, "url(#hachT6)", ' stroke="' + C.cram + '" stroke-width=".6"') +
+         T(139, ly, "financé autrement, à taux inchangé", { s: 6.2, c: C.cram }) +
+         T(4, ly + 10, "versé = actifs par retraité × (cotisation + part prise ailleurs) × années de retraite", { s: 6, c: C.soft }) +
+         T(4, ly + 18, "cotisé = taux moyen de la carrière × années de carrière · sans croissance des salaires", { s: 6, c: C.soft });
     SVG("svg-t6b", W, H, s);
   }
 
@@ -300,7 +283,7 @@
     3: { tool: "treemap", hash: "#realite:Retraites/Déséquilibre des retraites", title: "Les masses · d'où viennent les 145 milliards" },
     4: { tool: "treemap", hash: "#revele",  title: "Les masses · ce qui s'y cache" },
     5: { tool: "sankey",  hash: "#dive=Enseignement sup. & recherche (ESR)", title: "Les flux · enseignement supérieur et recherche, 2020 → 2025" },
-    6: { tool: "svg",     hash: "",         title: "Moins de cotisants par retraité, moins récupéré par génération" },
+    6: { tool: "svg",     hash: "",         title: "Moins de cotisants par retraité, moins versé pour 1 € cotisé" },
     7: { tool: "sankey",  hash: "#these",   title: "Les flux · ce qui finance les retraites sous un autre nom" },
   };
   const PAGES = { sankey: "sankey.html", treemap: "treemap.html" };

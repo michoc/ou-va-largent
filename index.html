@@ -11,7 +11,7 @@
   <meta property="og:image" content="https://michoc.github.io/ou-va-largent/assets/og-card.png">
   <link rel="preconnect" href="https://cdnjs.cloudflare.com">
   <!-- ?v= : cache-busting — incrémenter à chaque déploiement de style/app -->
-  <link rel="stylesheet" href="style.css?v=20260921r">
+  <link rel="stylesheet" href="style.css?v=20260921w">
 </head>
 <body class="landing fil">
   <nav class="site-nav" aria-label="Navigation du site">
@@ -32,7 +32,7 @@
         paient, dans les faits, des retraites. Sur les <strong><span data-ch="pensions">422</span>&nbsp;milliards</strong>
         de pensions versées en 2025, <strong><span data-ch="cotisations">277</span></strong> seulement sont
         financés par des cotisations. Les <strong><span data-ch="non_contributif">145</span>&nbsp;milliards</strong>
-        restants — une fois et demie les bénéfices du CAC&nbsp;40 — sont pris ailleurs&nbsp;: dans les budgets des
+        restants — <span data-ch="cac40_fois">une fois et demie</span> les bénéfices du CAC&nbsp;40 — sont pris ailleurs&nbsp;: dans les budgets des
         ministères, dans les impôts, dans la Sécurité sociale, dans la dette. Au détriment des services publics.
       </p>
       <div class="statband" id="statband" aria-label="Totaux de l'exercice"></div>
@@ -61,22 +61,24 @@
         <iframe id="stage-treemap" class="stage-frame" title="Les masses" src="treemap.html?embed=1#realite" hidden></iframe>
         <div id="stage-svg" class="stage-svg" hidden>
           <div class="stage-panel">
-            <p class="stage-cap"><b>Cotisants pour un retraité</b><span class="cap-more"> — le régime général est créé en 1945&nbsp;;
-              au plus haut, en 1965, <span data-ch="rg_1965">4,3</span>&nbsp;cotisants par retraité (Cnav). Tous régimes&nbsp;:
+            <p class="stage-cap"><b>Cotisants pour un retraité</b><span class="cap-more"> — au plus haut en 1965 (régime général, Cnav)&nbsp;;
               <span data-ch="cotisants">30,6</span>&nbsp;millions de cotisants pour <span data-ch="retraites_m">17,4</span>&nbsp;millions
-              de retraités en 2025 (COR, juin 2026).</span></p>
+              de retraités en 2025, 1,3 en 2070 (tous régimes, COR).</span></p>
             <div class="fil-svg" id="svg-t6" role="img" aria-label="Cotisants pour un retraité : 2002, 2025, 2070"></div>
           </div>
           <div class="stage-panel">
-            <p class="stage-cap"><b>Ce qu'on verse à une génération pour 1&nbsp;€ cotisé</b><span class="cap-more"> — calculé par le compte d'une
-              année&nbsp;: chaque année, un retraité reçoit ce que les actifs du moment lui apportent (actifs par retraité ×
-              taux de cotisation, plus la part prise ailleurs)&nbsp;; sur une vie, on rapporte ces années de retraite aux
-              années de carrière cotisées. Passé&nbsp;: paramètres de l'époque (2,3 → 1,8 actifs par retraité, taux de cotisation
-              montant de 13 à 28&nbsp;%, carrières de 40 à 42 ans). Futur&nbsp;: paramètres constants — 28&nbsp;% de cotisation,
-              part prise ailleurs à taux inchangé (<span data-ch="autre_actif">14,7</span>&nbsp;% du salaire par actif), 43 ans de
-              carrière, 1,8 → 1,3 actif par retraité (COR). En salaires de l'année, sans croissance. Pour mémoire, en euros
-              constants avec la croissance, France Stratégie trouve 4,1&nbsp;€ pour la génération 1930 et 1,9&nbsp;€ pour 1960.</span></p>
+            <p class="stage-cap"><b>Ce qu'on verse à une génération pour 1&nbsp;€ cotisé</b><span class="cap-more"> — chaque année, un
+              retraité reçoit ce que les actifs du moment lui apportent. Passé&nbsp;: paramètres de l'époque. Futur&nbsp;: paramètres
+              constants, avec 1,8 puis 1,3 actif par retraité.</span></p>
             <div class="fil-svg" id="svg-t6b" role="img" aria-label="Ce qu'on verse à une génération pour 1 € cotisé, générations 1930 à 2000"></div>
+            <details class="stage-more"><summary>Paramètres et sources</summary>
+              <p>Passé&nbsp;: 2,3 → 1,8 actifs par retraité, taux de cotisation montant de 13 à 28&nbsp;%, carrières de 40 à 42 ans,
+              retraites de 22 à 24 ans, part prise ailleurs incluse dans ce qui est versé. Futur&nbsp;: 28&nbsp;% de cotisation, part prise
+              ailleurs à taux inchangé (<span data-ch="autre_actif">14,7</span>&nbsp;% du salaire par actif), 43 ans de carrière, 25 ans de
+              retraite, 1,8 → 1,3 actif par retraité (COR). En salaires de l'année, sans croissance. Repères d'autres conventions&nbsp;:
+              France Stratégie (euros constants avec la croissance) 4,1&nbsp;€ pour la génération 1930 et 1,9&nbsp;€ pour 1960&nbsp;; INSEE
+              (rapporté au salaire de chaque époque) <span data-ch="rect_1950">1,75</span>&nbsp;€ pour 1950 et
+              <span data-ch="rect_1980">1,27</span>&nbsp;€ pour 1980.</p></details>
           </div>
         </div>
       </div>
@@ -208,9 +210,9 @@
           <strong><span data-ch="rec_1930">2,9</span>&nbsp;€</strong> pour chaque euro cotisé&nbsp;; née en 1950,
           <strong><span data-ch="rec_1950">2,1</span>&nbsp;€</strong>&nbsp;; née en 1960, <strong><span data-ch="rec_1960">1,7</span>&nbsp;€</strong>.
           En gardant les paramètres d'aujourd'hui, avec 1,3 actif par retraité au lieu de 1,8, les 28&nbsp;% de cotisations
-          ne financeraient plus que <strong><span data-ch="cot_1980">0,87</span>&nbsp;€</strong> à une personne née en 1980 et
+          ne financeraient plus que <strong><span data-ch="cot_1980">0,86</span>&nbsp;€</strong> à une personne née en 1980 et
           <strong><span data-ch="cot_2000">0,76</span>&nbsp;€</strong> à une personne née en 2000 — et, si l'on continue de
-          prendre ailleurs au même taux, <span data-ch="aut_2000">0,40</span>&nbsp;€ de plus en impôts et en dette.
+          prendre ailleurs au même taux, <span data-ch="aut_2000">0,4</span>&nbsp;€ de plus en impôts et en dette.
           En 2025, pour la première fois, la France a compté plus de décès que de naissances.</p>
         <p>Même métier, même salaire, même carrière&nbsp;: née en 1950, 1975, 2000 ou 2026, la même vie ne reçoit pas la
           même retraite pour la même somme cotisée. Et l'équilibre reste à trouver, en 2050 comme après&nbsp;: par le taux, par
@@ -234,7 +236,7 @@
          <p class="fil-these">Le budget de l'État présente comme des dépenses d'éducation, de défense ou de justice des sommes
            qui paient, dans les faits, des retraites. Sur les <span data-ch="pensions">422</span>&nbsp;milliards de pensions
            versées en 2025, <span data-ch="cotisations">277</span> seulement sont financés par des cotisations. Les
-           <span data-ch="non_contributif">145</span>&nbsp;milliards restants — une fois et demie les bénéfices du CAC&nbsp;40 —
+           <span data-ch="non_contributif">145</span>&nbsp;milliards restants — <span data-ch="cac40_fois">une fois et demie</span> les bénéfices du CAC&nbsp;40 —
            sont pris ailleurs&nbsp;: dans les budgets des ministères, dans les impôts, dans la Sécurité sociale, dans la
            dette. Au détriment des services publics.</p>
          <p class="fil-exit-nums">
@@ -253,15 +255,15 @@
        </div>
        <div class="fil-exit-tools">
          <a class="fil-tool" href="sankey.html">
-           <img src="assets/preview-sankey.svg?v=20260921r" alt="" loading="lazy" onerror="this.style.display='none'">
+           <img src="assets/preview-sankey.svg?v=20260921w" alt="" loading="lazy" onerror="this.style.display='none'">
            <span><b>Voir les flux →</b><small>d'où vient chaque euro, qui le dépense, où il finit</small></span>
          </a>
          <a class="fil-tool" href="treemap.html#realite">
-           <img src="assets/preview-mondrian.svg?v=20260921r" alt="" loading="lazy" onerror="this.style.display='none'">
+           <img src="assets/preview-mondrian.svg?v=20260921w" alt="" loading="lazy" onerror="this.style.display='none'">
            <span><b>Voir les masses →</b><small>les <span data-ch="non_contributif">145</span>&nbsp;milliards, en trois lectures</small></span>
          </a>
          <a class="fil-tool" href="labo/simulateur.html">
-           <img src="assets/preview-labo.svg?v=20260921r" alt="" loading="lazy" onerror="this.style.display='none'">
+           <img src="assets/preview-labo.svg?v=20260921w" alt="" loading="lazy" onerror="this.style.display='none'">
            <span><b>Passer au labo →</b><small>comparer les quatre vies, équilibrer le système et choisir qui paie</small></span>
          </a>
        </div>
@@ -279,7 +281,7 @@
     </p>
   </footer>
 
-  <script src="fil.js?v=20260921r"></script>
-  <script src="lexique.js?v=20260921r"></script>
+  <script src="fil.js?v=20260921w"></script>
+  <script src="lexique.js?v=20260921w"></script>
 </body>
 </html>

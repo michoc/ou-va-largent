@@ -5,13 +5,13 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Le labo — la même vie née quatre fois, et qui paie l'équilibre</title>
   <meta name="description" content="Deux questions sur les retraites : que verse le système à chaque génération, pour la même vie ? Et comment équilibrer les pensions, une année au choix jusqu'en 2070 — qui paie ?">
-  <link rel="stylesheet" href="../style.css?v=20260921r">
+  <link rel="stylesheet" href="../style.css?v=20260921w">
   <style>
     /* ---- styles propres au labo ---- */
     .sim-wrap { max-width: 1240px; margin: 0 auto; padding: 0 16px 60px; }
     .sim-card { background: var(--paper); border: 1px solid var(--rule); border-radius: 12px;
       box-shadow: 0 2px 14px rgba(30,36,48,.06); padding: 18px 20px; }
-    .labo-crumb { display: flex; flex-wrap: wrap; gap: 6px 18px; align-items: center; font: 700 12.5px/1 var(--sans);
+    .labo-crumb { display: flex; flex-wrap: wrap; gap: 8px 16px; align-items: center; font: 700 12px/1 var(--sans);
       letter-spacing: .04em; text-transform: uppercase; color: var(--ink-soft); margin: 4px 0 8px; }
     .labo-crumb a { color: var(--ink-soft); text-decoration: none; padding: 6px 0; }
     .labo-crumb a:hover, .labo-crumb a.is-current { color: var(--ink);
@@ -46,7 +46,7 @@
     .gc-ratio.perdant { color: #8E1B38; }
     .gc-sub { display: block; font-size: 11px; color: var(--ink-soft); margin-bottom: 8px; }
     .gc-squares { display: block; margin: 4px 0 6px; }
-    .gc-facts { display: block; font-size: 11.5px; line-height: 1.55; color: var(--ink); }
+    .gc-facts { display: block; font-size: 12px; line-height: 1.55; color: var(--ink); }
     .gc-facts b { font-variant-numeric: tabular-nums; }
     .gc-eq { display: block; font-size: 11px; color: var(--ink-soft); margin: 6px 0 -6px; }
     .gc-dette { display: inline-block; margin-top: 6px; font-size: 11px; line-height: 1.5;
@@ -86,11 +86,11 @@
     #sim-chart { width: 100%; margin-top: 10px; background: var(--paper); border: 1px solid var(--rule); border-radius: 10px; padding: 8px 10px 4px; box-sizing: border-box; }
     #sim-chart svg { display: block; width: 100%; height: auto; }
     .cohr { margin-top: 2px; padding: 12px 14px; background: #FBF7EE; border: 1px solid var(--rule);
-      border-left: 5px solid #A2683A; border-radius: 10px; font-size: 12.5px; line-height: 1.6; }
-    .cohr h4 { margin: 0 0 6px; font-size: 12.5px; color: #A2683A; }
+      border-left: 5px solid #A2683A; border-radius: 10px; font-size: 13px; line-height: 1.6; }
+    .cohr h4 { margin: 0 0 6px; font-size: 13px; color: #A2683A; }
     .cohr .use { color: var(--accent); font-weight: 700; cursor: pointer; border-bottom: 1px dotted var(--accent); white-space: nowrap; }
     .avance { margin-top: 12px; border-top: 1px dashed var(--rule); padding-top: 10px; }
-    .avance summary { cursor: pointer; font-size: 12.5px; font-weight: 700; color: var(--ink-soft); }
+    .avance summary { cursor: pointer; font-size: 13px; font-weight: 700; color: var(--ink-soft); }
     .avance[open] summary { color: var(--accent); }
     .ctl { margin: 14px 0; }
     .ctl label { display: flex; justify-content: space-between; align-items: baseline; gap: 10px;
@@ -104,9 +104,9 @@
     .custom-tag { display: none; font: 700 11px/1 var(--sans); color: #A2683A; margin-left: 8px; }
     .custom .custom-tag { display: inline; }
 
-    /* --- acte ② : le jeu « Équilibrer 2050 » --- */
+    /* --- acte ② : le jeu « Équilibrer le système » --- */
     .mission { background: var(--paper); border: 1px solid var(--rule); border-left: 6px solid #8E1B38;
-      border-radius: 12px; padding: 16px 20px; margin: 0 0 14px; font-size: 15px; line-height: 1.55; }
+      border-radius: 12px; padding: 16px 20px; margin: 0 0 14px; font-size: 15px; line-height: 1.55; max-width: 84ch; }
     .mission b { color: var(--ink); }
     .mission .m-kicker { display: block; font: 700 11px/1 var(--sans); letter-spacing: .12em; text-transform: uppercase; color: #8E1B38; margin-bottom: 6px; }
     .jeu-grid { display: grid; grid-template-columns: minmax(320px, 1.1fr) minmax(300px, 1fr); gap: 20px 28px; align-items: start; }
@@ -114,10 +114,10 @@
     .verdict { text-align: center; padding: 16px 16px 12px; border-radius: 12px; margin: 0 0 14px;
       background: #FDE8ED; border: 1.5px solid #E8ADBA; transition: background .2s, border-color .2s; }
     .verdict.ok { background: #E7F2E9; border-color: #BFDCC6; }
-    .verdict .v-lab { display: block; font: 700 11.5px/1 var(--sans); letter-spacing: .1em; text-transform: uppercase; color: var(--ink-soft); margin-bottom: 8px; }
+    .verdict .v-lab { display: block; font: 700 12px/1 var(--sans); letter-spacing: .1em; text-transform: uppercase; color: var(--ink-soft); margin-bottom: 8px; }
     .verdict .v-big { display: block; font: 800 40px/1.05 var(--serif); color: #8E1B38; letter-spacing: -.01em; }
     .verdict.ok .v-big { color: #3E7A4E; }
-    .verdict .v-sub { display: block; font-size: 13.5px; color: var(--ink); margin-top: 6px; line-height: 1.45; }
+    .verdict .v-sub { display: block; font-size: 14px; color: var(--ink); margin-top: 6px; line-height: 1.45; }
     .jauge { height: 12px; background: #F0E9DA; border-radius: 999px; margin: 10px auto 0; max-width: 420px; overflow: hidden; display: flex; }
     .jauge .seg { height: 100%; transition: width .2s; }
     .jauge .seg-fin { background: #6E5BAE; }
@@ -141,7 +141,7 @@
     .levier .l-reperes { display: flex; gap: 4px 12px; flex-wrap: wrap; font-size: 11px; color: var(--ink-soft); }
     .levier .repere { cursor: pointer; border-bottom: 1px dotted #B9AE97; }
     .levier-reste { border-style: dashed; }
-    .levier-reste .l-cout { font-size: 13.5px; }
+    .levier-reste .l-cout { font-size: 14px; }
     .annee-ctl { display: flex; align-items: center; gap: 12px; margin: 0 0 12px; font-size: 13px; font-weight: 700; }
     .annee-ctl input[type=range] { flex: 1 1 auto; height: 26px; accent-color: #1E2430; }
     .annee-ctl output { font: 800 20px/1 var(--serif); color: var(--ink); min-width: 3.2ch; font-variant-numeric: tabular-nums; }
@@ -156,20 +156,20 @@
     .bal-caption b { color: #8E1B38; }
     .resultat { border: 1px solid var(--rule); border-top: 4px solid var(--ink); border-radius: 12px; padding: 14px 18px 16px; background: var(--paper); }
     .resultat h3 { margin: 0 0 4px; font: 800 18px/1.2 var(--serif); }
-    .resultat .r-sous { font-size: 12.5px; color: var(--ink-soft); margin: 0 0 10px; }
+    .resultat .r-sous { font-size: 13px; color: var(--ink-soft); margin: 0 0 10px; }
     .parts { display: grid; gap: 7px; margin: 0 0 12px; }
     .part { display: grid; grid-template-columns: 14px 1fr auto; gap: 10px; align-items: center; font-size: 13px; }
     .part i { width: 14px; height: 14px; border-radius: 3px; display: block; }
     .part b { font-variant-numeric: tabular-nums; font-size: 15px; }
-    .part small { display: block; color: var(--ink-soft); font-size: 11.5px; }
+    .part small { display: block; color: var(--ink-soft); font-size: 12px; }
     .r-phrase { font-size: 14px; line-height: 1.55; margin: 0 0 10px; }
     .r-phrase b { color: #8E1B38; }
     .r-actions { display: flex; flex-wrap: wrap; gap: 8px 14px; align-items: center; font-size: 13px; }
     .r-actions button, .r-actions a { font: 700 13px/1 var(--sans); color: var(--accent); background: var(--paper); border: 1px solid var(--accent);
       border-radius: 999px; padding: 8px 14px; cursor: pointer; text-decoration: none; }
     .r-actions button:hover, .r-actions a:hover { background: var(--accent); color: #fff; }
-    .r-toast { color: var(--ink-soft); font-size: 12.5px; }
-    .avance-jeu { margin-top: 6px; font-size: 12.5px; }
+    .r-toast { color: var(--ink-soft); font-size: 13px; }
+    .avance-jeu { margin-top: 6px; font-size: 13px; }
     .avance-jeu summary { cursor: pointer; font-weight: 700; color: var(--ink-soft); }
     .avance-jeu .repere { cursor: pointer; border-bottom: 1px dotted #B9AE97; }
     .inv-note { font-size: 12px; color: #A2683A; font-weight: 700; min-height: 16px; margin: 6px 0 0; }
@@ -286,7 +286,7 @@
         <li><b>Ce que chacun verse</b> = salaire brut × taux de cotisation vieillesse de chaque année (série ≈ 13 % en 1970 — régime général 8,5 % + complémentaires naissantes — → 28,1 % en 2025, calée sur les moyennes générationnelles 22 % / 28 %, estimation S. Catherine). Âges légaux historiques : 65 ans → 60 (réforme 1982, effective 1983) → 62 (réforme 2010, montée achevée en 2017) → 62 ans 9 mois en 2025 (réforme 2023 en montée) — <b>montée suspendue par la LFSS 2026</b> (art. 105) : 62 ans 9 mois et 170 trimestres gelés jusqu'au 1er janvier 2028&nbsp;; 64 ans atteints vers 2032 si la réforme reprend (hypothèse de référence du COR, retenue ici pour le futur).</li>
         <li><b>Départs ≤ 2025</b> : règles réelles (taux de remplacement observé, dégressif). <b>Départs &gt; 2025 : jeu à somme nulle</b> — pension = taux × ratio cotisants/retraité de la génération (COR juin 2026 : 1,8 en 2025 → ≈ 1,55 en 2040 → 1,3 en 2070) × salaire brut fin.</li>
         <li><b>La cascade de la dette (①)</b> : chaque carte peut cocher « maintenir la pension et léguer la dette ». La part non financée de la pension (pension maintenue − pension d'équilibre, cumulée sur sa retraite, rapportée à un actif de la génération suivante via le ratio démographique) devient une <b>dette</b> : la génération suivante la rembourse en impôts tout au long de sa carrière — sauf si elle coche à son tour, auquel cas la dette s'ajoute à la sienne et glisse d'une génération. La carte 1950 est cochée par défaut : <b>c'est ce qui s'est réellement passé</b> — aujourd'hui cette dette est comblée en prenant ailleurs dans le budget, <span data-ch="non_contributif">145</span> Md€ en 2025 (COR juin 2026). <span class="flag">Dettes par tête, hors intérêts — ordres de grandeur.</span></li>
-        <li><b>Le jeu « Équilibrer 2050 » (②)</b> — <b>les mêmes chiffres que le site</b> (COR juin 2026) : le jeu compte en <b>brut, par retraité</b> : la dépense du système — <span data-ch="pensions">422,2</span> Md€ pour <span data-ch="retraites_m">17,4</span> millions de retraités, soit ≈ 2 020 € bruts par mois — face à ce que les cotisations seules encaissent (<span data-ch="cotisations">277</span> Md€, ≈ 1 330 € par retraité) : 66 %. Cette dépense par retraité n'est <b>pas</b> « la pension d'un retraité » : la pension moyenne de droit direct est de 1 666 € bruts (1 541 € nets) fin 2023 (DREES, résidents en France) ; s'y ajoutent la réversion (≈ 39 Md€), le minimum vieillesse, les majorations, les frais de gestion et l'action sociale, et deux revalorisations (2024, 2025). L'écart 2025 (≈ 695 € bruts par retraité) multiplié par le nombre de retraités redonne exactement les <span data-ch="non_contributif">145</span> Md€ non contributifs du Mondrian. Équation : couvert par les cotisations = taux × ratio cotisants/retraité × salaire brut moyen par tête, avec un salaire brut moyen <b>par tête</b> de <b>2 685 €</b> (assiette moyenne des ≈ 30,6 M de cotisants, calée pour que 28,1 % × masse salariale = 277 Md€). Le nombre de retraités d'une année = cotisants (≈ stables) ÷ ratio cotisants/retraité (COR). Levier âge : ≈ +0,06 cotisant par retraité par année de report (estimation)&nbsp;; natalité +0,2 enfant par femme : +0,1 seulement après 2050. Le niveau « scénario COR » applique la baisse de la pension relative que le COR projette avec l'indexation sur les prix (54,6 % du revenu d'activité moyen en 2025 → ≈ 49,7 % en 2050, 45,3 % en 2070) : −9 % en 2050. <b>Les quatre parts</b> du résultat sont calculées par rapport à la situation de référence (28,1 %, 64 ans, pension d'aujourd'hui) : part « cotisants » = supplément financé par la hausse du taux, « futurs retraités » = supplément financé par le report d'âge, « retraités » = baisse de la pension, « pris ailleurs » = l'écart restant, comblé comme aujourd'hui par les impôts, la dette et les budgets des ministères. Tout est en euros d'aujourd'hui, sans gain de productivité : la mission « la même pension qu'aujourd'hui » suppose que les pensions suivent les salaires, ce que l'indexation sur les prix ne fait pas — d'où le niveau COR.</li>
+        <li><b>Le jeu « Équilibrer le système » (②)</b> — <b>les mêmes chiffres que le site</b> (COR juin 2026) : le jeu compte en <b>brut, par retraité</b> : la dépense du système — <span data-ch="pensions">422,2</span> Md€ pour <span data-ch="retraites_m">17,4</span> millions de retraités, soit ≈ 2 020 € bruts par mois — face à ce que les cotisations seules encaissent (<span data-ch="cotisations">277</span> Md€, ≈ 1 330 € par retraité) : 66 %. Cette dépense par retraité n'est <b>pas</b> « la pension d'un retraité » : la pension moyenne de droit direct est de 1 666 € bruts (1 541 € nets) fin 2023 (DREES, résidents en France) ; s'y ajoutent la réversion (≈ 39 Md€), le minimum vieillesse, les majorations, les frais de gestion et l'action sociale, et deux revalorisations (2024, 2025). L'écart 2025 (≈ 695 € bruts par retraité) multiplié par le nombre de retraités redonne exactement les <span data-ch="non_contributif">145</span> Md€ non contributifs du Mondrian. Équation : couvert par les cotisations = taux × ratio cotisants/retraité × salaire brut moyen par tête, avec un salaire brut moyen <b>par tête</b> de <b>2 685 €</b> (assiette moyenne des ≈ 30,6 M de cotisants, calée pour que 28,1 % × masse salariale = 277 Md€). Le nombre de retraités d'une année = cotisants (≈ stables) ÷ ratio cotisants/retraité (COR). Levier âge : ≈ +0,06 cotisant par retraité par année de report (estimation)&nbsp;; natalité +0,2 enfant par femme : +0,1 seulement après 2050. Le niveau « scénario COR » applique la baisse de la pension relative que le COR projette avec l'indexation sur les prix (54,6 % du revenu d'activité moyen en 2025 → ≈ 49,7 % en 2050, 45,3 % en 2070) : −9 % en 2050. <b>Les quatre parts</b> du résultat sont calculées par rapport à la situation de référence (28,1 %, 64 ans, pension d'aujourd'hui) : part « cotisants » = supplément financé par la hausse du taux, « futurs retraités » = supplément financé par le report d'âge, « retraités » = baisse de la pension, « pris ailleurs » = l'écart restant, comblé comme aujourd'hui par les impôts, la dette et les budgets des ministères. Tout est en euros d'aujourd'hui, sans gain de productivité : la mission « la même pension qu'aujourd'hui » suppose que les pensions suivent les salaires, ce que l'indexation sur les prix ne fait pas — d'où le niveau COR.</li>
         <li><b>Une pension relative plus basse ne veut pas dire un niveau de vie plus bas</b> : en moyenne, les retraités vivent au niveau des actifs, ou mieux — très majoritairement propriétaires de leur logement, moins de dettes et de frais (COR : niveau de vie relatif ≈ 97 %, ≈ 105 % en comptant le logement possédé). Le pourcentage mesure un flux de revenu, pas un niveau de vie.</li>
         <li>Non modélisés : plafonds, minimum contributif, redistribution, carrières hachées, fonction publique et régimes spéciaux, réversion. <b>Ordres de grandeur pédagogiques, pas un droit à pension.</b></li>
         <li>Sources : <a href="https://www.cor-retraites.fr/">COR, rapport annuel juin 2026</a> · <a href="https://www.insee.fr/fr/statistiques/2416631">INSEE, espérance de vie</a> · <a href="https://www.cor-retraites.fr/sites/default/files/2019-06/doc-3731.pdf">Dubois &amp; Marino (INSEE), taux de récupération par génération, 2016</a> · <a href="https://x.com/sc_cath/status/1955025559919980629">S. Catherine</a> · <a href="https://docs.google.com/spreadsheets/d/1VMvwlbG37IsAkWsQ--E-q1GeYnc1FvwKW2ew6dn0abU/">tableur de travail</a>.</li>
@@ -300,7 +300,7 @@
       <a href="../sankey.html#signaler">signalée</a>.</p>
   </footer>
 
-  <script src="simulateur.js?v=20260921r"></script>
-  <script src="../lexique.js?v=20260921r"></script>
+  <script src="simulateur.js?v=20260921w"></script>
+  <script src="../lexique.js?v=20260921w"></script>
 </body>
 </html>

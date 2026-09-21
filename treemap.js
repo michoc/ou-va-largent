@@ -188,9 +188,15 @@
   /* ============ étiquettes : wrap au mot ============ */
   // ECharts césure en plein mot (« Administr/ation ») : on replie NOUS-MÊMES
   // aux espaces (lignes ≤ 13 caractères), l'ellipsis ne gère que le reliquat.
+  // sur téléphone, les mots trop longs pour une tuile sont coupés à un endroit
+  // lisible (plutôt que tronqués « Enseigne… » ou brisés « Enseignemen/t »)
+  const HYPH = { "Enseignement": "Enseigne-\nment", "Administration": "Adminis-\ntration", "Collectivités": "Collecti-\nvités",
+                 "Solidarités,": "Solida-\nrités,", "territoriales": "territo-\nriales", "agriculture": "agri-\nculture",
+                 "investissements": "investis-\nsements", "européenne": "euro-\npéenne", "Déséquilibre": "Déséqui-\nlibre",
+                 "cotisations": "cotisa-\ntions", "Financement": "Finance-\nment", "complémentaires": "complé-\nmentaires" };
   function wrapMot(name, max) {
-    max = max || 13;
-    const mots = String(name).split(" ");
+    max = max || (isPhone() ? 11 : 13);
+    const mots = String(name).split(" ").map((m) => (isPhone() && m.length > max && HYPH[m]) ? HYPH[m] : m);
     const lignes = [];
     let cur = "";
     mots.forEach((m) => {
@@ -929,8 +935,8 @@
     const pop = (((DATA.meta || {}).chiffres || {}).population_france || {}).millions;
     const hab = pop ? Math.round(c.depenses_totales * 1000 / pop / 10) * 10 : null;
     document.getElementById("statband").innerHTML =
-      "<b>" + fmt(c.depenses_totales) + " Md€</b> de dépenses publiques en " + (DATA.meta || {}).exercice +
-      (hab ? '<span class="sep">·</span><b>' + fmt0(hab) + " €</b> par habitant" : "");
+      '<span class="stat"><b>' + fmt(c.depenses_totales) + " Md€</b> de dépenses publiques en " + (DATA.meta || {}).exercice + "</span>" +
+      (hab ? '<span class="sep">·</span><span class="stat"><b>' + fmt0(hab) + " €</b> par habitant</span>" : "");
     cur = { name: "Ensemble des dépenses publiques", court: "l'ensemble des dépenses publiques",
             value: c.depenses_totales, color: "#5C7FB8" };
 
@@ -973,7 +979,7 @@
         // reste libre pour le badge « part retraites » du mode ② (plus de collision)
         label: { show: true, position: "insideTop", padding: [4, 0, 0, 0],
           formatter: (p) => wrapMot(p.name) + "\n" + fmt(p.value) + " Md€",
-          fontSize: 12, fontWeight: 700, overflow: "truncate", ellipsis: "…" },
+          fontSize: isPhone() ? 11 : 12, fontWeight: 700, overflow: "truncate", ellipsis: "…" },
         // ⚠ l'upperLabel HÉRITE du label : formatter une-ligne explicite sinon
         // les noms de groupes n'affichent que la 1re ligne du wrap
         upperLabel: { show: true, height: 22, fontSize: 12, fontWeight: 700, color: "#1E2430",
