@@ -1,0 +1,376 @@
+/* ==========================================================================
+ * ANNOTER — le mode commentaire de l'auteur. INVISIBLE pour les lecteurs :
+ * le fichier n'est même pas téléchargé tant que le mode n'est pas activé
+ * (chargeur en une ligne à la fin de chaque page).
+ * --------------------------------------------------------------------------
+ * ACTIVER   : ajouter ?annoter à n'importe quelle URL du site (une seule fois :
+ *             le mode suit ensuite la navigation, drapeau dans localStorage).
+ * COMMENTER : ⌥/Alt + clic sur n'importe quel élément — ou le bouton
+ *             « + Commenter » du panneau puis un clic (tactile).
+ * RELIRE    : le panneau liste tout, « ↗ » ramène à l'endroit commenté.
+ * SORTIR    : « Copier pour Claude » → une liste markdown à coller dans le
+ *             chat ; « Quitter » désactive le mode (les notes sont gardées).
+ *
+ * Chaque note retient : la page, l'état du graphique (lecture ①②③, plongée,
+ * temps du fil, hash), un sélecteur CSS de l'élément, son texte visible, la
+ * largeur d'écran et la date. Zéro réseau, zéro compte : tout reste dans le
+ * navigateur (localStorage, donc par appareil et par origine).
+ * ========================================================================== */
+
+(function () {
+  "use strict";
+
+  const QS = new URLSearchParams(location.search);
+  if (QS.has("embed")) return;          // la scène du fil : on annote le cadre, pas son contenu
+
+  const FLAG = "ovlap.annoter", KEY = "ovlap.annotations";
+  const LS = {
+    get: (k) => { try { return localStorage.getItem(k); } catch (e) { return null; } },
+    set: (k, v) => { try { localStorage.setItem(k, v); } catch (e) { /* navigation privée */ } },
+    del: (k) => { try { localStorage.removeItem(k); } catch (e) { /* navigation privée */ } },
+  };
+
+  if (QS.has("annoter")) {
+    const v = (QS.get("annoter") || "").toLowerCase();
+    if (v === "0" || v === "off" || v === "non") {
+      LS.del(FLAG);
+      location.replace(location.pathname + location.hash);
+      return;
+    }
+    LS.set(FLAG, "1");
+  }
+  if (LS.get(FLAG) !== "1") return;
+
+  /* ---------- données ---------- */
+  const load = () => { try { return JSON.parse(LS.get(KEY) || "[]"); } catch (e) { return []; } };
+  const save = (a) => LS.set(KEY, JSON.stringify(a));
+  let notes = load();
+  let armed = false, pending = null;
+
+  const esc = (s) => String(s == null ? "" : s).replace(/[&<>"]/g,
+    (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+  const clean = (s) => String(s || "").replace(/\s+/g, " ").trim();
+
+  /* ---------- contexte : où en est le lecteur ---------- */
+  function pageName() {
+    const f = (location.pathname.split("/").pop() || "index.html").toLowerCase();
+    return f.indexOf("sankey") === 0 ? "Les flux"
+      : f.indexOf("treemap") === 0 ? "Les masses"
+      : f.indexOf("simulateur") === 0 ? "Le labo"
+      : "Le fil";
+  }
+  const MODES = { officiel: "① ce qu'on montre", revele: "② ce qui s'y cache", realite: "③ ce que ça coûte vraiment" };
+  function etatOf() {
+    const bits = [];
+    const mode = document.body.dataset.mode;
+    if (mode) bits.push(MODES[mode] || mode);
+    const crumb = document.querySelector('#tm-crumb .tm-crumb-item[aria-current], .breadcrumb .crumb[aria-current]');
+    if (crumb && clean(crumb.textContent) && clean(crumb.textContent) !== "Vue d'ensemble") bits.push("plongée " + clean(crumb.textContent));
+    const rail = document.querySelector(".fil-rail a.is-current span");
+    if (rail) bits.push("temps « " + clean(rail.textContent) + " »");
+    const acte = document.querySelector(".labo-crumb a.is-current");
+    if (acte) bits.push(clean(acte.textContent));
+    if (location.hash && location.hash.length > 1) bits.push(location.hash);
+    return bits.join(" · ");
+  }
+
+  /* ---------- cibles : le plus petit bloc de sens sous le curseur ---------- */
+  const CIBLES = "p,li,h1,h2,h3,h4,figure,table,tr,button,a,label,summary,output," +
+    ".fil-svg,#chart,#treemap,#sim-chart,#balance-svg,.gen-card,.levier,.vie-col,.mini,.stage-panel," +
+    ".histo-card,.these-banner,.mode-step,.temps-exergue,.fil-tool,.verdict,.resultat,.mission,section";
+  const cibleDe = (el) => (el && el.closest ? el.closest(CIBLES) || el : el);
+
+  function selectorFor(el) {
+    if (!el || el === document.body) return "body";
+    const parts = [];
+    let cur = el;
+    while (cur && cur !== document.body && parts.length < 4) {
+      if (cur.id) { parts.unshift("#" + cur.id); break; }
+      if (cur.dataset && cur.dataset.ch) { parts.unshift('[data-ch="' + cur.dataset.ch + '"]'); break; }
+      let s = cur.tagName.toLowerCase();
+      const cls = typeof cur.className === "string"
+        ? cur.className.trim().split(/\s+/).filter((c) => c && !/^(is-|on$|open$)/.test(c))[0] : null;
+      if (cls) s += "." + cls;
+      const sibs = cur.parentElement ? [].filter.call(cur.parentElement.children, (x) => x.tagName === cur.tagName) : [];
+      if (sibs.length > 1) s += ":nth-of-type(" + (sibs.indexOf(cur) + 1) + ")";
+      parts.unshift(s);
+      cur = cur.parentElement;
+    }
+    return parts.join(" > ");
+  }
+
+  /* ---------- styles (injectés : style.css reste celui des lecteurs) ---------- */
+  const css = document.createElement("style");
+  css.textContent = `
+  #annoter-ui, #annoter-pins { font: 13px/1.5 var(--sans, system-ui); }
+  #annoter-pins { position: absolute; inset: 0 auto auto 0; z-index: 9000; pointer-events: none; }
+  .annoter-pin { position: absolute; z-index: 9000; width: 22px; height: 22px; border-radius: 50%;
+    background: #C13B55; color: #fff; font: 700 11px/22px var(--sans, system-ui); text-align: center;
+    box-shadow: 0 2px 6px rgba(30,36,48,.35); pointer-events: auto; cursor: pointer; transform: translate(-50%, -50%); }
+  .annoter-pin:hover { background: #8E1B38; }
+  body.annoter-armed, body.annoter-alt { cursor: crosshair; }
+  body.annoter-armed .annoter-hi, body.annoter-alt .annoter-hi {
+    outline: 2px solid #C13B55 !important; outline-offset: 2px; background: rgba(193,59,85,.06) !important; }
+  #annoter-tip { position: fixed; z-index: 9100; background: #FFF; color: #1E2430; border: 1px solid #1E2430;
+    border-radius: 10px; box-shadow: 0 10px 30px rgba(30,36,48,.25); padding: 10px; width: 300px; max-width: calc(100vw - 24px); }
+  #annoter-tip p { margin: 0 0 6px; font-size: 11px; color: #4A5265; }
+  #annoter-tip textarea { width: 100%; height: 76px; box-sizing: border-box; font: 13px/1.45 var(--sans, system-ui);
+    border: 1px solid #E4DCCB; border-radius: 6px; padding: 7px; resize: vertical; color: #1E2430; background: #FFF; }
+  #annoter-tip .row { display: flex; gap: 8px; justify-content: flex-end; margin-top: 8px; }
+  #annoter-ui { position: fixed; right: 14px; bottom: 14px; z-index: 9200; max-width: min(380px, calc(100vw - 28px)); }
+  #annoter-open { display: flex; align-items: center; gap: 7px; background: #1E2430; color: #FFF; border: 0;
+    border-radius: 999px; padding: 10px 15px; font: 700 13px/1 var(--sans, system-ui); cursor: pointer;
+    box-shadow: 0 4px 16px rgba(30,36,48,.3); }
+  #annoter-open b { background: #C13B55; border-radius: 999px; padding: 2px 7px; font-size: 11px; }
+  #annoter-panel { display: none; background: #FFF; color: #1E2430; border: 1px solid #1E2430; border-radius: 12px;
+    box-shadow: 0 12px 40px rgba(30,36,48,.28); overflow: hidden; }
+  #annoter-ui.open #annoter-panel { display: block; }
+  #annoter-ui.open #annoter-open { display: none; }
+  #annoter-panel header { display: flex; align-items: center; justify-content: space-between; gap: 8px;
+    padding: 9px 12px; border-bottom: 1px solid #E4DCCB; background: #FAF6EF; }
+  #annoter-panel header b { font: 700 12px/1 var(--sans, system-ui); letter-spacing: .08em; text-transform: uppercase; }
+  #annoter-list { max-height: min(46vh, 420px); overflow: auto; margin: 0; padding: 0; list-style: none; }
+  #annoter-list li { border-bottom: 1px solid #E4DCCB; padding: 9px 12px; display: grid; grid-template-columns: 22px 1fr auto auto; gap: 6px; align-items: start; }
+  #annoter-list .n { width: 20px; height: 20px; border-radius: 50%; background: #C13B55; color: #fff;
+    font: 700 11px/20px var(--sans, system-ui); text-align: center; }
+  #annoter-list .ctx { font-size: 11px; color: #4A5265; }
+  #annoter-list .txt { font-size: 13px; }
+  #annoter-list .vide { color: #4A5265; font-style: italic; }
+  #annoter-panel footer { display: flex; flex-wrap: wrap; gap: 6px; padding: 9px 12px; border-top: 1px solid #E4DCCB; background: #FAF6EF; }
+  .annoter-btn { font: 700 12px/1 var(--sans, system-ui); border-radius: 999px; padding: 8px 12px; cursor: pointer;
+    border: 1px solid #C13B55; background: #FFF; color: #C13B55; }
+  .annoter-btn:hover { background: #C13B55; color: #FFF; }
+  .annoter-btn.ghost { border-color: #E4DCCB; color: #4A5265; }
+  .annoter-btn.ghost:hover { background: #1E2430; border-color: #1E2430; color: #FFF; }
+  .annoter-btn.on { background: #C13B55; color: #FFF; }
+  .annoter-mini { border: 0; background: none; cursor: pointer; color: #4A5265; font-size: 14px; padding: 0 3px; }
+  .annoter-mini:hover { color: #C13B55; }
+  #annoter-toast { position: fixed; left: 50%; bottom: 22px; transform: translateX(-50%); z-index: 9300;
+    background: #1E2430; color: #FFF; border-radius: 999px; padding: 9px 16px; font: 700 13px/1 var(--sans, system-ui); }
+  @media (max-width: 640px) {
+    #annoter-ui { left: 10px; right: 10px; bottom: 10px; max-width: none; }
+    #annoter-list { max-height: 40vh; }
+  }`;
+  document.head.appendChild(css);
+
+  /* ---------- interface ---------- */
+  const ui = document.createElement("div");
+  ui.id = "annoter-ui";
+  ui.innerHTML =
+    '<button type="button" id="annoter-open">Commentaires <b id="annoter-count">0</b></button>' +
+    '<div id="annoter-panel">' +
+      '<header><b>Mode commentaire</b><span>' +
+        '<button type="button" class="annoter-mini" id="annoter-close" title="Réduire">▾</button></span></header>' +
+      '<ul id="annoter-list"></ul>' +
+      '<footer>' +
+        '<button type="button" class="annoter-btn" id="annoter-arm">+ Commenter</button>' +
+        '<button type="button" class="annoter-btn" id="annoter-copy">Copier pour Claude</button>' +
+        '<button type="button" class="annoter-btn ghost" id="annoter-clear">Tout effacer</button>' +
+        '<button type="button" class="annoter-btn ghost" id="annoter-quit">Quitter le mode</button>' +
+      "</footer></div>";
+  document.body.appendChild(ui);
+  const pins = document.createElement("div");
+  pins.id = "annoter-pins";
+  document.body.appendChild(pins);
+
+  const $ = (id) => document.getElementById(id);
+  const toast = (txt) => {
+    const t = document.createElement("div");
+    t.id = "annoter-toast"; t.textContent = txt;
+    document.body.appendChild(t);
+    setTimeout(() => t.remove(), 1800);
+  };
+
+  /* ---------- épingles ---------- */
+  function ici(n) { return n.url.split("#")[0] === location.href.split("#")[0].split("?")[0] || n.page === pageName(); }
+  function placePins() {
+    pins.innerHTML = "";
+    notes.forEach((n, i) => {
+      if (!ici(n)) return;
+      let el = null;
+      try { el = document.querySelector(n.sel); } catch (e) { el = null; }
+      if (!el) return;
+      const r = el.getBoundingClientRect();
+      if (!r.width && !r.height) return;
+      const p = document.createElement("button");
+      p.type = "button"; p.className = "annoter-pin"; p.textContent = i + 1;
+      p.title = n.note;
+      p.style.left = (r.right + window.scrollX - 6) + "px";
+      p.style.top = (r.top + window.scrollY + 8) + "px";
+      p.addEventListener("click", (e) => { e.stopPropagation(); ouvrir(); surligner(i); });
+      pins.appendChild(p);
+    });
+  }
+  let raf = 0;
+  const replace = () => { if (raf) return; raf = requestAnimationFrame(() => { raf = 0; placePins(); }); };
+  window.addEventListener("scroll", replace, { passive: true });
+  window.addEventListener("resize", replace);
+
+  /* ---------- liste ---------- */
+  function render() {
+    $("annoter-count").textContent = notes.length;
+    const list = $("annoter-list");
+    if (!notes.length) { list.innerHTML = '<li><span></span><span class="vide">Aucun commentaire. ⌥/Alt + clic sur un élément, ou « + Commenter ».</span><span></span><span></span></li>'; placePins(); return; }
+    list.innerHTML = notes.map((n, i) =>
+      '<li data-i="' + i + '"><span class="n">' + (i + 1) + "</span>" +
+      '<span><span class="ctx">' + esc(n.page) + (n.etat ? " · " + esc(n.etat) : "") + " · " + esc(n.vw) + "&nbsp;px</span><br>" +
+      '<span class="txt">' + esc(n.note) + "</span>" +
+      (n.texte ? '<br><span class="ctx">sur : « ' + esc(n.texte.slice(0, 70)) + (n.texte.length > 70 ? "…" : "") + " »</span>" : "") +
+      "</span>" +
+      '<button type="button" class="annoter-mini" data-go="' + i + '" title="Aller voir">↗</button>' +
+      '<button type="button" class="annoter-mini" data-del="' + i + '" title="Supprimer">✕</button></li>').join("");
+    placePins();
+  }
+  function surligner(i) {
+    const li = document.querySelector('#annoter-list li[data-i="' + i + '"]');
+    if (!li) return;
+    li.scrollIntoView({ block: "nearest" });
+    li.style.background = "#FDF3D6";
+    setTimeout(() => { li.style.background = ""; }, 1200);
+  }
+  const ouvrir = () => ui.classList.add("open");
+
+  /* ---------- capture ---------- */
+  let hi = null;
+  function setHi(el) {
+    if (hi === el) return;
+    if (hi) hi.classList.remove("annoter-hi");
+    hi = el;
+    if (hi) hi.classList.add("annoter-hi");
+  }
+  document.addEventListener("pointermove", (e) => {
+    if (!armed && !document.body.classList.contains("annoter-alt")) { setHi(null); return; }
+    if (e.target.closest("#annoter-ui, #annoter-tip, .annoter-pin")) { setHi(null); return; }
+    setHi(cibleDe(e.target));
+  }, true);
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Alt") document.body.classList.add("annoter-alt");
+    if (e.key === "Escape") { fermerTip(); desarmer(); }
+  });
+  document.addEventListener("keyup", (e) => {
+    if (e.key === "Alt") { document.body.classList.remove("annoter-alt"); setHi(null); }
+  });
+  window.addEventListener("blur", () => { document.body.classList.remove("annoter-alt"); setHi(null); });
+
+  document.addEventListener("click", (e) => {
+    if (e.target.closest("#annoter-ui, #annoter-tip, .annoter-pin")) return;
+    if (!armed && !e.altKey) return;
+    e.preventDefault(); e.stopPropagation();
+    const el = cibleDe(e.target);
+    setHi(null); desarmer();
+    ouvrirTip(el, e.clientX, e.clientY);
+  }, true);
+
+  function desarmer() { armed = false; document.body.classList.remove("annoter-armed"); $("annoter-arm").classList.remove("on"); }
+  function armer() { armed = true; document.body.classList.add("annoter-armed"); $("annoter-arm").classList.add("on"); ui.classList.remove("open"); }
+
+  /* ---------- bulle de saisie ---------- */
+  function fermerTip() { if (pending) { pending.remove(); pending = null; } }
+  function ouvrirTip(el, x, y) {
+    fermerTip();
+    const contexte = clean(el.textContent).slice(0, 120) || el.getAttribute("aria-label") || el.id || el.tagName.toLowerCase();
+    const tip = document.createElement("div");
+    tip.id = "annoter-tip";
+    tip.innerHTML = '<p>' + esc(pageName()) + (etatOf() ? " · " + esc(etatOf()) : "") + "<br>sur : « " +
+      esc(contexte.slice(0, 70)) + (contexte.length > 70 ? "…" : "") + " »</p>" +
+      '<textarea placeholder="Ce qui ne va pas, ou ce qu\'il faut changer…"></textarea>' +
+      '<div class="row"><button type="button" class="annoter-btn ghost" data-a="x">Annuler</button>' +
+      '<button type="button" class="annoter-btn" data-a="ok">Ajouter</button></div>';
+    document.body.appendChild(tip);
+    pending = tip;
+    const w = tip.offsetWidth, h = tip.offsetHeight;
+    tip.style.left = Math.max(8, Math.min(x - w / 2, window.innerWidth - w - 8)) + "px";
+    tip.style.top = Math.max(8, Math.min(y + 14, window.innerHeight - h - 8)) + "px";
+    const ta = tip.querySelector("textarea");
+    ta.focus();
+    const valider = () => {
+      const txt = ta.value.trim();
+      if (!txt) { fermerTip(); return; }
+      notes.push({ ts: Date.now(), page: pageName(), url: location.href, etat: etatOf(),
+        sel: selectorFor(el), texte: contexte, note: txt, vw: window.innerWidth });
+      save(notes); fermerTip(); render(); ouvrir();
+      toast("Commentaire " + notes.length + " ajouté");
+    };
+    ta.addEventListener("keydown", (ev) => {
+      if (ev.key === "Enter" && (ev.metaKey || ev.ctrlKey)) valider();
+      if (ev.key === "Escape") fermerTip();
+    });
+    tip.addEventListener("click", (ev) => {
+      const a = ev.target.getAttribute("data-a");
+      if (a === "ok") valider();
+      if (a === "x") fermerTip();
+    });
+  }
+
+  /* ---------- export ---------- */
+  function markdown() {
+    const d = new Date().toLocaleDateString("fr-FR");
+    const lignes = notes.map((n, i) =>
+      (i + 1) + ". **" + n.page + "**" + (n.etat ? " · " + n.etat : "") + " — " + n.vw + " px\n" +
+      "   élément : `" + n.sel + "`" + (n.texte ? ' — « ' + n.texte.slice(0, 80) + (n.texte.length > 80 ? "…" : "") + " »" : "") + "\n" +
+      "   > " + n.note.replace(/\n/g, "\n   > "));
+    return "## " + notes.length + " commentaire" + (notes.length > 1 ? "s" : "") +
+      " sur le site — " + d + "\n\n" + lignes.join("\n\n") + "\n";
+  }
+
+  /* ---------- actions du panneau ---------- */
+  $("annoter-open").addEventListener("click", ouvrir);
+  $("annoter-close").addEventListener("click", () => ui.classList.remove("open"));
+  $("annoter-arm").addEventListener("click", () => (armed ? desarmer() : armer()));
+  function copier(txt) {
+    const ok = () => toast("Copié — coller dans le chat");
+    const repli = () => {
+      const ta = document.createElement("textarea");
+      ta.value = txt; ta.style.cssText = "position:fixed;left:-9999px";
+      document.body.appendChild(ta); ta.select();
+      let fait = false;
+      try { fait = document.execCommand("copy"); } catch (e) { fait = false; }
+      ta.remove();
+      if (fait) ok(); else window.prompt("Copier :", txt);
+    };
+    if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(txt).then(ok, repli);
+    else repli();
+  }
+  $("annoter-copy").addEventListener("click", () => {
+    if (!notes.length) { toast("Aucun commentaire"); return; }
+    copier(markdown());
+  });
+  $("annoter-clear").addEventListener("click", () => {
+    if (!notes.length || !window.confirm("Effacer les " + notes.length + " commentaires ?")) return;
+    notes = []; save(notes); render(); toast("Effacés");
+  });
+  $("annoter-quit").addEventListener("click", () => {
+    LS.del(FLAG);
+    location.replace(location.pathname + location.hash);
+  });
+  $("annoter-list").addEventListener("click", (e) => {
+    const del = e.target.getAttribute("data-del"), go = e.target.getAttribute("data-go");
+    if (del != null) { notes.splice(+del, 1); save(notes); render(); return; }
+    if (go != null) {
+      const n = notes[+go];
+      if (!ici(n)) { location.href = n.url; return; }
+      let el = null;
+      try { el = document.querySelector(n.sel); } catch (err) { el = null; }
+      if (!el) { toast("Élément introuvable dans cet état"); return; }
+      el.scrollIntoView({ behavior: "smooth", block: "center" });
+      el.classList.add("annoter-hi");
+      setTimeout(() => el.classList.remove("annoter-hi"), 1600);
+    }
+  });
+
+  // le fil a une barre de points fixée en bas sous 1280 px : on remonte le panneau
+  function caler() {
+    const rail = document.querySelector(".fil-rail");
+    const bas = rail && window.innerWidth <= 1280 && getComputedStyle(rail).position === "fixed"
+      ? Math.round(rail.getBoundingClientRect().height) + 12 : 14;
+    ui.style.bottom = bas + "px";
+  }
+  caler();
+  window.addEventListener("resize", caler);
+
+  render();
+  // les graphiques se redessinent après le chargement des données : on repositionne
+  setTimeout(placePins, 900);
+  setTimeout(placePins, 2500);
+  window.addEventListener("hashchange", () => setTimeout(placePins, 400));
+})();
